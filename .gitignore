@@ -38,3 +38,8 @@ desktop.ini
 .commitmsg.tmp
 shot-*.png
 
+
+# local verification scripts
+scripts/verify-live.mjs
+scripts/probe.mjs
+
