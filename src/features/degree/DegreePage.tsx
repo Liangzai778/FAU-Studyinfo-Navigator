@@ -327,7 +327,16 @@ export function DegreePage() {
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{academicDataSummary.dataReleaseId}</span>
         </div>
         {activeRules.length === 0 ? (
-          <EmptyState title={t('degree.emptyTitle')} body={t('degree.emptyBody')} badge={t('common.unknown')} />
+          // Three different situations reach this branch, and saying "no verified
+          // rules" for all of them would be wrong. A student who picked a
+          // programme and PO is looking at a version that simply has no
+          // transcribed module table, and telling them nothing is verified would
+          // read as "your selection did not save".
+          <EmptyState
+            title={t(activePo ? 'degree.poTemplateOnlyTitle' : 'degree.emptyTitle')}
+            body={t(activePo ? 'degree.poTemplateOnlyBody' : 'degree.emptyBody')}
+            badge={t('common.unknown')}
+          />
         ) : (
           <div className="grid gap-4 md:grid-cols-2" data-testid="rule-cards">
             {activeRules

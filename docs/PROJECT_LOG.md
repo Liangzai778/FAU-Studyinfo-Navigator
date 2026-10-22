@@ -4,7 +4,8 @@
 > 项目路径：`D:\dev\FAU-Study-Navigator`（原 `C:\dev\FAU-Study-Navigator`，已迁移）
 > 线上地址：https://fau-studyinfo-navigator.pages.dev
 > 仓库：https://github.com/tommy2345-art/FAU-Studyinfo-Navigator（私有）
-> 当前提交：`c7595a6` — Put FAUmail on the dashboard and in the resource list
+> 当前提交：`d502b91` — Refresh the project log after adding FAUmail
+> 另有未提交改动：修复 2019 PO 空状态误导（见第十节）
 
 ---
 
@@ -323,6 +324,24 @@ npm run preview      # 本地预览生产构建
 
 用户影响：非生物系学生点进去会看到空白，不报错但看起来像网站没做完。
 
+### 5.1.1 已录入但不完整的 PO 版本
+
+`FPO BAMA Bio 2019`（细胞与分子生物学旧版条例）在数据包里**存在**，但**没有任何要求组**：
+
+| 字段 | 值 |
+|---|---|
+| `id` | `po-zmb-2019` |
+| `entrySemesterFrom` | `null` |
+| `entrySemesterUntil` | `2026-summer` |
+| `verificationStatus` | `needs_review` |
+| `applicabilityNotes` | 明确写「本工具未逐条录入该版模块表」 |
+
+含义：**2026 夏季及之前入学的老生会正常匹配到这个 PO**，选中后看到的是「此 PO 版本尚未逐条录入」的提示，而不是模块清单。
+
+这是已知且有意保留的缺口，不是 bug。要补齐需回溯 2019 版考试条例 PDF 并重新走一遍深度录入工序。
+
+注意：`po-zmb-2019` 与 `po-zmb-2026` 同时挂在同一个专业下，入学期决定匹配哪个 —— 2026 冬季及之后 → 2026 版；之前 → 2019 版。两条路径均已实测正确。
+
 ### 5.2 HTTP 状态码问题
 
 `/degree`、`/planner`、`/exams` 等子路径**渲染正常**，但返回 HTTP **404** 而不是 200。
@@ -520,6 +539,26 @@ D:\dev\FAU-Study-Navigator\
 
 **教训**：复杂脚本写成 `.cjs` / `.mjs` 文件执行，不要在命令行内联。
 
+### 9.4 探测脚本漏填字段导致误判「功能坏了」
+
+排查「细胞与分子生物学专业选不到任何 PO」时，先以为匹配逻辑有 bug。实际是页面有**两个**输入：年份数字框（`input[type=number]`，占位符「入学年份」）和夏/冬下拉。探测脚本只填了下拉、没填年份，`entrySemesterId` 拼出来是 `-winter`，正则不匹配，自然返回空。
+
+补上 2025 后一切正常：2026 冬季 → `po-zmb-2026`；2024/2025 入学 → `po-zmb-2019`。
+
+**教训**：报「功能坏了」之前，先确认探测脚本把所有必填项都填了。表现是「永远为空」而不是「部分错误」时，优先怀疑输入不完整。
+
+### 9.5 FPO BAMA Bio 2019 是空壳，但提示文案误导（已修复）
+
+数据结构上 `po-zmb-2019` **没有任何 requirementGroup**（`groups=0`）。这是**有意为之**：`applicabilityNotes` 写明「本工具未逐条录入该版模块表」，`verificationStatus` 为 `needs_review`。
+
+**但它是个陷阱**：老生（2026 夏季及之前入学）会正确匹配到这个 PO，选中后规则面板显示「尚无已核实的专业规则」—— 这句话语义是错的。专业是核实过的，只是这一版没录模块表。学生会以为自己的选择没保存成功。
+
+**修复**：`DegreePage.tsx` 空状态改为按 `activePo` 分支：
+- 未选专业 → 原通用文案
+- 已选 PO 但无组 → 新增 `degree.poTemplateOnlyTitle/Body`：「此 PO 版本尚未逐条录入……这不代表你的选择无效，也不代表这个版本不存在」
+
+**教训**：空状态文案要区分「没有数据」和「这一项没录」。后者必须明说「你的选择有效」，否则会被当成 bug。
+
 ---
 
 *本文档由项目维护者与 AI 助手共同整理，2026-10-22*
@@ -527,6 +566,37 @@ D:\dev\FAU-Study-Navigator\
 ---
 
 ## 十、变更历史
+
+### 2026-10-22 · 关机前检查：修复 2019 PO 空状态误导（未发布）
+
+**发现问题**：`FPO BAMA Bio 2019` 无要求组，选中后规则面板显示「尚无已核实的专业规则」。这句话语义错误 —— 专业已核实，只是这一版没录模块表。学生会以为自己的选择没保存。
+
+**改动**：
+
+| 文件 | 改动 |
+|---|---|
+| `src/features/degree/DegreePage.tsx` | 空状态按 `activePo` 分支渲染 |
+| `src/i18n/messages.ts` | 新增 `degree.poTemplateOnlyTitle` / `poTemplateOnlyBody` |
+
+**验证**：typecheck 0 / lint 0 / 单元 32 / 静态 32 / 数据 ALL CHECKS PASSED / build 成功 / 浏览器实测新文案出现、旧文案消失。
+
+**顺带核实的数据事实**（手工统计，与 2.3 节一致）：
+
+| 项目 | 实际值 |
+|---|---|
+| modules | 65 |
+| moduleVersions | 65 |
+| requirementGroups | 15 |
+| academicSources | 17 |
+| programmes | 3 |
+| faculties | 5 |
+| examinationRegulationVersions | **4**（含 2019 空壳） |
+| resourceSeeds | 13 |
+| dataReleaseId | `2026-10-22.2` |
+
+各专业模块数：ZMB 13、ILS 32、整合免疫学 11 —— 与日志一致。
+
+---
 
 ### 2026-10-22 · `c7595a6` 加入 FAUmail
 
