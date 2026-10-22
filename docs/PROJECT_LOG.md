@@ -4,7 +4,7 @@
 > 项目路径：`D:\dev\FAU-Study-Navigator`（原 `C:\dev\FAU-Study-Navigator`，已迁移）
 > 线上地址：https://fau-studyinfo-navigator.pages.dev
 > 仓库：https://github.com/tommy2345-art/FAU-Studyinfo-Navigator（私有）
-> 当前提交：`971238d` — Serve client routes on Cloudflare Pages
+> 当前提交：`c7595a6` — Put FAUmail on the dashboard and in the resource list
 
 ---
 
@@ -48,6 +48,42 @@
 - 用户可添加个人网站与自定义分类（增删改排序）
 - 所有外链强制 HTTPS，`noopener` 安全处理
 - 数据存 `localStorage: fau-study-navigator.resources.v1`
+
+**已收录的官方资源（13 条，按优先级排序）**：
+
+| 优先级 | ID | 名称 | 分类 |
+|---|---|---|---|
+| 10 | `campo` | Campo | 学习 |
+| 20 | `studon` | StudOn | 学习 |
+| 30 | `studon-exam` | StudOn-Exam | 考试 |
+| 40 | `idm` | IdM 身份管理 | 校园服务 |
+| 45 | `faumail` | **FAUmail 邮箱** | 校园服务 |
+| 50 | `library` | FAU 图书馆 | 校园服务 |
+| 60 | `regulations` | 考试条例总入口 | 考试 |
+| 70 | `academic-dates` | 学期重要日期 | 考试 |
+| 80 | `exam-registration-windows` | 考试报名窗口说明 | 考试 |
+| 90 | `module-descriptions-guide` | Campo 模块说明指南 | 学习 |
+| 100 | `study-planner-guide` | Campo 学习规划指南 | 学习 |
+| 110 | `first-year-faq` | 新生 FAQ | 校园服务 |
+| 120 | `faculties-overview` | FAU 五学院概览 | 学院 |
+
+### 2.2.1 首页「常用入口」区块（2026-10-22 新增）
+
+学生每天必开的三个服务直接放在首页，不必先进资源页：
+
+| 入口 | 地址 | 说明 |
+|---|---|---|
+| FAUmail 邮箱 | `https://faumail.fau.de` | 学校通知、考试与课程邮件 |
+| Campo | `https://campo.fau.de` | 选课、成绩与考试报名 |
+| StudOn | `https://www.studon.fau.de` | 课程资料与学习小组 |
+
+- 全部 `target="_blank"` + `rel="noopener noreferrer"`
+- 区块说明文字明确写出「本工具不会读取你的登录信息」
+- FAUmail 未放入左侧主菜单：主菜单是站内功能页，FAUmail 是跳出的外部站点，
+  混排会让学生分不清哪些会离开应用
+
+**地址核实方式**：未凭印象填写。从 FAU 官方词汇表 `https://www.fau.de/glossary/webmail/`
+抓取链接得出实际 Webmail 地址为 `faumail.fau.de`，来源标注指向该官方说明页。
 
 ### 2.3 学术数据模型（P2/P3 重点）
 
@@ -456,6 +492,9 @@ D:\dev\FAU-Study-Navigator\
 | 2026-10-22 | 部署从 GitHub Pages 改 Cloudflare Pages | 私有仓库 + 免费账号不支持 Pages |
 | 2026-10-22 | 项目从 C 盘迁移到 D 盘 | 用户要求 |
 | 2026-10-22 | 删除 G 盘两个备份快照 | 代码已在 GitHub，快照冗余 |
+| 2026-10-22 | FAUmail 加入资源清单，优先级 45 | 邮箱随 IdM 激活后开通，两者实际连用 |
+| 2026-10-22 | 首页新增「常用入口」三张卡 | 每天要用的服务不该先经过资源页 |
+| 2026-10-22 | FAUmail 不进左侧主菜单 | 主菜单是站内功能，外部站点混入会误导 |
 
 ---
 
@@ -484,3 +523,83 @@ D:\dev\FAU-Study-Navigator\
 ---
 
 *本文档由项目维护者与 AI 助手共同整理，2026-10-22*
+
+---
+
+## 十、变更历史
+
+### 2026-10-22 · `c7595a6` 加入 FAUmail
+
+**改动文件**：
+
+| 文件 | 改动 |
+|---|---|
+| `src/data/resources.ts` | 新增 `faumail` 资源条目，优先级 45，分类 `services` |
+| `src/components/common/Icon.tsx` | 新增 `mail` 图标（信封） |
+| `src/features/dashboard/DashboardPage.tsx` | 新增「常用入口」区块与 `quickLinks` 常量 |
+| `src/i18n/messages.ts` | 新增 8 个键（中英各 8 条） |
+
+**新增的 i18n 键**：
+
+```
+dashboard.quickLinksTitle
+dashboard.quickLinksBody
+dashboard.quickLinksMail / quickLinksMailBody
+dashboard.quickLinksCampo / quickLinksCampoBody
+dashboard.quickLinksStudOn / quickLinksStudOnBody
+```
+
+**验证结果**：
+
+| 检查 | 结果 |
+|---|---|
+| typecheck | ✅ 0 错误 |
+| lint | ✅ 0 错误 |
+| 单元测试 | ✅ 32/32 |
+| 静态测试 | ✅ 32/32 |
+| 数据校验 | ✅ ALL CHECKS PASSED |
+| 构建 | ✅ 成功 |
+| 本地浏览器实测 | ✅ 三个入口渲染正常，无控制台报错 |
+| 线上实测 | ✅ 已确认生效 |
+
+**线上实测输出**（`fau-studyinfo-navigator.pages.dev`）：
+
+```
+quickLinks: true
+  https://faumail.fau.de      target=_blank  rel=noopener noreferrer
+  https://campo.fau.de        target=_blank  rel=noopener noreferrer
+  https://www.studon.fau.de   target=_blank  rel=noopener noreferrer
+errors: none
+```
+
+---
+
+### 2026-10-22 · `0d94de7` 项目日志初版
+
+创建 `docs/PROJECT_LOG.md`，记录功能、缺口与工序。
+
+### 2026-10-22 · `971238d` Cloudflare Pages 子路由修复
+
+新增 `public/_routes.json`。说明见「九、已知问题」中关于 404 状态码的部分。
+
+### 2026-10-22 · `faf9e7d` GitHub Pages 工作流
+
+`.github/workflows/deploy-pages.yml`。因私有仓库 + 免费账号不支持 Pages，改用 Cloudflare，此工作流保留但未启用。
+
+### 2026-10-22 · `970bf85` ILS 模块手册录入
+
+32 个模块入库，规则面板改为树形渲染。详见 2.4 节。
+
+---
+
+## 十一、下一步待办（按优先级）
+
+| 优先级 | 事项 | 预估工时 |
+|---|---|---|
+| 高 | 补齐自然科学学院 12 个硕士专业骨架 | 1-2 天 |
+| 中 | 修复子路径 HTTP 404 状态码 | 1-2 小时 |
+| 中 | 深度录入 1-2 个用户关心的专业 | 每个 4-8 小时 |
+| 低 | 扩展其他四个学院 | 按学院分批 |
+| 低 | 建立条例版本追踪机制 | 每学期一次 |
+
+详见第六节「期望内容与所需工序」。
