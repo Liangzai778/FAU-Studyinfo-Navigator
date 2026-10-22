@@ -10,6 +10,7 @@ type IconName =
   | 'globe'
   | 'external'
   | 'shield'
+  | 'mail'
   | 'empty';
 
 type IconProps = {
@@ -29,6 +30,7 @@ const paths: Record<IconName, React.ReactNode> = {
   globe: <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0c2.2-2.4 3.4-5.4 3.4-9S14.2 5.4 12 3c-2.2 2.4-3.4 5.4-3.4 9s1.2 6.6 3.4 9ZM3.5 9h17m-17 6h17" />,
   external: <path d="M14 4h6v6m0-6-9 9M10 6H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" />,
   shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Zm-3-10 2 2 4-5" />,
+  mail: <path d="M3 6h18v12H3V6Zm0 1 9 6 9-6" />,
   empty: <path d="M4 7h16v12H4V7Zm3-3h10v3M8 12h8m-5 4h2" />,
 };
 

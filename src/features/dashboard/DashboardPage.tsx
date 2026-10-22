@@ -37,6 +37,35 @@ const actions: Array<{
   },
 ];
 
+// These three are opened daily and are the reason a student keeps the page pinned.
+// Keeping them on the dashboard saves a trip through the resource list, which
+// stays the place for everything rarer.
+const quickLinks: Array<{
+  href: string;
+  icon: 'mail' | 'degree' | 'resources';
+  title: TranslationKey;
+  body: TranslationKey;
+}> = [
+  {
+    href: 'https://faumail.fau.de',
+    icon: 'mail',
+    title: 'dashboard.quickLinksMail',
+    body: 'dashboard.quickLinksMailBody',
+  },
+  {
+    href: 'https://campo.fau.de',
+    icon: 'degree',
+    title: 'dashboard.quickLinksCampo',
+    body: 'dashboard.quickLinksCampoBody',
+  },
+  {
+    href: 'https://www.studon.fau.de',
+    icon: 'resources',
+    title: 'dashboard.quickLinksStudOn',
+    body: 'dashboard.quickLinksStudOnBody',
+  },
+];
+
 export function DashboardPage() {
   const { t } = useTranslation();
   const profile = useAcademicProfileStore((state) => state.profile);
@@ -96,6 +125,35 @@ export function DashboardPage() {
               <h3 className="mt-5 font-semibold text-slate-950 dark:text-white">{t(action.title)}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{t(action.body)}</p>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="quick-links-heading" className="mb-10">
+        <h2 id="quick-links-heading" className="mb-1 text-lg font-semibold text-slate-950 dark:text-white">
+          {t('dashboard.quickLinksTitle')}
+        </h2>
+        <p className="mb-4 text-sm leading-6 text-slate-600 dark:text-slate-300">{t('dashboard.quickLinksBody')}</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {quickLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-sky-300 hover:bg-sky-50/40 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-sky-800 dark:hover:bg-sky-950/30"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-sky-50 text-sky-700 group-hover:bg-sky-100 dark:bg-sky-950 dark:text-sky-300">
+                <Icon name={link.icon} className="h-4 w-4" />
+              </span>
+              <span className="min-w-0">
+                <span className="flex items-center gap-1 font-semibold text-slate-950 dark:text-white">
+                  {t(link.title)}
+                  <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                </span>
+                <span className="mt-1 block text-sm leading-5 text-slate-600 dark:text-slate-300">{t(link.body)}</span>
+              </span>
+            </a>
           ))}
         </div>
       </section>

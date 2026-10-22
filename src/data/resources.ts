@@ -85,6 +85,28 @@ const resourceSeeds: Resource[] = [
     priority: 40,
   },
   {
+    // Students reach for this every day and it sits next to IdM in practice: the
+    // mailbox only exists once the IdM identifier is activated, so the two belong
+    // together in the list.
+    ...commonScope,
+    id: 'faumail',
+    kind: 'official',
+    name: { 'zh-CN': 'FAUmail 邮箱', en: 'FAUmail mailbox' },
+    description: {
+      'zh-CN':
+        '学生邮箱网页版入口。邮箱在 IdM 账号激活后自动开通，学校通知、考试与课程邮件都会寄到这里；本工具不会读取或保存你的登录信息。',
+      en: 'Web mail for your student mailbox. The mailbox opens once your IdM account is activated, and university notices, exam and course mail arrive here. This tool never reads or stores your login details.',
+    },
+    categoryId: 'services',
+    url: 'https://faumail.fau.de',
+    keywords: {
+      'zh-CN': ['邮箱', '邮件', 'FAUmail', 'webmail', '学校通知', '收件箱'],
+      en: ['mail', 'email', 'FAUmail', 'webmail', 'university notices', 'inbox'],
+    },
+    source: prdSource('FAUmail', 'https://www.fau.de/glossary/webmail/'),
+    priority: 45,
+  },
+  {
     ...commonScope,
     id: 'library',
     kind: 'official',
