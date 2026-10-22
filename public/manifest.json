@@ -1,0 +1,10 @@
+/* SPA fallback for static hosts (Cloudflare Pages, Netlify, GitHub Pages).
+   Client-side routes such as /degree must resolve to index.html. */
+{
+  "name": "FAU Study Navigator",
+  "short_name": "FAU Navigator",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a"
+}

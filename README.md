@@ -102,9 +102,33 @@ npm run preview
 
 用户输入的课程、ECTS、考试和任务始终显示为个人数据，不会作为 FAU 官方资料。规则或来源不完整时，毕业条件结果保持 `unknown`；即使全部本地计算条件满足，界面也只显示“可能满足”，并要求以官方文件和 Campo 为准。
 
+## 部署为在线站点
+
+应用是纯静态前端，构建产物在 `dist/`，可部署到任意静态托管。所有用户数据保存在各自浏览器的 IndexedDB / localStorage 中，不会上传到服务器。
+
+构建会自动生成 SPA 回退文件：
+
+- `dist/_redirects`：Cloudflare Pages / Netlify 使用
+- `dist/404.html`：GitHub Pages 使用
+
+### 部署到 GitHub Pages
+
+```bash
+npm run build
+```
+
+将 `dist/` 发布到 `gh-pages` 分支，或在仓库 Settings → Pages 中选择 GitHub Actions 并由 CI 构建。
+
+### 部署到 Cloudflare Pages / Netlify
+
+构建命令 `npm run build`，输出目录 `dist`。两者都支持连接本仓库自动部署。
+
+> 公网部署后，README 顶部的免责声明同样适用于在线版本：本工具与 FAU 无官方隶属关系，所有考试与学分要求以官方文件和 Campo 为准。
+
 ## 已知限制
 
-- 尚无经过人工核实的真实专业、PO、模块或学分要求，因此不能给出正式毕业判断。
+- 已录入 FAU 生物系三个硕士项目（细胞与分子生物学、Integrated Life Sciences、Integrated Immunology）及对应官方来源链接，但**尚无已录模块、ECTS 或 PO 规则**，因此仍不能给出正式毕业判断。
+- 已录入的官方链接标注了核对日期与核实状态；`verified` 仅表示来源页面已核对，不代表规则已转录进本工具。
 - 尚无官方考试日期或报名期限；考试页只显示用户个人填写的数据。
 - 无 FAU 登录、Campo/StudOn 数据读取、考试报名、自动同步或后台通知。
 - JSON 备份暂不包含 localStorage 中的界面偏好和资源导航自定义数据。

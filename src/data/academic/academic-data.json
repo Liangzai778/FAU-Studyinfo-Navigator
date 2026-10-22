@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataReleaseId": "2026-10-22-p3-empty-academic-rules",
+  "dataReleaseId": "2026-10-22-biologie-master-1",
   "createdAt": "2026-10-22",
   "faculties": [
     {
@@ -39,7 +39,66 @@
       }
     }
   ],
-  "programmes": [],
+  "programmes": [
+    {
+      "id": "nat-biologie-zell-molekularbiologie-msc",
+      "facultyId": "nat",
+      "degreeType": "master",
+      "name": {
+        "zh-CN": "细胞与分子生物学（硕士）",
+        "en": "Zell- und Molekularbiologie (M.Sc.)"
+      },
+      "programmeTrackIds": [],
+      "examinationRegulationVersionIds": [],
+      "dataStatus": "partial",
+      "websiteSourceIds": [
+        "fau-bio-master-intro-zmb",
+        "fau-bio-master-admission-zmb",
+        "fau-bio-master-intro-week",
+        "fau-bio-department-study-overview",
+        "fau-nat-faculty-master-list",
+        "fau-master-application-deadlines-pdf"
+      ]
+    },
+    {
+      "id": "nat-biologie-integrated-life-sciences-msc",
+      "facultyId": "nat",
+      "degreeType": "master",
+      "name": {
+        "zh-CN": "整合生命科学：生物学、生物数学与生物物理（硕士）",
+        "en": "Integrated Life Sciences: Biology, Biomathematics and Biophysics (M.Sc.)"
+      },
+      "programmeTrackIds": [],
+      "examinationRegulationVersionIds": [],
+      "dataStatus": "partial",
+      "websiteSourceIds": [
+        "fau-ils-programme-site",
+        "fau-bio-master-intro-week",
+        "fau-bio-department-study-overview",
+        "fau-nat-faculty-master-list",
+        "fau-master-application-deadlines-pdf"
+      ]
+    },
+    {
+      "id": "nat-biologie-integrated-immunology-msc",
+      "facultyId": "nat",
+      "degreeType": "master",
+      "name": {
+        "zh-CN": "整合免疫学（精英硕士项目）",
+        "en": "Integrated Immunology (M.Sc., Elite programme)"
+      },
+      "programmeTrackIds": [],
+      "examinationRegulationVersionIds": [],
+      "dataStatus": "partial",
+      "websiteSourceIds": [
+        "fau-iimmune-programme-site",
+        "fau-bio-master-intro-week",
+        "fau-bio-department-study-overview",
+        "fau-nat-faculty-master-list",
+        "fau-master-application-deadlines-pdf"
+      ]
+    }
+  ],
   "programmeTracks": [],
   "examinationRegulationVersions": [],
   "modules": [],
@@ -65,12 +124,254 @@
       },
       "documentVersion": null,
       "sectionOrPage": null,
-      "lastCheckedAt": "2026-10-21",
+      "lastCheckedAt": "2026-10-22",
       "lastVerifiedAt": null,
       "verificationStatus": "unverified",
       "notes": {
-        "zh-CN": "仅作为用户主动核对的官方导航入口；本地数据包尚未核实任何具体专业或 PO 规则。",
-        "en": "Navigation only for user-led checking; no programme-specific or PO rules are verified in the local package."
+        "zh-CN": "仅作为用户主动核对 PO 的官方导航入口；本地数据包尚未核实任何具体专业的 PO 规则。",
+        "en": "Navigation only for user-led PO checking; no programme-specific PO rules are verified in the local package."
+      }
+    },
+    {
+      "id": "fau-bio-department-study-overview",
+      "title": {
+        "zh-CN": "FAU 生物系学习总览",
+        "en": "FAU Department of Biology – Study overview"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, Department Biologie",
+      "url": "https://www.biologie.nat.fau.de/studium/",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "faculty",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": "Studium",
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": "2026-10-22",
+      "verificationStatus": "verified",
+      "notes": {
+        "zh-CN": "官方页面明确列出生物系开设的硕士项目为：Zell- und Molekularbiologie、Integrated Life Sciences、Integrated Immunology。本数据包的专业清单依据此页面。",
+        "en": "The department page explicitly lists its master programmes: Zell- und Molekularbiologie, Integrated Life Sciences, and Integrated Immunology. The programme list in this package is based on this page."
+      }
+    },
+    {
+      "id": "fau-nat-faculty-master-list",
+      "title": {
+        "zh-CN": "FAU 自然科学学院硕士专业列表",
+        "en": "FAU Faculty of Sciences – Master's programmes list"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, Naturwissenschaftliche Fakultät",
+      "url": "https://www.nat.fau.de/studium/studiengaenge/master/",
+      "documentType": "official_index",
+      "scope": {
+        "level": "faculty",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": "Masterstudiengänge",
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": "2026-10-22",
+      "verificationStatus": "verified",
+      "notes": {
+        "zh-CN": "用于核对授课语言、入学学期与录取方式。该页确认 Integrated Life Sciences 与 Integrated Immunology 为纯英语授课，Zell- und Molekularbiologie 为德语授课。",
+        "en": "Used to cross-check language of instruction, entry semesters, and admission mode. The page confirms ILS and Integrated Immunology are taught entirely in English, while Zell- und Molekularbiologie is taught in German."
+      }
+    },
+    {
+      "id": "fau-bio-master-intro-zmb",
+      "title": {
+        "zh-CN": "细胞与分子生物学硕士项目结构（2025年7月版）",
+        "en": "Structure of the Zell- und Molekularbiologie master programme (July 2025)"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, Department Biologie",
+      "url": "https://www.biologie.nat.fau.de/files/2025/07/Master-ZMB-Einfuehrungsveranst-Juli-2025.pdf",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-zell-molekularbiologie-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "July 2025",
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": null,
+      "verificationStatus": "tentative",
+      "notes": {
+        "zh-CN": "院系发布的课程结构介绍，非具有法律效力的考试条例。具体模块与学分要求仍须以官方 PO 为准。",
+        "en": "Departmental programme-structure handout, not a legally binding examination regulation. Module and credit requirements still follow the official PO."
+      }
+    },
+    {
+      "id": "fau-bio-master-admission-zmb",
+      "title": {
+        "zh-CN": "细胞与分子生物学硕士录取条件",
+        "en": "Admission requirements for the Zell- und Molekularbiologie master programme"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, Department Biologie",
+      "url": "https://www.biologie.nat.fau.de/files/2023/07/Zulassung-ZMB.pdf",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-zell-molekularbiologie-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "July 2023",
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": null,
+      "verificationStatus": "tentative",
+      "notes": {
+        "zh-CN": "录取条件说明文件。链接标注为 2023 年 7 月版，是否仍为现行版本尚未与考试条例交叉核对。",
+        "en": "Admission requirements handout. The link is labelled July 2023; whether it is still the current version has not been cross-checked against the examination regulation."
+      }
+    },
+    {
+      "id": "fau-bio-master-intro-week",
+      "title": {
+        "zh-CN": "生物系硕士项目入学介绍与模块选择说明",
+        "en": "Biology master programmes – introductory week and module allocation"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, Department Biologie",
+      "url": "https://www.biologie.nat.fau.de/masterstudiengaenge/",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "faculty",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-zell-molekularbiologie-msc",
+          "nat-biologie-integrated-life-sciences-msc",
+          "nat-biologie-integrated-immunology-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "Stand SoSe 2026",
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": "2026-10-22",
+      "verificationStatus": "verified",
+      "notes": {
+        "zh-CN": "确认三个硕士项目的入学介绍安排与模块分配机制。ZMB 可通过电子选课系统分配到两个模块位置；ILS 由 Böckmann 教授主持介绍会。",
+        "en": "Confirms introductory arrangements and module allocation for all three master programmes. ZMB students receive two module places via an electronic allocation system; the ILS introduction is hosted by Prof. Böckmann."
+      }
+    },
+    {
+      "id": "fau-iimmune-programme-site",
+      "title": {
+        "zh-CN": "整合免疫学（iImmune）硕士项目官网",
+        "en": "Integrated Immunology (iImmune) master programme site"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "url": "https://www.iimmune.nat.fau.de/",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-integrated-immunology-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": null,
+      "verificationStatus": "unverified",
+      "notes": {
+        "zh-CN": "项目专属官网，本轮仅登记链接，尚未逐项核对内容。",
+        "en": "Dedicated programme website. Only the link is recorded in this round; its contents have not been checked item by item."
+      }
+    },
+    {
+      "id": "fau-ils-programme-site",
+      "title": {
+        "zh-CN": "Integrated Life Sciences 本科与硕士项目官网",
+        "en": "Integrated Life Sciences bachelor and master programme site"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "url": "https://www.ils.nat.fau.de/",
+      "documentType": "official_notice",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-integrated-life-sciences-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": null,
+      "verificationStatus": "unverified",
+      "notes": {
+        "zh-CN": "项目官网，本轮仅登记链接，尚未逐项核对内容。",
+        "en": "Programme website. Only the link is recorded in this round; its contents have not been checked item by item."
+      }
+    },
+    {
+      "id": "fau-master-application-deadlines-pdf",
+      "title": {
+        "zh-CN": "FAU 硕士专业申请截止日期与语言要求总表",
+        "en": "FAU master's programmes – application deadlines and language requirements"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "url": "https://www.fau.de/wp-content/uploads/sites/4/2025/10/Masterstudiengaenge-Bewerbungsfristen-und-Sprachnachweise.pdf",
+      "documentType": "official_index",
+      "scope": {
+        "level": "university",
+        "facultyIds": [],
+        "programmeIds": [],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "2025-10",
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": null,
+      "verificationStatus": "unverified",
+      "notes": {
+        "zh-CN": "官方汇总 PDF，含各硕士专业的申请截止日期与语言证明要求。本轮未逐项提取具体日期，请以该 PDF 最新版本为准。",
+        "en": "Official summary PDF covering application deadlines and language certificates per master's programme. Specific dates were not extracted in this round; defer to the latest version of the PDF."
       }
     }
   ]

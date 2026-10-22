@@ -1,0 +1,4 @@
+# SPA fallback: every unknown path serves index.html so client-side
+# routes such as /degree work on direct load and refresh.
+/*
+  /index.html 200

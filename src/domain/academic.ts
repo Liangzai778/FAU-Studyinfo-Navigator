@@ -88,6 +88,9 @@ export const programmeSchema = z.object({
   programmeTrackIds: z.array(z.string().min(1)).default([]),
   examinationRegulationVersionIds: z.array(z.string().min(1)).default([]),
   dataStatus: z.enum(['verified', 'partial', 'unverified']),
+  // Official department/programme pages the user can follow for the current rules.
+  // Kept as source references rather than free-form URLs so every link stays traceable.
+  websiteSourceIds: z.array(z.string().min(1)).default([]),
 });
 export type Programme = z.infer<typeof programmeSchema>;
 

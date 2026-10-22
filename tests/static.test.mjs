@@ -157,10 +157,33 @@ test('models P3 academic entities, PO confirmation, and local JSON data', async 
     assert.match(schema, new RegExp(`export const ${entity}`));
   }
   assert.equal(data.faculties.length, 5);
-  assert.equal(data.programmes.length, 0);
-  assert.equal(data.examinationRegulationVersions.length, 0);
-  assert.equal(data.modules.length, 0);
-  assert.equal(data.requirementGroups.length, 0);
+  assert.ok(Array.isArray(data.programmes));
+  assert.ok(Array.isArray(data.examinationRegulationVersions));
+  assert.ok(Array.isArray(data.modules));
+  assert.ok(Array.isArray(data.requirementGroups));
+  // Programme entries must be traceable: every faculty reference resolves, no
+  // verified dataStatus is claimed, and every source uses HTTPS.
+  const facultyIds = new Set(data.faculties.map((faculty) => faculty.id));
+  const sourceIds = new Set(data.academicSources.map((source) => source.id));
+  for (const programme of data.programmes) {
+    assert.ok(facultyIds.has(programme.facultyId), `unknown facultyId ${programme.facultyId}`);
+    assert.notEqual(programme.dataStatus, 'verified', `${programme.id} claims verified status`);
+  }
+  for (const source of data.academicSources) {
+    assert.ok(source.url.startsWith('https://'), `${source.id} must use HTTPS`);
+    for (const programmeId of source.scope.programmeIds) {
+      assert.ok(
+        data.programmes.some((programme) => programme.id === programmeId),
+        `${source.id} references unknown programme ${programmeId}`,
+      );
+    }
+  }
+  for (const po of data.examinationRegulationVersions) {
+    assert.ok(po.sourceIds.length >= 1, `${po.id} has no source`);
+    for (const sourceId of po.sourceIds) {
+      assert.ok(sourceIds.has(sourceId), `${po.id} references unknown source ${sourceId}`);
+    }
+  }
   assert.match(schema, /poConfirmedByUser: z\.literal\(true\)/);
   assert.match(page, /findCandidatePoVersions/);
   assert.match(storage, /openLocalDatabase/);

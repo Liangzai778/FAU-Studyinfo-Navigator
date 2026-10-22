@@ -70,6 +70,11 @@ export function DegreePage() {
     [degreeType, facultyId],
   );
   const selectedProgramme = academicData.programmes.find((item) => item.id === programmeId);
+  const programmeSources = useMemo(() => {
+    if (!selectedProgramme) return [];
+    const ids = new Set(selectedProgramme.websiteSourceIds);
+    return academicData.academicSources.filter((source) => ids.has(source.id));
+  }, [selectedProgramme]);
   const tracks = academicData.programmeTracks.filter((item) => item.programmeId === programmeId);
   const entrySemesterId = `${entryYear}-${entryTerm}`;
   const validEntrySemester = entrySemesterIdSchema.safeParse(entrySemesterId).success;
@@ -184,6 +189,35 @@ export function DegreePage() {
               ))}
             </select>
           </label>
+
+          {selectedProgramme && programmeSources.length > 0 ? (
+            <section className="mt-5 rounded-xl border border-sky-200 bg-sky-50/60 p-4 dark:border-sky-900 dark:bg-sky-950/30 md:col-span-2">
+              <h3 className="font-semibold text-sky-950 dark:text-sky-100">{t('degree.officialLinksTitle')}</h3>
+              <p className="mt-1 text-sm leading-6 text-sky-900/80 dark:text-sky-200/80">{t('degree.officialLinksBody')}</p>
+              <ul className="mt-3 grid gap-2">
+                {programmeSources.map((source) => (
+                  <li key={source.id}>
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="flex flex-wrap items-baseline gap-x-2 rounded-lg px-2 py-1.5 hover:bg-sky-100/70 dark:hover:bg-sky-900/40"
+                    >
+                      <span className="font-medium text-sky-900 underline decoration-sky-400 underline-offset-2 dark:text-sky-100">
+                        {source.title[language]}
+                      </span>
+                      <span className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+                        {t(`degree.verification.${source.verificationStatus}`)}
+                      </span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {t('degree.lastChecked')} {source.lastCheckedAt}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           <div>
             <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('degree.entrySemester')}</span>

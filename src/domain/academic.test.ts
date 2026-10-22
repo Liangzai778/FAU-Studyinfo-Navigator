@@ -48,6 +48,7 @@ const syntheticPackage: AcademicDataPackage = {
     programmeTrackIds: ['synthetic-test-only-track'],
     examinationRegulationVersionIds: ['synthetic-test-only-po-a', 'synthetic-test-only-po-b'],
     dataStatus: 'unverified',
+    websiteSourceIds: [],
   }],
   programmeTracks: [{
     id: 'synthetic-test-only-track',
