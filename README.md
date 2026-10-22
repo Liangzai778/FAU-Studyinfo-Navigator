@@ -7,22 +7,21 @@ FAU Study Navigator 是面向 FAU 学生的本地优先学习导航与个人规�
 ## 本地环境要求
 
 - Node.js `>= 22.13.0`
-- npm，以及包含 `package.json` 全部依赖的已批准本地 npm 缓存或离线镜像
+- npm 10 或更新版本
 - 支持 IndexedDB、localStorage、Blob 下载和现代 `Intl` 时区数据的浏览器
 - 可选：本机已有 Playwright Chromium 浏览器，用于 E2E 测试
 
-当前项目不允许自动访问 npm 注册表。不要为安装依赖连接 GitHub、Codex Cloud 或远程包源。
+依赖从 npm 官方注册表安装。`package-lock.json` 已随仓库提交，请使用 `npm ci` 以获得可复现的依赖版本。
 
-## 离线安装与启动
-
-在项目根目录使用经过批准的离线缓存：
+## 安装、启动与构建
 
 ```bash
-npm install --offline --cache /absolute/path/to/approved-npm-cache
+npm ci
 npm run dev
 ```
 
-开发服务器只监听 `127.0.0.1`，默认地址通常为 `http://127.0.0.1:5173`。
+开发服务器只监听 `127.0.0.1`，默认地址为 `http://127.0.0.1:5173`。
+建议始终使用同一地址访问，不要与 `localhost` 交替，否则浏览器会视为不同站点，看到不同的本地数据。
 
 执行全部本地质量门禁：
 
@@ -32,6 +31,12 @@ npm run typecheck
 npm run test
 npm run test:e2e
 npm run build
+```
+
+首次运行 E2E 前需安装浏览器：
+
+```bash
+npx playwright install chromium
 ```
 
 不依赖第三方 npm 包的静态和核心领域测试：
@@ -104,8 +109,8 @@ npm run preview
 - 无 FAU 登录、Campo/StudOn 数据读取、考试报名、自动同步或后台通知。
 - JSON 备份暂不包含 localStorage 中的界面偏好和资源导航自定义数据。
 - 弹窗具备语义、Escape 关闭与键盘可操作控件，但尚未完成独立屏幕阅读器和 400% 缩放人工认证。
-- Playwright 需要本机已有依赖和浏览器；项目不会自动联网下载浏览器。
-- 当前未生成依赖锁文件；首次经过批准的离线安装应生成并保留 `package-lock.json`。
+- 首次运行 E2E 需手动执行 `npx playwright install chromium`；项目不会在安装依赖时自动下载浏览器。
+- 生产包为单一 JS 文件（约 494 kB / gzip 140 kB），尚未做代码分割。
 
 ## 如何添加真实 FAU 专业数据
 
