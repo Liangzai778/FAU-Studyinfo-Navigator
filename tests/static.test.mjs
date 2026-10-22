@@ -161,13 +161,42 @@ test('models P3 academic entities, PO confirmation, and local JSON data', async 
   assert.ok(Array.isArray(data.examinationRegulationVersions));
   assert.ok(Array.isArray(data.modules));
   assert.ok(Array.isArray(data.requirementGroups));
-  // Programme entries must be traceable: every faculty reference resolves, no
-  // verified dataStatus is claimed, and every source uses HTTPS.
+  // Programme entries must stay traceable. Verified status is allowed only when
+  // the entry points at sources and regulation versions that actually exist,
+  // so nothing can be marked verified without something to verify it against.
   const facultyIds = new Set(data.faculties.map((faculty) => faculty.id));
   const sourceIds = new Set(data.academicSources.map((source) => source.id));
+  const poVersionIds = new Set(data.examinationRegulationVersions.map((po) => po.id));
   for (const programme of data.programmes) {
     assert.ok(facultyIds.has(programme.facultyId), `unknown facultyId ${programme.facultyId}`);
-    assert.notEqual(programme.dataStatus, 'verified', `${programme.id} claims verified status`);
+    for (const sourceId of programme.websiteSourceIds) {
+      assert.ok(sourceIds.has(sourceId), `${programme.id} links unknown source ${sourceId}`);
+    }
+    for (const poId of programme.examinationRegulationVersionIds) {
+      assert.ok(poVersionIds.has(poId), `${programme.id} references unknown regulation ${poId}`);
+    }
+    if (programme.dataStatus === 'verified') {
+      assert.ok(
+        programme.websiteSourceIds.length > 0,
+        `${programme.id} claims verified status with no source links`,
+      );
+      assert.ok(
+        programme.examinationRegulationVersionIds.length > 0,
+        `${programme.id} claims verified status with no regulation version`,
+      );
+    }
+  }
+  // Requirement groups that claim to be verified must cite a source, and the
+  // modules they list must exist.
+  const moduleVersionIds = new Set(data.moduleVersions.map((version) => version.id));
+  for (const group of data.requirementGroups) {
+    assert.ok(group.sourceIds.length >= 1, `${group.id} has no source`);
+    for (const sourceId of group.sourceIds) {
+      assert.ok(sourceIds.has(sourceId), `${group.id} references unknown source ${sourceId}`);
+    }
+    for (const moduleVersionId of group.eligibleModuleVersionIds) {
+      assert.ok(moduleVersionIds.has(moduleVersionId), `${group.id} references unknown module version ${moduleVersionId}`);
+    }
   }
   for (const source of data.academicSources) {
     assert.ok(source.url.startsWith('https://'), `${source.id} must use HTTPS`);

@@ -43,3 +43,11 @@ shot-*.png
 scripts/verify-live.mjs
 scripts/probe.mjs
 
+
+# extracted regulation text and local probes
+.po-cache/
+scripts/check-*.mjs
+scripts/probe-*.mjs
+scripts/dump-*.mjs
+shot-*.png
+
