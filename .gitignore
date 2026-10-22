@@ -51,3 +51,6 @@ scripts/probe-*.mjs
 scripts/dump-*.mjs
 shot-*.png
 
+
+scripts/verify-online.mjs
+
