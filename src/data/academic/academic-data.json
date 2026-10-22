@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "dataReleaseId": "2026-10-22-p3-empty-academic-rules",
+  "createdAt": "2026-10-22",
+  "faculties": [
+    {
+      "id": "phil",
+      "name": {
+        "zh-CN": "人文、社会科学与神学学院",
+        "en": "Faculty of Humanities, Social Sciences, and Theology"
+      }
+    },
+    {
+      "id": "wiso",
+      "name": {
+        "zh-CN": "经济、管理与法律学院",
+        "en": "Faculty of Business, Economics, and Law"
+      }
+    },
+    {
+      "id": "med",
+      "name": {
+        "zh-CN": "医学院",
+        "en": "Faculty of Medicine"
+      }
+    },
+    {
+      "id": "nat",
+      "name": {
+        "zh-CN": "自然科学学院",
+        "en": "Faculty of Sciences"
+      }
+    },
+    {
+      "id": "tech",
+      "name": {
+        "zh-CN": "工程学院",
+        "en": "Faculty of Engineering"
+      }
+    }
+  ],
+  "programmes": [],
+  "programmeTracks": [],
+  "examinationRegulationVersions": [],
+  "modules": [],
+  "moduleVersions": [],
+  "requirementGroups": [],
+  "academicSources": [
+    {
+      "id": "fau-po-official-index",
+      "title": {
+        "zh-CN": "FAU 考试条例官方总入口",
+        "en": "Official FAU examination regulations index"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "url": "https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/",
+      "documentType": "official_index",
+      "scope": {
+        "level": "university",
+        "facultyIds": [],
+        "programmeIds": [],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": null,
+      "lastCheckedAt": "2026-10-21",
+      "lastVerifiedAt": null,
+      "verificationStatus": "unverified",
+      "notes": {
+        "zh-CN": "仅作为用户主动核对的官方导航入口；本地数据包尚未核实任何具体专业或 PO 规则。",
+        "en": "Navigation only for user-led checking; no programme-specific or PO rules are verified in the local package."
+      }
+    }
+  ]
+}
