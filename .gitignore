@@ -33,3 +33,8 @@ desktop.ini
 
 # TypeScript build info
 *.tsbuildinfo
+
+# transient files
+.commitmsg.tmp
+shot-*.png
+
