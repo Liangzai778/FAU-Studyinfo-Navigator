@@ -329,14 +329,110 @@ export function DegreePage() {
         {activeRules.length === 0 ? (
           <EmptyState title={t('degree.emptyTitle')} body={t('degree.emptyBody')} badge={t('common.unknown')} />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {activeRules.map((rule) => (
+          <div className="grid gap-4 md:grid-cols-2" data-testid="rule-cards">
+            {activeRules
+              .filter((rule) => {
+                // Sub-groups are rendered inside their parent card, so they must not
+                // also appear as standalone cards. A rule with no parent is never a
+                // sub-group.
+                if (!rule.parentRequirementGroupId) return true;
+                return !activeRules.some((candidate) => candidate.id === rule.parentRequirementGroupId);
+              })
+              .map((rule) => (
               <article key={rule.id} className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold text-slate-950 dark:text-white">{rule.name[language]}</h3>
                   <StatusBadge status={rule.verificationStatus} label={t(statusKeys[rule.verificationStatus])} />
                 </div>
                 <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">{rule.ruleText[language]}</p>
+                {(() => {
+                  // Render the group hierarchy as a tree: a group shows the modules it
+                  // owns plus a labelled block for each child group. A module that a
+                  // child already lists is not repeated at the parent level.
+                  type ModuleSection = {
+                    key: string;
+                    label: string;
+                    moduleVersionIds: string[];
+                    children: ModuleSection[];
+                  };
+
+                  const buildSection = (group: (typeof activeRules)[number]): ModuleSection => {
+                    const children = activeRules.filter(
+                      (candidate) => candidate.parentRequirementGroupId === group.id,
+                    );
+                    const covered = new Set(children.flatMap((child) => child.eligibleModuleVersionIds));
+                    return {
+                      key: group.id,
+                      label: group.name[language],
+                      moduleVersionIds: group.eligibleModuleVersionIds.filter((id) => !covered.has(id)),
+                      children: children.map(buildSection),
+                    };
+                  };
+
+                  const groupsToRender = [buildSection(rule)];
+
+                  const resolve = (versionId: string) => {
+                    const version = academicData.moduleVersions.find((item) => item.id === versionId);
+                    const module = version
+                      ? academicData.modules.find((item) => item.id === version.moduleId)
+                      : undefined;
+                    return module && version ? { id: versionId, name: module.name[language], ects: version.ects } : null;
+                  };
+
+                  type ResolvedModule = { id: string; name: string; ects: number | null };
+                  type Section = { key: string; label: string; modules: ResolvedModule[]; children: Section[] };
+
+                  const resolveSection = (group: (typeof groupsToRender)[number]): Section => ({
+                    key: group.key,
+                    label: group.label,
+                    modules: group.moduleVersionIds
+                      .map(resolve)
+                      .filter((item): item is ResolvedModule => item !== null),
+                    children: group.children.map(resolveSection),
+                  });
+
+                  const sectionTree = resolveSection(groupsToRender[0]!);
+                  const countModules = (section: Section): number =>
+                    section.modules.length + section.children.reduce((sum, child) => sum + countModules(child), 0);
+                  const total = countModules(sectionTree);
+
+                  if (total === 0) {
+                    return <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">{t('degree.modulesEmpty')}</p>;
+                  }
+
+                  const renderSection = (section: Section, depth: number) => (
+                    <div key={section.key} className={depth > 0 ? 'mt-3 border-l-2 border-slate-200 pl-3 dark:border-slate-700' : ''}>
+                      {section.modules.length > 0 ? (
+                        <h4 className={`text-sm font-semibold text-slate-800 dark:text-slate-100 ${depth > 0 ? 'mt-1' : ''}`}>
+                          {section.label}
+                        </h4>
+                      ) : null}
+                      {section.modules.length > 0 ? (
+                        <ul className="mt-1.5 space-y-1.5">
+                          {section.modules.map((module) => (
+                            <li key={module.id} className="flex items-baseline justify-between gap-3 text-sm">
+                              <span className="text-slate-700 dark:text-slate-200">{module.name}</span>
+                              <span className="shrink-0 font-mono text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                {module.ects ?? '—'}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                      {section.children.map((child) => renderSection(child, depth + 1))}
+                    </div>
+                  );
+
+                  return (
+                    <div className="mt-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        {t('degree.modulesTitle')} · {total}
+                      </p>
+                      <div className="mt-3">{renderSection(sectionTree, 0)}</div>
+                      <p className="mt-3 text-xs leading-5 text-slate-500 dark:text-slate-400">{t('degree.modulesBody')}</p>
+                    </div>
+                  );
+                })()}
               </article>
             ))}
           </div>

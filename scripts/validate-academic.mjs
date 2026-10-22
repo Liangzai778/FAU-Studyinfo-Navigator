@@ -64,5 +64,47 @@ for (const mv of data.moduleVersions) {
 console.log('\nModule ECTS totals per PO (all listed modules):');
 for (const [po, v] of Object.entries(poTotals)) console.log(`  ${po}: ${v.all} ECTS`);
 
+// Elective lists must not repeat a module, and each module group's core modules
+// must add up to what the regulation states for that group.
+const ectsOf = new Map(data.moduleVersions.map((mv) => [mv.id, mv.ects ?? 0]));
+
+for (const rg of data.requirementGroups) {
+  const seen = new Set();
+  for (const id of rg.eligibleModuleVersionIds) {
+    if (seen.has(id)) fail(`rg ${rg.id} lists ${id} more than once`);
+    seen.add(id);
+  }
+}
+
+const ilsGroupExpectations = [
+  { id: 'rg-ils-mg1-wahlpflicht', core: ['ils-m2-biomathematik-v1', 'ils-b1-systems-biology-v1'], coreEcts: 15, label: 'MG1' },
+  { id: 'rg-ils-mg2-wahlpflicht', core: ['ils-i1a-bioimaging-v1', 'ils-i1b-bioimaging-v1'], coreEcts: 15, label: 'MG2' },
+  { id: 'rg-ils-mg3-wahlpflicht', core: ['ils-i2a-macromolecules-v1', 'ils-i2b-macromolecules-v1'], coreEcts: 10, label: 'MG3' },
+];
+
+console.log('\nILS module groups:');
+for (const expectation of ilsGroupExpectations) {
+  const rg = data.requirementGroups.find((r) => r.id === expectation.id);
+  if (!rg) {
+    fail(`missing ILS module group ${expectation.id}`);
+    continue;
+  }
+  if (rg.parentRequirementGroupId !== 'rg-ils-modulgruppen') {
+    fail(`${expectation.id} must hang under rg-ils-modulgruppen`);
+  }
+  if (rg.eligibleModuleVersionIds.length === 0) fail(`${expectation.id} has no electives`);
+
+  const coreTotal = expectation.core.reduce((sum, id) => sum + (ectsOf.get(id) ?? 0), 0);
+  const ok = coreTotal === expectation.coreEcts;
+  console.log(
+    `  ${ok ? 'OK  ' : 'FAIL'} ${expectation.label}: core ${coreTotal} ECTS (expected ${expectation.coreEcts}), ${rg.eligibleModuleVersionIds.length} electives`,
+  );
+  if (!ok) bad += 1;
+
+  for (const id of rg.eligibleModuleVersionIds) {
+    if ((ectsOf.get(id) ?? 0) <= 0) fail(`${expectation.id} elective ${id} has no ECTS`);
+  }
+}
+
 console.log(`\n${bad === 0 ? 'ALL CHECKS PASSED' : bad + ' CHECK(S) FAILED'}`);
 process.exit(bad === 0 ? 0 : 1);

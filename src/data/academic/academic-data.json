@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataReleaseId": "2026-10-22-biologie-master-1",
+  "dataReleaseId": "2026-10-22.2",
   "createdAt": "2026-10-22",
   "faculties": [
     {
@@ -567,6 +567,326 @@
         "zh-CN": "硕士论文",
         "en": "Master Thesis"
       }
+    },
+    {
+      "id": "ils-mod-48071",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Introduction to Statistics and Statistical Programming",
+        "en": "Introduction to Statistics and Statistical Programming"
+      }
+    },
+    {
+      "id": "ils-mod-48081",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Advanced Module",
+        "en": "Advanced Module"
+      }
+    },
+    {
+      "id": "ils-mod-1999",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Master's thesis",
+        "en": "Master's thesis"
+      }
+    },
+    {
+      "id": "ils-mod-48091",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Biomathematics",
+        "en": "Biomathematics"
+      }
+    },
+    {
+      "id": "ils-mod-48101",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Systems Biology",
+        "en": "Systems Biology"
+      }
+    },
+    {
+      "id": "ils-mod-48131",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Metabolic Networks II",
+        "en": "Metabolic Networks II"
+      }
+    },
+    {
+      "id": "ils-mod-48142",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Spatial Modeling of Metabolic Processes",
+        "en": "Spatial Modeling of Metabolic Processes"
+      }
+    },
+    {
+      "id": "ils-mod-48161",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Introduction to Mathematical Modeling",
+        "en": "Introduction to Mathematical Modeling"
+      }
+    },
+    {
+      "id": "ils-mod-48181",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Partial Differential Equations for Life Sciences",
+        "en": "Partial Differential Equations for Life Sciences"
+      }
+    },
+    {
+      "id": "ils-mod-48241",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Mathematical Image Processing",
+        "en": "Mathematical Image Processing"
+      }
+    },
+    {
+      "id": "ils-mod-48151",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Stochastic Models for Life Sciences",
+        "en": "Stochastic Models for Life Sciences"
+      }
+    },
+    {
+      "id": "ils-mod-42291",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Bioanalytics",
+        "en": "Bioanalytics"
+      }
+    },
+    {
+      "id": "ils-mod-47582",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Systems Immunology and Infectiology",
+        "en": "Systems Immunology and Infectiology"
+      }
+    },
+    {
+      "id": "ils-mod-48111",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Bioimaging and Biophysics A",
+        "en": "Bioimaging and Biophysics A"
+      }
+    },
+    {
+      "id": "ils-mod-48112",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Bioimaging and Biophysics B",
+        "en": "Bioimaging and Biophysics B"
+      }
+    },
+    {
+      "id": "ils-mod-48500",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Cell Adhesion and Cytoskeleton: Cell Biological, Biophysical, and Medical Aspects",
+        "en": "Cell Adhesion and Cytoskeleton: Cell Biological, Biophysical, and Medical Aspects"
+      }
+    },
+    {
+      "id": "ils-mod-66122",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Experimental Physics 3: Optics and Quantum Phenomena",
+        "en": "Experimental Physics 3: Optics and Quantum Phenomena"
+      }
+    },
+    {
+      "id": "ils-mod-48331",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Methods of Modern (Confocal-) Light Microscopy",
+        "en": "Methods of Modern (Confocal-) Light Microscopy"
+      }
+    },
+    {
+      "id": "ils-mod-48311",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Modern Optics 1: Advanced Optics",
+        "en": "Modern Optics 1: Advanced Optics"
+      }
+    },
+    {
+      "id": "ils-mod-48313",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Modern Optics 3: Quantum Optics",
+        "en": "Modern Optics 3: Quantum Optics"
+      }
+    },
+    {
+      "id": "ils-mod-63301",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Molecular Neurophysiology",
+        "en": "Molecular Neurophysiology"
+      }
+    },
+    {
+      "id": "ils-mod-48121",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Interactions of Biological Macromolecules A",
+        "en": "Interactions of Biological Macromolecules A"
+      }
+    },
+    {
+      "id": "ils-mod-48122",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Interactions of Biological Macromolecules B",
+        "en": "Interactions of Biological Macromolecules B"
+      }
+    },
+    {
+      "id": "ils-mod-48251",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Introduction to X-ray and Neutron Scattering I",
+        "en": "Introduction to X-ray and Neutron Scattering I"
+      }
+    },
+    {
+      "id": "ils-mod-48261",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Introduction to X-ray and Neutron Scattering II",
+        "en": "Introduction to X-ray and Neutron Scattering II"
+      }
+    },
+    {
+      "id": "ils-mod-48301",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Ion Transport And Signal Transduction",
+        "en": "Ion Transport And Signal Transduction"
+      }
+    },
+    {
+      "id": "ils-mod-42241",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Developmental Biology 2: Tissue Differentiation and Organogenesis",
+        "en": "Developmental Biology 2: Tissue Differentiation and Organogenesis"
+      }
+    },
+    {
+      "id": "ils-mod-42201",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Structural Biology I: Protein Design and Designer Proteins",
+        "en": "Structural Biology I: Protein Design and Designer Proteins"
+      }
+    },
+    {
+      "id": "ils-mod-42211",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Structural Biology II: Structure and Function Relationships in Biotechnologically Relevant Macromolecules",
+        "en": "Structural Biology II: Structure and Function Relationships in Biotechnologically Relevant Macromolecules"
+      }
+    },
+    {
+      "id": "ils-mod-42062",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Python for bioinformatics and data analysis",
+        "en": "Python for bioinformatics and data analysis"
+      }
+    },
+    {
+      "id": "ils-mod-47841",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Basic Immunology",
+        "en": "Basic Immunology"
+      }
+    },
+    {
+      "id": "ils-mod-47861",
+      "programmeIds": [
+        "nat-biologie-integrated-life-sciences-msc"
+      ],
+      "name": {
+        "zh-CN": "Cell- and molecular biology",
+        "en": "Cell- and molecular biology"
+      }
     }
   ],
   "moduleVersions": [
@@ -1097,6 +1417,558 @@
         "fau-fpo-iimmune-2026"
       ],
       "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48071-v1",
+      "moduleId": "ils-mod-48071",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "summer"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48081-v1",
+      "moduleId": "ils-mod-48081",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 20,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-1999-v1",
+      "moduleId": "ils-mod-1999",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 30,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48091-v1",
+      "moduleId": "ils-mod-48091",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 10,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48101-v1",
+      "moduleId": "ils-mod-48101",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48131-v1",
+      "moduleId": "ils-mod-48131",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48142-v1",
+      "moduleId": "ils-mod-48142",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 10,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48161-v1",
+      "moduleId": "ils-mod-48161",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 10,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48181-v1",
+      "moduleId": "ils-mod-48181",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48241-v1",
+      "moduleId": "ils-mod-48241",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48151-v1",
+      "moduleId": "ils-mod-48151",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-42291-v1",
+      "moduleId": "ils-mod-42291",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-47582-v1",
+      "moduleId": "ils-mod-47582",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48111-v1",
+      "moduleId": "ils-mod-48111",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48112-v1",
+      "moduleId": "ils-mod-48112",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "summer"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48500-v1",
+      "moduleId": "ils-mod-48500",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-66122-v1",
+      "moduleId": "ils-mod-66122",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48331-v1",
+      "moduleId": "ils-mod-48331",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48311-v1",
+      "moduleId": "ils-mod-48311",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48313-v1",
+      "moduleId": "ils-mod-48313",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-63301-v1",
+      "moduleId": "ils-mod-63301",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48121-v1",
+      "moduleId": "ils-mod-48121",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48122-v1",
+      "moduleId": "ils-mod-48122",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "summer"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48251-v1",
+      "moduleId": "ils-mod-48251",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48261-v1",
+      "moduleId": "ils-mod-48261",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-48301-v1",
+      "moduleId": "ils-mod-48301",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-42241-v1",
+      "moduleId": "ils-mod-42241",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-42201-v1",
+      "moduleId": "ils-mod-42201",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-42211-v1",
+      "moduleId": "ils-mod-42211",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-42062-v1",
+      "moduleId": "ils-mod-42062",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-47841-v1",
+      "moduleId": "ils-mod-47841",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 10,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "ils-mod-47861-v1",
+      "moduleId": "ils-mod-47861",
+      "versionLabel": "2026 夏季学期模块手册",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-ils-2026"
+      ],
+      "ects": 5,
+      "offeringTerms": [
+        "winter"
+      ],
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
     }
   ],
   "requirementGroups": [
@@ -1272,12 +2144,29 @@
       "minEcts": 65,
       "maxEcts": 65,
       "eligibleModuleVersionIds": [
-        "ils-m2-biomathematik-v1",
-        "ils-b1-systems-biology-v1",
-        "ils-i1a-bioimaging-v1",
-        "ils-i1b-bioimaging-v1",
-        "ils-i2a-macromolecules-v1",
-        "ils-i2b-macromolecules-v1"
+        "ils-mod-48131-v1",
+        "ils-mod-48142-v1",
+        "ils-mod-48161-v1",
+        "ils-mod-48181-v1",
+        "ils-mod-48241-v1",
+        "ils-mod-48151-v1",
+        "ils-mod-42291-v1",
+        "ils-mod-47582-v1",
+        "ils-mod-48500-v1",
+        "ils-mod-66122-v1",
+        "ils-mod-48331-v1",
+        "ils-mod-48311-v1",
+        "ils-mod-48313-v1",
+        "ils-mod-63301-v1",
+        "ils-mod-48251-v1",
+        "ils-mod-48261-v1",
+        "ils-mod-48301-v1",
+        "ils-mod-42241-v1",
+        "ils-mod-42201-v1",
+        "ils-mod-42211-v1",
+        "ils-mod-42062-v1",
+        "ils-mod-47841-v1",
+        "ils-mod-47861-v1"
       ],
       "exclusiveCounting": false,
       "sourceIds": [
@@ -1415,6 +2304,107 @@
       "exclusiveCounting": false,
       "sourceIds": [
         "fau-fpo-iimmune-2026"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-ils-mg1-wahlpflicht",
+      "examinationRegulationVersionId": "po-ils-2026",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-ils-modulgruppen",
+      "name": {
+        "zh-CN": "模块组 1 必修与选修模块",
+        "en": "Required and elective modules in module group 1"
+      },
+      "kind": "restricted_elective",
+      "ruleText": {
+        "zh-CN": "以下课程构成模块组 1（生物数学建模与系统生物学）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
+        "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
+      },
+      "minEcts": null,
+      "maxEcts": null,
+      "eligibleModuleVersionIds": [
+        "ils-m2-biomathematik-v1",
+        "ils-b1-systems-biology-v1",
+        "ils-mod-48131-v1",
+        "ils-mod-48142-v1",
+        "ils-mod-48161-v1",
+        "ils-mod-48181-v1",
+        "ils-mod-48241-v1",
+        "ils-mod-48151-v1",
+        "ils-mod-42291-v1",
+        "ils-mod-47582-v1"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-ils-mg2-wahlpflicht",
+      "examinationRegulationVersionId": "po-ils-2026",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-ils-modulgruppen",
+      "name": {
+        "zh-CN": "模块组 2 必修与选修模块",
+        "en": "Required and elective modules in module group 2"
+      },
+      "kind": "restricted_elective",
+      "ruleText": {
+        "zh-CN": "以下课程构成模块组 2（生物成像与生物物理）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
+        "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
+      },
+      "minEcts": null,
+      "maxEcts": null,
+      "eligibleModuleVersionIds": [
+        "ils-i1a-bioimaging-v1",
+        "ils-i1b-bioimaging-v1",
+        "ils-mod-48500-v1",
+        "ils-mod-66122-v1",
+        "ils-mod-48331-v1",
+        "ils-mod-48311-v1",
+        "ils-mod-48313-v1",
+        "ils-mod-63301-v1"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-ils-mg3-wahlpflicht",
+      "examinationRegulationVersionId": "po-ils-2026",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-ils-modulgruppen",
+      "name": {
+        "zh-CN": "模块组 3 必修与选修模块",
+        "en": "Required and elective modules in module group 3"
+      },
+      "kind": "restricted_elective",
+      "ruleText": {
+        "zh-CN": "以下课程构成模块组 3（生物结构与过程）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
+        "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
+      },
+      "minEcts": null,
+      "maxEcts": null,
+      "eligibleModuleVersionIds": [
+        "ils-i2a-macromolecules-v1",
+        "ils-i2b-macromolecules-v1",
+        "ils-mod-48251-v1",
+        "ils-mod-48261-v1",
+        "ils-mod-48301-v1",
+        "ils-mod-42241-v1",
+        "ils-mod-42201-v1",
+        "ils-mod-42211-v1",
+        "ils-mod-42062-v1",
+        "ils-mod-47841-v1",
+        "ils-mod-47861-v1"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-ils-module-handbook-sose26"
       ],
       "verificationStatus": "verified"
     }
@@ -1917,10 +2907,43 @@
       "sectionOrPage": null,
       "lastCheckedAt": "2026-10-22",
       "lastVerifiedAt": null,
-      "verificationStatus": "tentative",
+      "verificationStatus": "needs_review",
       "notes": {
-        "zh-CN": "选修模块的内容与考核形式以模块手册为准，手册每学期更新。",
-        "en": "Elective module content and assessment formats follow the module handbook, which is updated each semester."
+        "zh-CN": "院系模块手册总入口。具体模块细则已改由整合生命科学硕士手册（2026 夏季学期版）作为来源。",
+        "en": "General entry point for department module handbooks. Module-level detail is now sourced from the ILS handbook for summer term 2026."
+      }
+    },
+    {
+      "id": "fau-ils-module-handbook-sose26",
+      "title": {
+        "zh-CN": "整合生命科学硕士模块手册（2026 夏季学期版）",
+        "en": "Module description for the M.Sc. Integrated Life Sciences (summer term 2026)"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "documentType": "module_handbook",
+      "url": "https://www.biologie.nat.fau.de/files/2026/05/Integrated-Life-Sciences-Biology-Biomathematics-Biophysics_Master-of-Science-SoSe-26-1.pdf",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "nat"
+        ],
+        "programmeIds": [
+          "nat-biologie-integrated-life-sciences-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [
+          "po-ils-2026"
+        ],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "2026 夏季学期版（对应考试条例 2019 版）",
+      "sectionOrPage": "第 1–70 页",
+      "lastCheckedAt": "2026-10-22",
+      "lastVerifiedAt": "2026-10-22",
+      "verificationStatus": "verified",
+      "notes": {
+        "zh-CN": "模块层面的权威来源。手册封面标注对应考试条例 2019 版，但内容为 2026 夏季学期现行开设情况。学分与考核方式逐条据此录入。",
+        "en": "Authoritative module-level source. The cover references the 2019 examination regulation, while the content reflects modules offered in summer term 2026."
       }
     }
   ]

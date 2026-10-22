@@ -44,9 +44,28 @@ export function validateAcademicSelection(data: AcademicDataPackage, selection: 
 
 export function getRequirementGroupsForSelection(data: AcademicDataPackage, selection: AcademicSelection) {
   if (!validateAcademicSelection(data, selection)) return [];
-  return data.requirementGroups.filter(
-    (group) =>
-      group.examinationRegulationVersionId === selection.examinationRegulationVersionId &&
-      (group.programmeTrackIds.length === 0 || group.programmeTrackIds.some((id) => selection.programmeTrackIds.includes(id))),
+  const inScope = data.requirementGroups.filter(
+    (group) => group.examinationRegulationVersionId === selection.examinationRegulationVersionId,
   );
+
+  // A group scoped to a track only applies when that track is selected. Groups
+  // that merely describe a parent group's contents (its children) are shown
+  // whenever the parent is, so their scoping follows the parent, not the track.
+  const scopedParentIds = new Set(
+    inScope
+      .filter(
+        (group) =>
+          group.programmeTrackIds.length > 0 &&
+          !group.programmeTrackIds.some((id) => selection.programmeTrackIds.includes(id)),
+      )
+      .map((group) => group.id),
+  );
+
+  return inScope.filter((group) => {
+    if (group.programmeTrackIds.length > 0) {
+      return group.programmeTrackIds.some((id) => selection.programmeTrackIds.includes(id));
+    }
+    // Hide children whose parent is out of scope.
+    return !(group.parentRequirementGroupId && scopedParentIds.has(group.parentRequirementGroupId));
+  });
 }
