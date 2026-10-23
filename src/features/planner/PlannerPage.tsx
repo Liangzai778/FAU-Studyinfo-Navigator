@@ -11,6 +11,7 @@ import type {
   LocalCourse,
   LocalCourseInput,
   StudyStatus,
+  CourseMeeting,
 } from '../../domain/planner';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useAcademicProfileStore } from '../../store/academicProfile';
@@ -122,7 +123,7 @@ export function PlannerPage() {
   // about the attempt is preserved as-is.
   const onTimetablePatch = async (
     attemptId: string,
-    patch: { location?: string; days?: TimetableDay[]; startMinutes?: number | null; durationMinutes?: number | null },
+    patch: { location?: string; meetings?: CourseMeeting[]; days?: TimetableDay[] },
   ) => {
     const attempt = attempts.find((item) => item.id === attemptId);
     if (!attempt) return;
@@ -138,9 +139,8 @@ export function PlannerPage() {
       poVersionId: attempt.poVersionId,
       requirementGroupId: attempt.requirementGroupId,
       location: attempt.location,
+      meetings: attempt.meetings,
       days: attempt.days,
-      startMinutes: attempt.startMinutes,
-      durationMinutes: attempt.durationMinutes,
       notes: attempt.notes,
       ...patch,
     });
@@ -156,9 +156,9 @@ export function PlannerPage() {
       poVersionId: selectedPoId,
       requirementGroupId: selectedPoId === previousAttempt.poVersionId ? previousAttempt.requirementGroupId : null,
       location: '',
-      days: [],
-      startMinutes: null,
-      durationMinutes: null,
+      // Carry the times into the retake: the lecture usually keeps its slot.
+      meetings: previousAttempt.meetings.map((meeting) => ({ ...meeting })),
+      days: previousAttempt.days,
       notes: '',
     });
     setLiveMessage(t(id ? 'planner.retakeAdded' : 'planner.storageFailed'));

@@ -15,28 +15,48 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
 }
 
 /**
- * Folds the weekday column introduced in the first timetable build into the
- * day list used now. Rows written before the list existed are read, not
- * rejected: throwing away a student's saved plan because one field was
- * renamed would lose real work.
+ * Reshapes rows written by earlier builds into the current one.
+ *
+ * Two older shapes exist: a single `day` string (first timetable build) and a
+ * `days` array sharing one start time (second build). Both are folded into a
+ * meeting list here. Throwing away a student's saved plan because a field was
+ * renamed would lose real work, so this migrates instead of rejecting.
  */
 function migrateAttempt(raw: unknown): unknown {
   if (!raw || typeof raw !== 'object') return raw;
-  const attempt = raw as Record<string, unknown>;
-  if (attempt.days !== undefined) return attempt;
+  const attempt = { ...(raw as Record<string, unknown>) };
 
-  const legacyDay = attempt.day;
-  const days: string[] = [];
-  if (Array.isArray(legacyDay)) {
-    days.push(...legacyDay.filter((value): value is string => typeof value === 'string'));
-  } else if (typeof legacyDay === 'string') {
-    days.push(legacyDay);
+  const legacyDays: string[] = [];
+  if (Array.isArray(attempt.days)) {
+    legacyDays.push(...attempt.days.filter((value): value is string => typeof value === 'string'));
+  }
+  if (typeof attempt.day === 'string') legacyDays.push(attempt.day);
+  delete attempt.day;
+
+  const startMinutes = attempt.startMinutes;
+  const durationMinutes = typeof attempt.durationMinutes === 'number' ? attempt.durationMinutes : null;
+  delete attempt.startMinutes;
+  delete attempt.durationMinutes;
+
+  // A time recorded by an older build is shared by every weekday it knew about.
+  const sharedStart = typeof startMinutes === 'number' ? startMinutes : null;
+  const meetings: unknown[] = Array.isArray(attempt.meetings) ? attempt.meetings : [];
+  const alreadyScheduled = new Set(
+    meetings.map((meeting) => (meeting && typeof meeting === 'object' ? (meeting as Record<string, unknown>).day : null)),
+  );
+
+  const daysWithoutTime: string[] = [];
+  for (const day of legacyDays) {
+    if (alreadyScheduled.has(day)) continue;
+    alreadyScheduled.add(day);
+    if (sharedStart === null) {
+      daysWithoutTime.push(day);
+    } else {
+      meetings.push({ day, startMinutes: sharedStart, durationMinutes });
+    }
   }
 
-  // The legacy column is dropped here; the day list replaces it.
-  const rest: Record<string, unknown> = { ...attempt };
-  delete rest.day;
-  return { ...rest, days };
+  return { ...attempt, meetings, days: daysWithoutTime };
 }
 
 export async function readPlannerSnapshot(): Promise<PlannerSnapshot> {

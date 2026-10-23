@@ -11,7 +11,7 @@ import {
   type StudyStatus,
   type TimetableDay,
 } from '../../domain/planner';
-import { GRID_END_MINUTES, clampDuration, parseTimeOfDay, snapToSlot } from '../../domain/timetableGrid';
+import { GRID_END_MINUTES, SLOT_MINUTES, clampDuration, parseTimeOfDay, snapToSlot } from '../../domain/timetableGrid';
 import { timetableDayLabelKey, TIMETABLE_DAYS } from '../../domain/timetableLabels';
 import { useTranslation } from '../../i18n/useTranslation';
 
@@ -48,9 +48,9 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
   const [recognitionConfirmed, setRecognitionConfirmed] = useState(false);
   const [requirementGroupId, setRequirementGroupId] = useState(() => (editingCourse ? '' : ''));
   const [location, setLocation] = useState('');
-  const [days, setDays] = useState<TimetableDay[]>([]);
-  const [startTime, setStartTime] = useState('09:00');
-  const [endTime, setEndTime] = useState('10:30');
+  // Each chosen weekday keeps its own clock time: a lecture can be Monday 09:00
+  // and Wednesday 14:00, so one shared pair of inputs would be wrong.
+  const [meetings, setMeetings] = useState<Record<string, { start: string; end: string }>>({});
   const [isExtraCourse, setIsExtraCourse] = useState(() => editingCourse?.isExtraCourse ?? false);
   const [countsTowardDegree, setCountsTowardDegree] = useState(() => editingCourse?.countsTowardDegree ?? true);
   const [error, setError] = useState('');
@@ -121,19 +121,29 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
       return;
     }
 
-    // Time is optional, but if the student typed it we must be able to read it.
-    let startMinutes: number | null = null;
-    let durationMinutes: number | null = null;
-    const startRaw = parseTimeOfDay(startTime);
-    const endRaw = parseTimeOfDay(endTime);
-    if (days.length > 0 && startRaw !== null && endRaw !== null) {
-      const snappedStart = snapToSlot(startRaw);
-      if (endRaw <= startRaw || snappedStart + 15 > GRID_END_MINUTES) {
-        setError(t('planner.timeRangeInvalid'));
+    // One block per chosen weekday, each read from its own time inputs.
+    const meetingList: { day: TimetableDay; startMinutes: number; durationMinutes: number }[] = [];
+    for (const day of TIMETABLE_DAYS) {
+      const draft = meetings[day];
+      if (!draft) continue;
+      const startRaw = parseTimeOfDay(draft.start);
+      const endRaw = parseTimeOfDay(draft.end);
+      const snappedStart = startRaw === null ? null : snapToSlot(startRaw);
+      const snappedEnd = endRaw === null ? null : snapToSlot(endRaw);
+      if (
+        snappedStart === null ||
+        snappedEnd === null ||
+        snappedEnd <= snappedStart ||
+        snappedStart + SLOT_MINUTES > GRID_END_MINUTES
+      ) {
+        setError(`${t(timetableDayLabelKey(day))} ${t('planner.timeRangeInvalid')}`);
         return;
       }
-      startMinutes = snappedStart;
-      durationMinutes = clampDuration(snappedStart, snapToSlot(endRaw) - snappedStart);
+      meetingList.push({
+        day,
+        startMinutes: snappedStart,
+        durationMinutes: clampDuration(snappedStart, snappedEnd - snappedStart),
+      });
     }
 
     const saved = await onAdd(courseInput, {
@@ -143,9 +153,8 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
       poVersionId: selectedPo?.examinationRegulationVersionId ?? null,
       requirementGroupId: requirementGroupId && groupIdsInScope.has(requirementGroupId) ? requirementGroupId : null,
       location: location.trim(),
-      days: TIMETABLE_DAYS.filter((value) => days.includes(value)),
-      startMinutes,
-      durationMinutes,
+      meetings: meetingList,
+      days: [],
       notes: '',
     });
     if (!saved) {
@@ -160,9 +169,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
     setRecognitionConfirmed(false);
     setRequirementGroupId('');
     setLocation('');
-    setDays([]);
-    setStartTime('09:00');
-    setEndTime('10:30');
+    setMeetings({});
     setIsExtraCourse(false);
     setCountsTowardDegree(true);
     setError('');
@@ -322,16 +329,25 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
             <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.weekday')}</span>
             <div className="flex flex-wrap gap-2" role="group" aria-label={t('planner.timetable.weekday')}>
               {TIMETABLE_DAYS.map((value) => {
-                const active = days.includes(value);
+                const active = Boolean(meetings[value]);
                 return (
                   <button
                     key={value}
                     type="button"
                     aria-pressed={active}
                     onClick={() =>
-                      setDays((current) =>
-                        current.includes(value) ? current.filter((item) => item !== value) : TIMETABLE_DAYS.filter((item) => item === value || current.includes(item)),
-                      )
+                      setMeetings((current) => {
+                        const next = { ...current };
+                        if (next[value]) {
+                          delete next[value];
+                        } else {
+                          // A new day starts from the last time the student
+                          // typed, because most courses keep the same slot.
+                          const last = TIMETABLE_DAYS.map((day) => current[day]).filter(Boolean).pop();
+                          next[value] = last ? { ...last } : { start: '09:00', end: '10:30' };
+                        }
+                        return next;
+                      })
                     }
                     className={`h-11 rounded-xl border px-4 text-sm font-semibold transition ${
                       active
@@ -346,32 +362,56 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
             </div>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t('planner.timetable.weekdayHint')}</p>
           </div>
-          <label>
-            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.startTime')}</span>
-            <input
-              value={startTime}
-              type="time"
-              min="08:00"
-              max="20:45"
-              step="900"
-              disabled={days.length === 0}
-              onChange={(event) => setStartTime(event.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
-            />
-          </label>
-          <label>
-            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.endTime')}</span>
-            <input
-              value={endTime}
-              type="time"
-              min="08:15"
-              max="21:00"
-              step="900"
-              disabled={days.length === 0}
-              onChange={(event) => setEndTime(event.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
-            />
-          </label>
+
+          {TIMETABLE_DAYS.filter((day) => meetings[day]).map((day) => {
+            const draft = meetings[day]!;
+            const update = (patch: Partial<{ start: string; end: string }>) =>
+              setMeetings((current) => ({ ...current, [day]: { ...current[day]!, ...patch } }));
+            return (
+              <fieldset key={day} className="md:col-span-2 xl:col-span-4 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+                <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  {t(timetableDayLabelKey(day))} {t('planner.timetable.timeOn')}
+                </legend>
+                <div className="flex flex-wrap items-end gap-2">
+                  <label className="flex-1">
+                    <span className="mb-1 block text-xs text-slate-500 dark:text-slate-400">{t('planner.timetable.startTime')}</span>
+                    <input
+                      value={draft.start}
+                      type="time"
+                      min="08:00"
+                      max="20:45"
+                      step="900"
+                      onChange={(event) => update({ start: event.target.value })}
+                      className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
+                    />
+                  </label>
+                  <label className="flex-1">
+                    <span className="mb-1 block text-xs text-slate-500 dark:text-slate-400">{t('planner.timetable.endTime')}</span>
+                    <input
+                      value={draft.end}
+                      type="time"
+                      min="08:15"
+                      max="21:00"
+                      step="900"
+                      onChange={(event) => update({ end: event.target.value })}
+                      className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setMeetings((current) => {
+                      const next = { ...current };
+                      delete next[day];
+                      return next;
+                    })}
+                    className="h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:border-rose-400 hover:text-rose-600 dark:border-slate-700 dark:text-slate-300"
+                  >
+                    {t('planner.timetable.removeDay')}
+                  </button>
+                </div>
+              </fieldset>
+            );
+          })}
         </div>
       ) : null}
 

@@ -27,8 +27,7 @@ const syntheticSnapshot: PlannerSnapshot = {
     requirementGroupId: null,
     location: '',
     days: [],
-    startMinutes: null,
-    durationMinutes: null,
+    meetings: [],
     notes: '',
     createdAt: '2026-10-22T00:00:00.000Z',
     updatedAt: '2026-10-22T00:00:00.000Z',
@@ -50,12 +49,13 @@ describe('planner IndexedDB storage', () => {
     await expect(readPlannerSnapshot()).resolves.toEqual(syntheticSnapshot);
   });
 
-  it('reads a plan saved before weekdays became a list', async () => {
-    // Row shape written by the first timetable build: one `day` string and no
-    // `days` array. Losing a student's saved plan over a renamed field would be
-    // unacceptable, so the old shape must still load.
-    const legacyRow = {
-      id: 'legacy-attempt',
+  it('reads a plan saved before weekdays each got their own time', async () => {
+    // Shapes written by earlier builds:
+    //  1. one `day` string and no `days` array (the first timetable build),
+    //  2. a `days` array with one shared start time (the second build).
+    // Losing a student's saved plan over a renamed field would be unacceptable,
+    // so both must load.
+    const base = {
       courseId: 'synthetic-test-only-course',
       semesterId: '2026-winter',
       status: 'planned',
@@ -63,13 +63,13 @@ describe('planner IndexedDB storage', () => {
       poVersionId: null,
       requirementGroupId: null,
       location: 'Alte Aula',
-      day: 'thu',
-      startMinutes: null,
-      durationMinutes: null,
-      notes: 'written by an older build',
       createdAt: '2026-10-22T00:00:00.000Z',
       updatedAt: '2026-10-22T00:00:00.000Z',
     };
+    const legacyRows = [
+      { ...base, id: 'legacy-day', day: 'thu', startMinutes: null, durationMinutes: null, notes: 'first build' },
+      { ...base, id: 'legacy-days', days: ['mon', 'wed'], startMinutes: 480, durationMinutes: 90, notes: 'second build' },
+    ];
 
     await writePlannerSnapshot(syntheticSnapshot);
     await new Promise<void>((resolve, reject) => {
@@ -78,7 +78,7 @@ describe('planner IndexedDB storage', () => {
         const database = request.result;
         const transaction = database.transaction(['planner-attempts'], 'readwrite');
         transaction.objectStore('planner-attempts').clear();
-        transaction.objectStore('planner-attempts').put(legacyRow);
+        legacyRows.forEach((row) => transaction.objectStore('planner-attempts').put(row));
         transaction.oncomplete = () => {
           database.close();
           resolve();
@@ -89,12 +89,20 @@ describe('planner IndexedDB storage', () => {
     });
 
     const snapshot = await readPlannerSnapshot();
-    expect(snapshot.attempts).toHaveLength(1);
-    expect(snapshot.attempts[0]!.days).toEqual(['thu']);
-    expect(snapshot.attempts[0]!.notes).toBe('written by an older build');
-    expect('day' in snapshot.attempts[0]!).toBe(false);
-  });
+    expect(snapshot.attempts).toHaveLength(2);
 
+    const byNote = new Map(snapshot.attempts.map((item) => [item.notes, item]));
+    const first = byNote.get('first build')!;
+    expect(first.days).toEqual(['thu']);
+    expect(first.meetings).toEqual([]);
+    expect('day' in first).toBe(false);
+
+    const second = byNote.get('second build')!;
+    expect(second.meetings).toEqual([
+      { day: 'mon', startMinutes: 480, durationMinutes: 90 },
+      { day: 'wed', startMinutes: 480, durationMinutes: 90 },
+    ]);
+  });
   it('does not replace valid data when a new snapshot is invalid', async () => {
     await writePlannerSnapshot(syntheticSnapshot);
     const invalid = { ...syntheticSnapshot, attempts: [{ ...syntheticSnapshot.attempts[0]!, courseId: 'missing-course' }] };
