@@ -385,10 +385,12 @@ export function DegreePage() {
                     const module = version
                       ? academicData.modules.find((item) => item.id === version.moduleId)
                       : undefined;
-                    return module && version ? { id: versionId, name: module.name[language], ects: version.ects } : null;
+                    return module && version
+                      ? { id: versionId, name: module.name[language], ects: version.ects, offeringTerms: version.offeringTerms }
+                      : null;
                   };
 
-                  type ResolvedModule = { id: string; name: string; ects: number | null };
+                  type ResolvedModule = { id: string; name: string; ects: number | null; offeringTerms: ('summer' | 'winter')[] | null };
                   type Section = { key: string; label: string; modules: ResolvedModule[]; children: Section[] };
 
                   const resolveSection = (group: (typeof groupsToRender)[number]): Section => ({
@@ -421,8 +423,13 @@ export function DegreePage() {
                           {section.modules.map((module) => (
                             <li key={module.id} className="flex items-baseline justify-between gap-3 text-sm">
                               <span className="text-slate-700 dark:text-slate-200">{module.name}</span>
-                              <span className="shrink-0 font-mono text-xs font-semibold text-slate-500 dark:text-slate-400">
-                                {module.ects ?? '—'}
+                              <span className="flex shrink-0 items-baseline gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                {module.offeringTerms ? (
+                                  <span className="rounded-full bg-slate-200 px-2 py-0.5 font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                    {module.offeringTerms.map((term) => t(term === 'summer' ? 'degree.summerSemester' : 'degree.winterSemester')).join(' / ')}
+                                  </span>
+                                ) : null}
+                                <span className="font-mono font-semibold">{module.ects ?? '—'}</span>
                               </span>
                             </li>
                           ))}

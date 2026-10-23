@@ -57,3 +57,6 @@ scripts/verify-online.mjs
 
 # wrangler local dev state
 .wrangler/
+# keep the extracted handbook text out of git, keep the PDF reference record
+sources/ils/*.txt
+sources/ils/*.extraction.json

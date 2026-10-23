@@ -614,7 +614,7 @@
         "nat-biologie-integrated-life-sciences-msc"
       ],
       "name": {
-        "zh-CN": "Mathematical Image Processing",
+        "zh-CN": "数学图像处理",
         "en": "Mathematical Image Processing"
       }
     },
@@ -1011,14 +1011,16 @@
     {
       "id": "ils-m1-statistics-v1",
       "moduleId": "ils-m1-statistics",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 3",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1027,14 +1029,16 @@
     {
       "id": "ils-m2-biomathematik-v1",
       "moduleId": "ils-m2-biomathematik",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 9",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 10,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1043,14 +1047,16 @@
     {
       "id": "ils-b1-systems-biology-v1",
       "moduleId": "ils-b1-systems-biology",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 11",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1059,14 +1065,16 @@
     {
       "id": "ils-i1a-bioimaging-v1",
       "moduleId": "ils-i1a-bioimaging",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 30",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 7.5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1075,14 +1083,16 @@
     {
       "id": "ils-i1b-bioimaging-v1",
       "moduleId": "ils-i1b-bioimaging",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 32",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 7.5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1091,14 +1101,16 @@
     {
       "id": "ils-i2a-macromolecules-v1",
       "moduleId": "ils-i2a-macromolecules",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 49",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1107,14 +1119,16 @@
     {
       "id": "ils-i2b-macromolecules-v1",
       "moduleId": "ils-i2b-macromolecules",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 51",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1123,14 +1137,17 @@
     {
       "id": "ils-vertiefungsmodul-v1",
       "moduleId": "ils-vertiefungsmodul",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 5",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 20,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer",
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1139,14 +1156,17 @@
     {
       "id": "ils-masterarbeit-v1",
       "moduleId": "ils-masterarbeit",
-      "versionLabel": "po-ils-2026",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 6",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 30,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer",
+        "winter"
+      ],
       "sourceIds": [
         "fau-fpo-ils-2026"
       ],
@@ -1331,7 +1351,7 @@
     {
       "id": "ils-mod-48131-v1",
       "moduleId": "ils-mod-48131",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 14",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1349,7 +1369,7 @@
     {
       "id": "ils-mod-48142-v1",
       "moduleId": "ils-mod-48142",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 15",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1367,7 +1387,7 @@
     {
       "id": "ils-mod-48161-v1",
       "moduleId": "ils-mod-48161",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 17",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1385,14 +1405,16 @@
     {
       "id": "ils-mod-48181-v1",
       "moduleId": "ils-mod-48181",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 19",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1401,7 +1423,7 @@
     {
       "id": "ils-mod-48241-v1",
       "moduleId": "ils-mod-48241",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 41",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1417,14 +1439,16 @@
     {
       "id": "ils-mod-48151-v1",
       "moduleId": "ils-mod-48151",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 23",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1433,14 +1457,16 @@
     {
       "id": "ils-mod-42291-v1",
       "moduleId": "ils-mod-42291",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 25",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 7.5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1449,7 +1475,7 @@
     {
       "id": "ils-mod-47582-v1",
       "moduleId": "ils-mod-47582",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 27",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1467,7 +1493,7 @@
     {
       "id": "ils-mod-48500-v1",
       "moduleId": "ils-mod-48500",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 35",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1485,7 +1511,7 @@
     {
       "id": "ils-mod-66122-v1",
       "moduleId": "ils-mod-66122",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 37",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1503,14 +1529,16 @@
     {
       "id": "ils-mod-48331-v1",
       "moduleId": "ils-mod-48331",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 40",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1519,7 +1547,7 @@
     {
       "id": "ils-mod-48311-v1",
       "moduleId": "ils-mod-48311",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 43",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1537,14 +1565,17 @@
     {
       "id": "ils-mod-48313-v1",
       "moduleId": "ils-mod-48313",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 45",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer",
+        "winter"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1553,7 +1584,7 @@
     {
       "id": "ils-mod-63301-v1",
       "moduleId": "ils-mod-63301",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 46",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1571,7 +1602,7 @@
     {
       "id": "ils-mod-48251-v1",
       "moduleId": "ils-mod-48251",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 53",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1589,14 +1620,16 @@
     {
       "id": "ils-mod-48261-v1",
       "moduleId": "ils-mod-48261",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 55",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1605,14 +1638,16 @@
     {
       "id": "ils-mod-48301-v1",
       "moduleId": "ils-mod-48301",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 57",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1621,7 +1656,7 @@
     {
       "id": "ils-mod-42241-v1",
       "moduleId": "ils-mod-42241",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 59",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1639,7 +1674,7 @@
     {
       "id": "ils-mod-42201-v1",
       "moduleId": "ils-mod-42201",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 61",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1657,14 +1692,16 @@
     {
       "id": "ils-mod-42211-v1",
       "moduleId": "ils-mod-42211",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 63",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 7.5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1673,14 +1710,16 @@
     {
       "id": "ils-mod-42062-v1",
       "moduleId": "ils-mod-42062",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 65",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-ils-2026"
       ],
       "ects": 7.5,
-      "offeringTerms": null,
+      "offeringTerms": [
+        "summer"
+      ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
       ],
@@ -1689,7 +1728,7 @@
     {
       "id": "ils-mod-47841-v1",
       "moduleId": "ils-mod-47841",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 67",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -1707,7 +1746,7 @@
     {
       "id": "ils-mod-47861-v1",
       "moduleId": "ils-mod-47861",
-      "versionLabel": "2026 夏季学期模块手册",
+      "versionLabel": "Modulhandbuch SoSe 2026, S. 69",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
@@ -2668,16 +2707,49 @@
         "examinationRegulationVersionIds": [
           "po-ils-2026"
         ],
-        "moduleVersionIds": []
+        "moduleVersionIds": [
+          "ils-b1-systems-biology-v1",
+          "ils-i1a-bioimaging-v1",
+          "ils-i1b-bioimaging-v1",
+          "ils-i2a-macromolecules-v1",
+          "ils-i2b-macromolecules-v1",
+          "ils-m1-statistics-v1",
+          "ils-m2-biomathematik-v1",
+          "ils-masterarbeit-v1",
+          "ils-mod-42062-v1",
+          "ils-mod-42201-v1",
+          "ils-mod-42211-v1",
+          "ils-mod-42241-v1",
+          "ils-mod-42291-v1",
+          "ils-mod-47582-v1",
+          "ils-mod-47841-v1",
+          "ils-mod-47861-v1",
+          "ils-mod-48131-v1",
+          "ils-mod-48142-v1",
+          "ils-mod-48151-v1",
+          "ils-mod-48161-v1",
+          "ils-mod-48181-v1",
+          "ils-mod-48241-v1",
+          "ils-mod-48251-v1",
+          "ils-mod-48261-v1",
+          "ils-mod-48301-v1",
+          "ils-mod-48311-v1",
+          "ils-mod-48313-v1",
+          "ils-mod-48331-v1",
+          "ils-mod-48500-v1",
+          "ils-mod-63301-v1",
+          "ils-mod-66122-v1",
+          "ils-vertiefungsmodul-v1"
+        ]
       },
-      "documentVersion": "2026 夏季学期版（对应考试条例 2019 版）",
-      "sectionOrPage": "第 1–70 页",
+      "documentVersion": "SoSe 2026, Stand 2026-03-02",
+      "sectionOrPage": "Modulhandbuch SoSe 2026, S. 3-70",
       "lastCheckedAt": "2026-10-22",
-      "lastVerifiedAt": "2026-10-22",
+      "lastVerifiedAt": "2026-10-23",
       "verificationStatus": "verified",
       "notes": {
-        "zh-CN": "模块层面的权威来源。手册封面标注对应考试条例 2019 版，但内容为 2026 夏季学期现行开设情况。学分与考核方式逐条据此录入。",
-        "en": "Authoritative module-level source. The cover references the 2019 examination regulation, while the content reflects modules offered in summer term 2026."
+        "zh-CN": "ILS 硕士模块手册（SoSe 2026，2026-03-02 更新）。已逐模块核对 33 个模块的编号、名称、ECTS、开课学期与考试形式。SHA-256: 4a04ccdfc47cee2b4b3be1ffe7714b2c19422918e49212616712c542d24ac4a7",
+        "en": "ILS M.Sc. module handbook (SoSe 2026, updated 2 March 2026). All 33 modules checked one by one for code, title, ECTS, offered terms and examination method. SHA-256: 4a04ccdfc47cee2b4b3be1ffe7714b2c19422918e49212616712c542d24ac4a7"
       }
     }
   ]
