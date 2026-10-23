@@ -1,5 +1,5 @@
-{
+﻿{
   "version": 1,
   "include": ["/*"],
-  "exclude": ["/assets/*", "/manifest.json", "/favicon.ico", "/_redirects", "/_routes.json"]
+  "exclude": ["/assets/*", "/manifest.json", "/favicon.ico"]
 }

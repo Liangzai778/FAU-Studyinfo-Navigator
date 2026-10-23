@@ -1,3 +1,0 @@
-# SPA fallback: every path serves index.html so client-side routes such as
-# /degree work on direct load and refresh. Rules must be one line each.
-/*  /index.html  200

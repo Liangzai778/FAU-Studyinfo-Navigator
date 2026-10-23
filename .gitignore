@@ -54,3 +54,6 @@ shot-*.png
 
 scripts/verify-online.mjs
 
+
+# wrangler local dev state
+.wrangler/
