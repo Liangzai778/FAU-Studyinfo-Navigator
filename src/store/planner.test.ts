@@ -41,6 +41,8 @@ describe('planner local CRUD', () => {
         recognitionConfirmed: false,
         poVersionId: null,
         requirementGroupId: null,
+        location: '',
+        day: null,
         notes: '',
       },
     );
@@ -64,6 +66,8 @@ describe('planner local CRUD', () => {
       recognitionConfirmed: false,
       poVersionId: null,
       requirementGroupId: null,
+      location: '',
+      day: null,
       notes: '',
     })).resolves.toBe(true);
 
@@ -74,6 +78,8 @@ describe('planner local CRUD', () => {
       recognitionConfirmed: false,
       poVersionId: null,
       requirementGroupId: null,
+      location: '',
+      day: null,
       notes: 'Synthetic retake',
     })).resolves.not.toBeNull();
     expect(usePlannerStore.getState().attempts).toHaveLength(2);

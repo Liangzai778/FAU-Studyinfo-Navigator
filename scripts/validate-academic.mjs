@@ -44,13 +44,19 @@ for (const p of data.programmes) {
   for (const tr of p.programmeTrackIds) if (!trackIds.has(tr)) fail(`programme ${p.id} -> unknown track ${tr}`);
 }
 
-// Arithmetic: children of each root must sum to the root total.
+// Arithmetic: children of each root must reach the root total.
+//
+// The lower bound is exact: the children cannot require more than the degree
+// requires. The upper bound is a ceiling, not a sum: ILS lets a student take
+// up to 65 ECTS of module groups for a 60 ECTS requirement, so children may
+// legitimately total more than the root. A child range that cannot cover the
+// root is the failure that matters.
 for (const root of data.requirementGroups.filter((r) => r.parentRequirementGroupId === null && r.maxEcts)) {
   const kids = data.requirementGroups.filter((r) => r.parentRequirementGroupId === root.id);
   const sumMin = kids.reduce((a, k) => a + (k.minEcts ?? 0), 0);
   const sumMax = kids.reduce((a, k) => a + (k.maxEcts ?? 0), 0);
-  const ok = sumMin === root.minEcts && sumMax === root.maxEcts;
-  console.log(`${ok ? 'OK  ' : 'FAIL'} ${root.id}: total ${root.minEcts}-${root.maxEcts}, children sum ${sumMin}-${sumMax}`);
+  const ok = sumMin === root.minEcts && sumMax >= root.maxEcts;
+  console.log(`${ok ? 'OK  ' : 'FAIL'} ${root.id}: total ${root.minEcts}-${root.maxEcts}, children ${sumMin}-${sumMax}`);
   if (!ok) bad += 1;
 }
 

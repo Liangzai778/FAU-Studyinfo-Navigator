@@ -569,56 +569,6 @@
       }
     },
     {
-      "id": "ils-mod-48071",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Introduction to Statistics and Statistical Programming",
-        "en": "Introduction to Statistics and Statistical Programming"
-      }
-    },
-    {
-      "id": "ils-mod-48081",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Advanced Module",
-        "en": "Advanced Module"
-      }
-    },
-    {
-      "id": "ils-mod-1999",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Master's thesis",
-        "en": "Master's thesis"
-      }
-    },
-    {
-      "id": "ils-mod-48091",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Biomathematics",
-        "en": "Biomathematics"
-      }
-    },
-    {
-      "id": "ils-mod-48101",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Systems Biology",
-        "en": "Systems Biology"
-      }
-    },
-    {
       "id": "ils-mod-48131",
       "programmeIds": [
         "nat-biologie-integrated-life-sciences-msc"
@@ -699,26 +649,6 @@
       }
     },
     {
-      "id": "ils-mod-48111",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Bioimaging and Biophysics A",
-        "en": "Bioimaging and Biophysics A"
-      }
-    },
-    {
-      "id": "ils-mod-48112",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Bioimaging and Biophysics B",
-        "en": "Bioimaging and Biophysics B"
-      }
-    },
-    {
       "id": "ils-mod-48500",
       "programmeIds": [
         "nat-biologie-integrated-life-sciences-msc"
@@ -776,26 +706,6 @@
       "name": {
         "zh-CN": "Molecular Neurophysiology",
         "en": "Molecular Neurophysiology"
-      }
-    },
-    {
-      "id": "ils-mod-48121",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Interactions of Biological Macromolecules A",
-        "en": "Interactions of Biological Macromolecules A"
-      }
-    },
-    {
-      "id": "ils-mod-48122",
-      "programmeIds": [
-        "nat-biologie-integrated-life-sciences-msc"
-      ],
-      "name": {
-        "zh-CN": "Interactions of Biological Macromolecules B",
-        "en": "Interactions of Biological Macromolecules B"
       }
     },
     {
@@ -1419,92 +1329,6 @@
       "verificationStatus": "verified"
     },
     {
-      "id": "ils-mod-48071-v1",
-      "moduleId": "ils-mod-48071",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 5,
-      "offeringTerms": [
-        "summer"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48081-v1",
-      "moduleId": "ils-mod-48081",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 20,
-      "offeringTerms": null,
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-1999-v1",
-      "moduleId": "ils-mod-1999",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 30,
-      "offeringTerms": null,
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48091-v1",
-      "moduleId": "ils-mod-48091",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 10,
-      "offeringTerms": [
-        "winter"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48101-v1",
-      "moduleId": "ils-mod-48101",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 5,
-      "offeringTerms": [
-        "winter"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
       "id": "ils-mod-48131-v1",
       "moduleId": "ils-mod-48131",
       "versionLabel": "2026 夏季学期模块手册",
@@ -1641,42 +1465,6 @@
       "verificationStatus": "verified"
     },
     {
-      "id": "ils-mod-48111-v1",
-      "moduleId": "ils-mod-48111",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 7.5,
-      "offeringTerms": [
-        "winter"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48112-v1",
-      "moduleId": "ils-mod-48112",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 7.5,
-      "offeringTerms": [
-        "summer"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
       "id": "ils-mod-48500-v1",
       "moduleId": "ils-mod-48500",
       "versionLabel": "2026 夏季学期模块手册",
@@ -1774,42 +1562,6 @@
       "ects": 7.5,
       "offeringTerms": [
         "winter"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48121-v1",
-      "moduleId": "ils-mod-48121",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 5,
-      "offeringTerms": [
-        "winter"
-      ],
-      "sourceIds": [
-        "fau-ils-module-handbook-sose26"
-      ],
-      "verificationStatus": "verified"
-    },
-    {
-      "id": "ils-mod-48122-v1",
-      "moduleId": "ils-mod-48122",
-      "versionLabel": "2026 夏季学期模块手册",
-      "validFromSemester": null,
-      "validUntilSemester": null,
-      "applicablePoVersionIds": [
-        "po-ils-2026"
-      ],
-      "ects": 5,
-      "offeringTerms": [
-        "summer"
       ],
       "sourceIds": [
         "fau-ils-module-handbook-sose26"
@@ -2138,36 +1890,12 @@
       },
       "kind": "restricted_elective",
       "ruleText": {
-        "zh-CN": "从三个模块组中选两个：生物数学建模与系统生物学、生物成像与生物物理、生物结构与过程。一组修 30 ECTS，另一组修 35 ECTS。模块组选择在报名第一门考试时确定，之后不可更改。",
-        "en": "Choose two of three module groups: Mathematical Modelling and Systems Biology, Bioimaging and Biophysics, or Biological Structures and Processes. One counts 30 ECTS, the other 35 ECTS. The choice is fixed when registering for the first exam and cannot be changed afterwards."
+        "zh-CN": "从三个模块组中选两个：生物数学建模与系统生物学、生物成像与生物物理、生物结构与过程。每组至少 30 ECTS、最多 40 ECTS，两组合计 60–70 ECTS。模块组选择在报名第一门考试时确定，之后不可更改。",
+        "en": "Choose two of the three module groups. Each group requires at least 30 and at most 40 ECTS; the two groups together make 60-70 ECTS. The group choice is fixed when the first examination in the group is registered."
       },
-      "minEcts": 65,
+      "minEcts": 60,
       "maxEcts": 65,
-      "eligibleModuleVersionIds": [
-        "ils-mod-48131-v1",
-        "ils-mod-48142-v1",
-        "ils-mod-48161-v1",
-        "ils-mod-48181-v1",
-        "ils-mod-48241-v1",
-        "ils-mod-48151-v1",
-        "ils-mod-42291-v1",
-        "ils-mod-47582-v1",
-        "ils-mod-48500-v1",
-        "ils-mod-66122-v1",
-        "ils-mod-48331-v1",
-        "ils-mod-48311-v1",
-        "ils-mod-48313-v1",
-        "ils-mod-63301-v1",
-        "ils-mod-48251-v1",
-        "ils-mod-48261-v1",
-        "ils-mod-48301-v1",
-        "ils-mod-42241-v1",
-        "ils-mod-42201-v1",
-        "ils-mod-42211-v1",
-        "ils-mod-42062-v1",
-        "ils-mod-47841-v1",
-        "ils-mod-47861-v1"
-      ],
+      "eligibleModuleVersionIds": [],
       "exclusiveCounting": false,
       "sourceIds": [
         "fau-fpo-ils-2026"
@@ -2185,11 +1913,11 @@
       },
       "kind": "mandatory",
       "ruleText": {
-        "zh-CN": "统计与统计编程 5 ECTS（90 分钟笔试 + 练习作业），深化模块 20 ECTS，硕士论文 30 ECTS，合计 55 ECTS。",
-        "en": "Statistics and statistical programming 5 ECTS (90-minute written exam plus exercises), advanced module 20 ECTS, master thesis 30 ECTS, 55 ECTS in total."
+        "zh-CN": "统计与统计编程 5 ECTS（90 分钟笔试 + 练习作业），深化模块 20 ECTS，硕士论文 30 ECTS，合计 55 ECTS；加上模块组最低合计 65 ECTS 共 120 ECTS。",
+        "en": "Statistics 5 ECTS, advanced module 20 ECTS, master's thesis 30 ECTS = 55 ECTS; together with the module groups the total is 120 ECTS."
       },
-      "minEcts": 55,
-      "maxEcts": 55,
+      "minEcts": 60,
+      "maxEcts": 60,
       "eligibleModuleVersionIds": [
         "ils-m1-statistics-v1",
         "ils-vertiefungsmodul-v1",
@@ -2310,19 +2038,21 @@
     {
       "id": "rg-ils-mg1-wahlpflicht",
       "examinationRegulationVersionId": "po-ils-2026",
-      "programmeTrackIds": [],
+      "programmeTrackIds": [
+        "ils-track-mg1"
+      ],
       "parentRequirementGroupId": "rg-ils-modulgruppen",
       "name": {
-        "zh-CN": "模块组 1 必修与选修模块",
-        "en": "Required and elective modules in module group 1"
+        "zh-CN": "模块组 1：生物数学建模与系统生物学",
+        "en": "Module Group 1: Biomathematical Modelling and Systems Biology"
       },
       "kind": "restricted_elective",
       "ruleText": {
         "zh-CN": "以下课程构成模块组 1（生物数学建模与系统生物学）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
         "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
       },
-      "minEcts": null,
-      "maxEcts": null,
+      "minEcts": 30,
+      "maxEcts": 40,
       "eligibleModuleVersionIds": [
         "ils-m2-biomathematik-v1",
         "ils-b1-systems-biology-v1",
@@ -2344,19 +2074,21 @@
     {
       "id": "rg-ils-mg2-wahlpflicht",
       "examinationRegulationVersionId": "po-ils-2026",
-      "programmeTrackIds": [],
+      "programmeTrackIds": [
+        "ils-track-mg2"
+      ],
       "parentRequirementGroupId": "rg-ils-modulgruppen",
       "name": {
-        "zh-CN": "模块组 2 必修与选修模块",
-        "en": "Required and elective modules in module group 2"
+        "zh-CN": "模块组 2：生物成像与生物物理",
+        "en": "Module Group 2: Bioimaging and Biophysics"
       },
       "kind": "restricted_elective",
       "ruleText": {
         "zh-CN": "以下课程构成模块组 2（生物成像与生物物理）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
         "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
       },
-      "minEcts": null,
-      "maxEcts": null,
+      "minEcts": 30,
+      "maxEcts": 40,
       "eligibleModuleVersionIds": [
         "ils-i1a-bioimaging-v1",
         "ils-i1b-bioimaging-v1",
@@ -2376,19 +2108,21 @@
     {
       "id": "rg-ils-mg3-wahlpflicht",
       "examinationRegulationVersionId": "po-ils-2026",
-      "programmeTrackIds": [],
+      "programmeTrackIds": [
+        "ils-track-mg3"
+      ],
       "parentRequirementGroupId": "rg-ils-modulgruppen",
       "name": {
-        "zh-CN": "模块组 3 必修与选修模块",
-        "en": "Required and elective modules in module group 3"
+        "zh-CN": "模块组 3：生物结构与过程",
+        "en": "Module Group 3: Biological Structures and Processes"
       },
       "kind": "restricted_elective",
       "ruleText": {
         "zh-CN": "以下课程构成模块组 3（生物结构与过程）的可选范围。具体每学期实际开设的课程以模块手册与选课系统为准。",
         "en": "These are the modules available within this module group. Which of them actually run in a given semester is decided by the module handbook and the course registration system."
       },
-      "minEcts": null,
-      "maxEcts": null,
+      "minEcts": 30,
+      "maxEcts": 40,
       "eligibleModuleVersionIds": [
         "ils-i2a-macromolecules-v1",
         "ils-i2b-macromolecules-v1",

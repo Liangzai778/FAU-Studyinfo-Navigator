@@ -15,7 +15,11 @@ import type {
 import { useTranslation } from '../../i18n/useTranslation';
 import { useAcademicProfileStore } from '../../store/academicProfile';
 import { usePlannerStore } from '../../store/planner';
+import { buildCourseCatalogue } from '../../domain/courseCatalogue';
+import { buildTimetable } from '../../domain/planner';
+import type { TimetableDay } from '../../domain/planner';
 import { CourseForm } from './CourseForm';
+import { TimetableGrid } from './TimetableGrid';
 
 const riskKeys: Record<EctsRiskCode, `planner.risk.${EctsRiskCode}`> = {
   no_selected_po: 'planner.risk.no_selected_po',
@@ -72,6 +76,11 @@ export function PlannerPage() {
     () => calculateEctsProgress({ selectedPoVersionId: selectedPoId, courses, attempts, requirementGroups: groups, sourceStatuses }),
     [attempts, courses, groups, selectedPoId, sourceStatuses],
   );
+  const catalogue = useMemo(
+    () => buildCourseCatalogue({ data: academicData, poVersionId: selectedPoId, groups, language }),
+    [groups, language, selectedPoId],
+  );
+  const timetable = useMemo(() => buildTimetable(attempts, courses), [attempts, courses]);
   const groupById = useMemo(() => new Map(groups.map((group) => [group.id, group])), [groups]);
   const courseById = useMemo(() => new Map(courses.map((course) => [course.id, course])), [courses]);
   const semesterGroups = useMemo(() => {
@@ -103,6 +112,14 @@ export function PlannerPage() {
     setLiveMessage(t(saved ? 'planner.courseDeleted' : 'planner.storageFailed'));
   };
 
+  // Inline timetable edits only ever touch room and weekday; everything else
+  // about the attempt is preserved as-is.
+  const onTimetablePatch = async (attemptId: string, patch: { location?: string; day?: TimetableDay | null }) => {
+    const attempt = attempts.find((item) => item.id === attemptId);
+    if (!attempt) return;
+    await patchAttempt(attempt, patch);
+  };
+
   const patchAttempt = async (attempt: CourseAttempt, patch: Partial<CourseAttemptInput>) => {
     const saved = await updateAttempt(attempt.id, {
       courseId: attempt.courseId,
@@ -111,6 +128,8 @@ export function PlannerPage() {
       recognitionConfirmed: attempt.recognitionConfirmed,
       poVersionId: attempt.poVersionId,
       requirementGroupId: attempt.requirementGroupId,
+      location: attempt.location,
+      day: attempt.day,
       notes: attempt.notes,
       ...patch,
     });
@@ -125,6 +144,8 @@ export function PlannerPage() {
       recognitionConfirmed: false,
       poVersionId: selectedPoId,
       requirementGroupId: selectedPoId === previousAttempt.poVersionId ? previousAttempt.requirementGroupId : null,
+      location: '',
+      day: null,
       notes: '',
     });
     setLiveMessage(t(id ? 'planner.retakeAdded' : 'planner.storageFailed'));
@@ -191,12 +212,41 @@ export function PlannerPage() {
       </section>
 
       <div className="mt-8">
-        <CourseForm key={`course-${editingCourse?.id ?? 'new'}`} selectedPo={selection} groups={groups} editingCourse={editingCourse} onAdd={addCourse} onEdit={editCourse} onCancelEdit={() => setEditingCourse(null)} />
+        <CourseForm key={`course-${editingCourse?.id ?? 'new'}`} selectedPo={selection} groups={groups} editingCourse={editingCourse} catalogue={catalogue} onAdd={addCourse} onEdit={editCourse} onCancelEdit={() => setEditingCourse(null)} />
       </div>
 
       <p aria-live="polite" className="mt-4 min-h-6 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
         {!hydrated ? t('planner.loading') : storageError ? t('planner.storageFailed') : liveMessage}
       </p>
+
+      <section className="mt-8">
+        <h2 className="text-2xl font-bold text-slate-950 dark:text-white">{t('planner.timetable.title')}</h2>
+        <p className="mt-2 text-slate-600 dark:text-slate-300">{t('planner.timetable.body')}</p>
+        {timetable.length === 0 ? (
+          <div className="mt-4"><EmptyState title={t('planner.timetable.empty')} body={t('planner.emptyBody')} /></div>
+        ) : (
+          <div className="mt-5 space-y-8">
+            {timetable.map((table) => (
+              <section key={table.semesterId} aria-label={formatSemester(table.semesterId, language)} className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="text-xl font-bold text-slate-950 dark:text-white">{formatSemester(table.semesterId, language)}</h3>
+                  <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800">
+                      {t('planner.timetable.totalEcts')}: {table.totalEcts}
+                    </span>
+                    {table.missingLocations > 0 ? (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                        {t('planner.timetable.locationMissing')} · {table.missingLocations}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <TimetableGrid table={table} onSave={(entry, patch) => void onTimetablePatch(entry.attemptId, patch)} />
+              </section>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="mt-6">
         <h2 className="text-2xl font-bold text-slate-950 dark:text-white">{t('planner.semesterPlanTitle')}</h2>

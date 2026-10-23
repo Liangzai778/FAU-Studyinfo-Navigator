@@ -25,6 +25,8 @@ const syntheticSnapshot: PlannerSnapshot = {
     recognitionConfirmed: false,
     poVersionId: null,
     requirementGroupId: null,
+    location: '',
+    day: null,
     notes: '',
     createdAt: '2026-10-22T00:00:00.000Z',
     updatedAt: '2026-10-22T00:00:00.000Z',

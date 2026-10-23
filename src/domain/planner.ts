@@ -17,6 +17,9 @@ export const localCourseSchema = z.object({
 });
 export type LocalCourse = z.infer<typeof localCourseSchema>;
 
+export const timetableDaySchema = z.enum(['mon', 'tue', 'wed', 'thu', 'fri']);
+export type TimetableDay = z.infer<typeof timetableDaySchema>;
+
 export const courseAttemptSchema = z.object({
   id: z.string().min(1).max(160),
   courseId: z.string().min(1),
@@ -25,6 +28,10 @@ export const courseAttemptSchema = z.object({
   recognitionConfirmed: z.boolean(),
   poVersionId: z.string().min(1).nullable(),
   requirementGroupId: z.string().min(1).nullable(),
+  // Room and weekday are personal timetable facts, recorded per attempt so a
+  // course moved to another room next semester keeps both entries honest.
+  location: z.string().max(160).default(''),
+  day: timetableDaySchema.nullable().default(null),
   notes: z.string().max(500),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -66,15 +73,8 @@ export const localCourseInputSchema = localCourseSchema.pick({
 });
 export type LocalCourseInput = z.infer<typeof localCourseInputSchema>;
 
-export const courseAttemptInputSchema = courseAttemptSchema.pick({
-  courseId: true,
-  semesterId: true,
-  status: true,
-  recognitionConfirmed: true,
-  poVersionId: true,
-  requirementGroupId: true,
-  notes: true,
-});
+export const courseAttemptInputSchema = courseAttemptSchema
+  .omit({ id: true, createdAt: true, updatedAt: true })
 export type CourseAttemptInput = z.infer<typeof courseAttemptInputSchema>;
 
 export const ectsRiskCodeSchema = z.enum([
@@ -93,6 +93,89 @@ export const ectsRiskCodeSchema = z.enum([
   'exclusive_double_count_prevented',
 ]);
 export type EctsRiskCode = z.infer<typeof ectsRiskCodeSchema>;
+
+export type TimetableEntry = {
+  attemptId: string;
+  courseId: string;
+  title: string;
+  ects: number | null;
+  semesterId: string;
+  location: string;
+  day: TimetableDay | null;
+};
+
+export type SemesterTimetable = {
+  semesterId: string;
+  entries: TimetableEntry[];
+  /** Sum of ECTS of the courses listed, independent of pass/fail or PO. */
+  totalEcts: number;
+  missingLocations: number;
+};
+
+type AttemptLike = {
+  id: string;
+  courseId: string;
+  semesterId: string;
+  location: string;
+  day: TimetableDay | null;
+};
+
+/**
+ * Groups course attempts into a per-semester timetable.
+ *
+ * Locations live on the attempt, not on the course: a course that moves room
+ * next semester must not make the old semester look like it moved too.
+ */
+export function buildTimetable(
+  attempts: readonly AttemptLike[],
+  courses: readonly LocalCourse[],
+): SemesterTimetable[] {
+  const courseById = new Map(courses.map((course) => [course.id, course]));
+  const bySemester = new Map<string, TimetableEntry[]>();
+
+  attempts.forEach((attempt) => {
+    const course = courseById.get(attempt.courseId);
+    if (!course) return;
+    const entries = bySemester.get(attempt.semesterId) ?? [];
+    entries.push({
+      attemptId: attempt.id,
+      courseId: course.id,
+      title: course.title,
+      ects: course.ects,
+      semesterId: attempt.semesterId,
+      location: attempt.location,
+      day: attempt.day,
+    });
+    bySemester.set(attempt.semesterId, entries);
+  });
+
+  return [...bySemester.entries()]
+    .sort(([left], [right]) => semesterSortKey(left) - semesterSortKey(right))
+    .map(([semesterId, entries]) => {
+      const ordered = [...entries].sort(compareEntries);
+      return {
+        semesterId,
+        entries: ordered,
+        totalEcts: ordered.reduce((sum, entry) => sum + (entry.ects ?? 0), 0),
+        missingLocations: ordered.filter((entry) => entry.location.trim() === '').length,
+      };
+    });
+}
+
+function semesterSortKey(semesterId: string) {
+  const [yearText, term] = semesterId.split('-');
+  return Number(yearText) * 2 + (term === 'winter' ? 1 : 0);
+}
+
+function compareEntries(left: TimetableEntry, right: TimetableEntry) {
+  const leftDay = left.day ? timetableDaySchema.options.indexOf(left.day) : 5;
+  const rightDay = right.day ? timetableDaySchema.options.indexOf(right.day) : 5;
+  if (leftDay !== rightDay) return leftDay - rightDay;
+  if (left.location !== right.location) return left.location.localeCompare(right.location, 'de');
+  return left.title.localeCompare(right.title, 'de');
+}
+
+
 
 export type EctsRisk = {
   code: EctsRiskCode;
