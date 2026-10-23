@@ -11,6 +11,7 @@ import {
   type StudyStatus,
   type TimetableDay,
 } from '../../domain/planner';
+import { GRID_END_MINUTES, clampDuration, parseTimeOfDay, snapToSlot } from '../../domain/timetableGrid';
 import { timetableDayLabelKey, TIMETABLE_DAYS } from '../../domain/timetableLabels';
 import { useTranslation } from '../../i18n/useTranslation';
 
@@ -18,13 +19,15 @@ type AddCourseFormProps = {
   selectedPo: AcademicSelection | null;
   groups: RequirementGroup[];
   catalogue: CatalogueEntry[];
+  /** Module version ids already present in the plan, so the picker can mark them. */
+  plannedModuleVersionIds: string[];
   editingCourse: LocalCourse | null;
   onAdd: (course: LocalCourseInput, attempt: Omit<CourseAttemptInput, 'courseId'>) => Promise<boolean>;
   onEdit: (courseId: string, course: LocalCourseInput) => Promise<boolean>;
   onCancelEdit: () => void;
 };
 
-export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd, onEdit, onCancelEdit }: AddCourseFormProps) {
+export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersionIds, editingCourse, onAdd, onEdit, onCancelEdit }: AddCourseFormProps) {
   const { language, t } = useTranslation();
   // The parent re-mounts this form via a `key` whenever `editingCourse` changes,
   // so lazy initial state is the single source of truth for the form's draft.
@@ -46,6 +49,8 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
   const [requirementGroupId, setRequirementGroupId] = useState(() => (editingCourse ? '' : ''));
   const [location, setLocation] = useState('');
   const [day, setDay] = useState<TimetableDay | ''>('');
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('10:30');
   const [isExtraCourse, setIsExtraCourse] = useState(() => editingCourse?.isExtraCourse ?? false);
   const [countsTowardDegree, setCountsTowardDegree] = useState(() => editingCourse?.countsTowardDegree ?? true);
   const [error, setError] = useState('');
@@ -115,6 +120,22 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
       setError(t('planner.formInvalidSemester'));
       return;
     }
+
+    // Time is optional, but if the student typed it we must be able to read it.
+    let startMinutes: number | null = null;
+    let durationMinutes: number | null = null;
+    const startRaw = parseTimeOfDay(startTime);
+    const endRaw = parseTimeOfDay(endTime);
+    if (startRaw !== null && endRaw !== null) {
+      const snappedStart = snapToSlot(startRaw);
+      if (endRaw <= startRaw || snappedStart + 15 > GRID_END_MINUTES) {
+        setError(t('planner.timeRangeInvalid'));
+        return;
+      }
+      startMinutes = snappedStart;
+      durationMinutes = clampDuration(snappedStart, snapToSlot(endRaw) - snappedStart);
+    }
+
     const saved = await onAdd(courseInput, {
       semesterId,
       status,
@@ -123,6 +144,8 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
       requirementGroupId: requirementGroupId && groupIdsInScope.has(requirementGroupId) ? requirementGroupId : null,
       location: location.trim(),
       day: day || null,
+      startMinutes,
+      durationMinutes,
       notes: '',
     });
     if (!saved) {
@@ -138,12 +161,15 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
     setRequirementGroupId('');
     setLocation('');
     setDay('');
+    setStartTime('09:00');
+    setEndTime('10:30');
     setIsExtraCourse(false);
     setCountsTowardDegree(true);
     setError('');
   };
 
   const canUseCatalogue = catalogue.length > 0;
+  const plannedSet = new Set(plannedModuleVersionIds);
 
   return (
     <form onSubmit={(event) => void submit(event)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
@@ -179,6 +205,7 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
                 <p className="text-sm text-slate-500 dark:text-slate-400">{t('planner.noSearchResults')}</p>
               ) : results.map((entry) => {
                 const selected = entry.moduleVersionId === selectedModuleVersionId;
+                const alreadyPlanned = plannedSet.has(entry.moduleVersionId);
                 const eligible = entry.groupIds.filter((id) => groupIdsInScope.has(id));
                 return (
                   <button
@@ -189,12 +216,17 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
                     onClick={() => chooseEntry(entry)}
                     className={`w-full rounded-xl border p-3 text-left transition ${
                       selected
-                        ? 'border-sky-600 bg-sky-50 dark:border-sky-400 dark:bg-sky-950/50'
-                        : 'border-slate-200 bg-white hover:border-sky-300 dark:border-slate-700 dark:bg-slate-950'
+                        ? 'border-sky-600 bg-sky-50 ring-2 ring-sky-500 dark:border-sky-400 dark:bg-sky-950/50'
+                        : alreadyPlanned
+                          ? 'border-emerald-300 bg-emerald-50/60 hover:border-emerald-400 dark:border-emerald-800 dark:bg-emerald-950/30'
+                          : 'border-slate-200 bg-white hover:border-sky-300 dark:border-slate-700 dark:bg-slate-950'
                     }`}
                   >
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <span className="font-semibold text-slate-950 dark:text-white">{language === 'zh-CN' ? entry.title : entry.titleEn}</span>
+                      <span className="font-semibold text-slate-950 dark:text-white">
+                        {alreadyPlanned ? <span aria-hidden="true" className="mr-1 text-emerald-600 dark:text-emerald-400">✓</span> : null}
+                        {language === 'zh-CN' ? entry.title : entry.titleEn}
+                      </span>
                       <span className="text-sm font-bold text-sky-800 dark:text-sky-300">{entry.ects ?? t('common.unknown')} ECTS</span>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
@@ -202,6 +234,9 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
                       {language === 'zh-CN' && entry.titleEn !== entry.title ? <span>{entry.titleEn}</span> : null}
                       {entry.offeringTerms ? (
                         <span>{entry.offeringTerms.map((termKey) => t(termKey === 'summer' ? 'planner.offeringSummer' : 'planner.offeringWinter')).join(' / ')}</span>
+                      ) : null}
+                      {alreadyPlanned ? (
+                        <span className="font-semibold text-emerald-700 dark:text-emerald-300">{t('planner.alreadyInPlan')}</span>
                       ) : null}
                     </div>
                     {eligible.length > 0 ? (
@@ -289,6 +324,32 @@ export function CourseForm({ selectedPo, groups, catalogue, editingCourse, onAdd
               <option value="">{t('planner.timetable.day.unassigned')}</option>
               {TIMETABLE_DAYS.map((value) => <option key={value} value={value}>{t(timetableDayLabelKey(value))}</option>)}
             </select>
+          </label>
+          <label>
+            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.startTime')}</span>
+            <input
+              value={startTime}
+              type="time"
+              min="08:00"
+              max="20:45"
+              step="900"
+              disabled={!day}
+              onChange={(event) => setStartTime(event.target.value)}
+              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
+            />
+          </label>
+          <label>
+            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.endTime')}</span>
+            <input
+              value={endTime}
+              type="time"
+              min="08:15"
+              max="21:00"
+              step="900"
+              disabled={!day}
+              onChange={(event) => setEndTime(event.target.value)}
+              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
+            />
           </label>
         </div>
       ) : null}

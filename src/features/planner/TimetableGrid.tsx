@@ -1,100 +1,200 @@
 import { useState } from 'react';
-import type { SemesterTimetable, TimetableDay } from '../../domain/planner';
+import type { SemesterTimetable, TimetableDay, TimetableEntry } from '../../domain/planner';
+import {
+  GRID_END_MINUTES,
+  GRID_START_MINUTES,
+  SLOT_COUNT,
+  SLOT_MINUTES,
+  minutesToLabel,
+} from '../../domain/timetableGrid';
 import { TIMETABLE_DAYS, timetableDayLabelKey } from '../../domain/timetableLabels';
 import { useTranslation } from '../../i18n/useTranslation';
 
-type TimetableGridProps = {
-  table: SemesterTimetable;
-  onSave: (entry: SemesterTimetable['entries'][number], patch: { location?: string; day?: TimetableDay | null }) => void;
+type Patch = {
+  location?: string;
+  day?: TimetableDay | null;
+  startMinutes?: number | null;
+  durationMinutes?: number | null;
 };
 
+type TimetableGridProps = {
+  table: SemesterTimetable;
+  onSave: (entry: TimetableEntry, patch: Patch) => void;
+};
+
+const STATUS_STYLES: Record<TimetableEntry['status'], string> = {
+  planned: 'border-sky-300 bg-sky-50 text-sky-950 dark:border-sky-700 dark:bg-sky-950/60 dark:text-sky-50',
+  in_progress: 'border-indigo-300 bg-indigo-50 text-indigo-950 dark:border-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-50',
+  passed: 'border-emerald-300 bg-emerald-50 text-emerald-950 dark:border-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-50',
+  failed: 'border-rose-300 bg-rose-50 text-rose-950 dark:border-rose-700 dark:bg-rose-950/60 dark:text-rose-50',
+  recognized: 'border-violet-300 bg-violet-50 text-violet-950 dark:border-violet-700 dark:bg-violet-950/60 dark:text-violet-50',
+};
+
+/** Pixel height of one quarter-hour row. */
+const SLOT_PX = 14;
+
 /**
- * Week view over one semester.
+ * Weekly grid from 08:00 to 21:00.
  *
- * Rooms are editable inline: the module handbook lists rooms but a student
- * knows their own group's actual room, and a wrong room should be correctable
- * without leaving the timetable.
+ * Courses without a start time cannot be placed on the clock, so they sit in a
+ * separate strip above the grid instead of being silently dropped. Their
+ * weekday is still shown, which is the part the student already entered.
  */
 export function TimetableGrid({ table, onSave }: TimetableGridProps) {
   const { t } = useTranslation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftLocation, setDraftLocation] = useState('');
 
-  const columns: (TimetableDay | null)[] = [...TIMETABLE_DAYS, null];
+  const placed = table.entries.filter((entry) => entry.day !== null && entry.startMinutes !== null);
+  const unplaced = table.entries.filter((entry) => !(entry.day !== null && entry.startMinutes !== null));
 
-  const startEditing = (attemptId: string, current: string) => {
-    setEditingId(attemptId);
-    setDraftLocation(current);
+  const hourMarks = [];
+  for (let minutes = GRID_START_MINUTES; minutes <= GRID_END_MINUTES; minutes += 60) hourMarks.push(minutes);
+
+  const startEditing = (entry: TimetableEntry) => {
+    setEditingId(entry.attemptId);
+    setDraftLocation(entry.location);
   };
 
-  const commit = (entry: SemesterTimetable['entries'][number]) => {
+  const commitLocation = (entry: TimetableEntry) => {
     onSave(entry, { location: draftLocation.trim() });
     setEditingId(null);
   };
 
-  return (
-    <div className="mt-4 overflow-x-auto">
-      <div className="grid min-w-[720px] grid-cols-6 gap-2">
-        {columns.map((day) => (
-          <div key={day ?? 'unassigned'} className="rounded-xl bg-slate-50 p-2 dark:bg-slate-950/60">
-            <h4 className="mb-2 text-center text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              {t(timetableDayLabelKey(day))}
-            </h4>
-            <div className="space-y-2">
-              {table.entries.filter((entry) => entry.day === day).map((entry) => (
-                <article key={entry.attemptId} className="rounded-lg border border-slate-200 bg-white p-2 text-xs dark:border-slate-700 dark:bg-slate-900">
-                  <p className="font-semibold leading-snug text-slate-950 dark:text-white">{entry.title}</p>
-                  <p className="mt-1 text-slate-500 dark:text-slate-400">{entry.ects ?? t('common.unknown')} ECTS</p>
-                  {editingId === entry.attemptId ? (
-                    <div className="mt-2 space-y-1">
-                      <input
-                        autoFocus
-                        value={draftLocation}
-                        maxLength={160}
-                        placeholder={t('planner.timetable.locationPlaceholder')}
-                        onChange={(event) => setDraftLocation(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') commit(entry);
-                          if (event.key === 'Escape') setEditingId(null);
-                        }}
-                        className="w-full rounded-md border border-slate-300 bg-white px-1.5 py-1 dark:border-slate-600 dark:bg-slate-950"
-                      />
-                      <div className="flex flex-wrap gap-1">
-                        <button type="button" onClick={() => commit(entry)} className="rounded bg-sky-700 px-2 py-1 font-semibold text-white">
-                          {t('planner.timetable.saveLocation')}
-                        </button>
-                        <select
-                          value={entry.day ?? ''}
-                          onChange={(event) => {
-                            const value = event.target.value as TimetableDay | '';
-                            onSave(entry, { day: value || null });
-                            setEditingId(null);
-                          }}
-                          className="rounded border border-slate-300 bg-white px-1 py-1 dark:border-slate-600 dark:bg-slate-950"
-                        >
-                          <option value="">{t('planner.timetable.day.unassigned')}</option>
-                          {TIMETABLE_DAYS.map((value) => <option key={value} value={value}>{t(timetableDayLabelKey(value))}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEditing(entry.attemptId, entry.location)}
-                      className={`mt-2 block w-full rounded-md px-1.5 py-1 text-left ${
-                        entry.location ? 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 dark:bg-amber-950/50 dark:text-amber-200'
-                      }`}
-                    >
-                      {entry.location || t('planner.timetable.setLocation')}
-                    </button>
-                  )}
-                </article>
-              ))}
-              {table.entries.filter((entry) => entry.day === day).length === 0 ? (
-                <p className="text-center text-xs text-slate-400 dark:text-slate-600">—</p>
-              ) : null}
-            </div>
+  const renderCard = (entry: TimetableEntry, absolute: boolean) => {
+    const top = absolute && entry.startMinutes !== null
+      ? ((entry.startMinutes - GRID_START_MINUTES) / SLOT_MINUTES) * SLOT_PX
+      : 0;
+    const height = absolute
+      ? Math.max(46, ((entry.durationMinutes ?? 90) / SLOT_MINUTES) * SLOT_PX - 2)
+      : undefined;
+
+    return (
+      <article
+        key={entry.attemptId}
+        className={`rounded-lg border p-1.5 text-[11px] leading-tight shadow-sm ${STATUS_STYLES[entry.status]} ${absolute ? 'absolute inset-x-1' : ''}`}
+        style={absolute ? { top, height } : undefined}
+      >
+        {entry.startMinutes !== null ? (
+          <p className="font-mono text-[10px] font-bold tracking-tight opacity-80">
+            {minutesToLabel(entry.startMinutes)}–{minutesToLabel(entry.startMinutes + (entry.durationMinutes ?? 90))}
+          </p>
+        ) : null}
+        <p className="mt-0.5 font-semibold">{entry.title}</p>
+        <p className="opacity-75">{entry.ects ?? t('common.unknown')} ECTS</p>
+        {editingId === entry.attemptId ? (
+          <div className="mt-1 space-y-1">
+            <input
+              autoFocus
+              value={draftLocation}
+              maxLength={160}
+              placeholder={t('planner.timetable.locationPlaceholder')}
+              onChange={(event) => setDraftLocation(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') commitLocation(entry);
+                if (event.key === 'Escape') setEditingId(null);
+              }}
+              className="w-full rounded border border-slate-300 bg-white px-1 py-0.5 text-[11px] text-slate-900 dark:border-slate-600 dark:bg-slate-950 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={() => commitLocation(entry)}
+              className="rounded bg-sky-700 px-1.5 py-0.5 font-semibold text-white"
+            >
+              {t('planner.timetable.saveLocation')}
+            </button>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => startEditing(entry)}
+            className={`mt-0.5 block w-full truncate rounded px-1 py-0.5 text-left ${
+              entry.location ? 'bg-white/60 hover:bg-white dark:bg-slate-900/60 dark:hover:bg-slate-900' : 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200'
+            }`}
+            title={entry.location || t('planner.timetable.setLocation')}
+          >
+            {entry.location || t('planner.timetable.setLocation')}
+          </button>
+        )}
+      </article>
+    );
+  };
+
+  return (
+    <div className="mt-4">
+      {unplaced.length > 0 ? (
+        <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/40">
+          <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">{t('planner.timetable.noTimeYet')}</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {unplaced.map((entry) => (
+              <button
+                key={entry.attemptId}
+                type="button"
+                onClick={() => startEditing(entry)}
+                className="rounded-lg border border-amber-300 bg-white p-2 text-left text-[11px] dark:border-amber-800 dark:bg-slate-900"
+              >
+                <span className="font-semibold text-slate-900 dark:text-white">{entry.title}</span>
+                <span className="ml-1 text-slate-500 dark:text-slate-400">
+                  · {t(timetableDayLabelKey(entry.day))} · {entry.ects ?? t('common.unknown')} ECTS
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="overflow-x-auto">
+        <div className="min-w-[760px]">
+          <div className="grid grid-cols-[3.2rem_repeat(5,1fr)] gap-px">
+            <div />
+            {TIMETABLE_DAYS.map((day) => (
+              <div key={day} className="pb-1 text-center text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {t(timetableDayLabelKey(day))}
+              </div>
+            ))}
+          </div>
+
+          <div className="relative grid grid-cols-[3.2rem_repeat(5,1fr)] gap-px rounded-lg bg-slate-200 dark:bg-slate-700">
+            <div className="relative bg-slate-50 dark:bg-slate-950" style={{ height: SLOT_COUNT * SLOT_PX }}>
+              {hourMarks.slice(0, -1).map((minutes) => (
+                <span
+                  key={minutes}
+                  className="absolute right-1 font-mono text-[10px] text-slate-500 dark:text-slate-400"
+                  style={{ top: ((minutes - GRID_START_MINUTES) / SLOT_MINUTES) * SLOT_PX - 6 }}
+                >
+                  {minutesToLabel(minutes)}
+                </span>
+              ))}
+            </div>
+
+            {TIMETABLE_DAYS.map((day) => {
+              const dayEntries = placed.filter((entry) => entry.day === day);
+              return (
+                <div
+                  key={day}
+                  className="relative bg-white dark:bg-slate-900"
+                  style={{
+                    height: SLOT_COUNT * SLOT_PX,
+                    backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${(4 * SLOT_PX) - 1}px, rgba(100,116,139,0.18) ${(4 * SLOT_PX) - 1}px, rgba(100,116,139,0.18) ${4 * SLOT_PX}px)`,
+                  }}
+                >
+                  {dayEntries.map((entry) => renderCard(entry, true))}
+                  {dayEntries.length === 0 ? (
+                    <span className="absolute inset-x-0 top-1 text-center text-[10px] text-slate-300 dark:text-slate-700">—</span>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+        {(['planned', 'in_progress', 'passed', 'failed', 'recognized'] as const).map((status) => (
+          <span key={status} className="inline-flex items-center gap-1">
+            <span className={`inline-block h-2.5 w-2.5 rounded-sm border ${STATUS_STYLES[status]}`} />
+            {t(`planner.status.${status}`)}
+          </span>
         ))}
       </div>
     </div>

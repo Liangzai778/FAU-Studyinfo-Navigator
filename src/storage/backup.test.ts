@@ -11,7 +11,7 @@ const timestamp = '2026-10-22T00:00:00.000Z';
 const planner: PlannerSnapshot = {
   schemaVersion: 1,
   courses: [{ id: 'synthetic-course', title: 'Synthetic test course', ects: 5, moduleId: null, moduleVersionId: null, isExtraCourse: false, countsTowardDegree: true, createdAt: timestamp, updatedAt: timestamp }],
-  attempts: [{ id: 'synthetic-attempt', courseId: 'synthetic-course', semesterId: '2026-winter', status: 'planned', recognitionConfirmed: false, poVersionId: null, requirementGroupId: null, location: '', day: null, notes: '', createdAt: timestamp, updatedAt: timestamp }],
+  attempts: [{ id: 'synthetic-attempt', courseId: 'synthetic-course', semesterId: '2026-winter', status: 'planned', recognitionConfirmed: false, poVersionId: null, requirementGroupId: null, location: '', day: null, startMinutes: null, durationMinutes: null, notes: '', createdAt: timestamp, updatedAt: timestamp }],
 };
 const examsAndTasks: ExamsTasksSnapshot = {
   schemaVersion: 1,

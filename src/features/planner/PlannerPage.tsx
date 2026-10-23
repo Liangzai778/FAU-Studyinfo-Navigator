@@ -81,6 +81,12 @@ export function PlannerPage() {
     [groups, language, selectedPoId],
   );
   const timetable = useMemo(() => buildTimetable(attempts, courses), [attempts, courses]);
+  // Marks already-planned modules in the picker so a second click cannot
+  // silently add the same lecture twice.
+  const plannedModuleVersionIds = useMemo(
+    () => courses.map((course) => course.moduleVersionId).filter((id): id is string => Boolean(id)),
+    [courses],
+  );
   const groupById = useMemo(() => new Map(groups.map((group) => [group.id, group])), [groups]);
   const courseById = useMemo(() => new Map(courses.map((course) => [course.id, course])), [courses]);
   const semesterGroups = useMemo(() => {
@@ -114,7 +120,10 @@ export function PlannerPage() {
 
   // Inline timetable edits only ever touch room and weekday; everything else
   // about the attempt is preserved as-is.
-  const onTimetablePatch = async (attemptId: string, patch: { location?: string; day?: TimetableDay | null }) => {
+  const onTimetablePatch = async (
+    attemptId: string,
+    patch: { location?: string; day?: TimetableDay | null; startMinutes?: number | null; durationMinutes?: number | null },
+  ) => {
     const attempt = attempts.find((item) => item.id === attemptId);
     if (!attempt) return;
     await patchAttempt(attempt, patch);
@@ -130,6 +139,8 @@ export function PlannerPage() {
       requirementGroupId: attempt.requirementGroupId,
       location: attempt.location,
       day: attempt.day,
+      startMinutes: attempt.startMinutes,
+      durationMinutes: attempt.durationMinutes,
       notes: attempt.notes,
       ...patch,
     });
@@ -146,6 +157,8 @@ export function PlannerPage() {
       requirementGroupId: selectedPoId === previousAttempt.poVersionId ? previousAttempt.requirementGroupId : null,
       location: '',
       day: null,
+      startMinutes: null,
+      durationMinutes: null,
       notes: '',
     });
     setLiveMessage(t(id ? 'planner.retakeAdded' : 'planner.storageFailed'));
@@ -212,7 +225,7 @@ export function PlannerPage() {
       </section>
 
       <div className="mt-8">
-        <CourseForm key={`course-${editingCourse?.id ?? 'new'}`} selectedPo={selection} groups={groups} editingCourse={editingCourse} catalogue={catalogue} onAdd={addCourse} onEdit={editCourse} onCancelEdit={() => setEditingCourse(null)} />
+        <CourseForm key={`course-${editingCourse?.id ?? 'new'}`} selectedPo={selection} groups={groups} editingCourse={editingCourse} catalogue={catalogue} plannedModuleVersionIds={plannedModuleVersionIds} onAdd={addCourse} onEdit={editCourse} onCancelEdit={() => setEditingCourse(null)} />
       </div>
 
       <p aria-live="polite" className="mt-4 min-h-6 text-sm font-semibold text-emerald-700 dark:text-emerald-300">

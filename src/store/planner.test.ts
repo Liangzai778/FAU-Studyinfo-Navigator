@@ -43,6 +43,8 @@ describe('planner local CRUD', () => {
         requirementGroupId: null,
         location: '',
         day: null,
+        startMinutes: null,
+        durationMinutes: null,
         notes: '',
       },
     );
@@ -68,6 +70,8 @@ describe('planner local CRUD', () => {
       requirementGroupId: null,
       location: '',
       day: null,
+      startMinutes: null,
+      durationMinutes: null,
       notes: '',
     })).resolves.toBe(true);
 
@@ -80,6 +84,8 @@ describe('planner local CRUD', () => {
       requirementGroupId: null,
       location: '',
       day: null,
+      startMinutes: null,
+      durationMinutes: null,
       notes: 'Synthetic retake',
     })).resolves.not.toBeNull();
     expect(usePlannerStore.getState().attempts).toHaveLength(2);

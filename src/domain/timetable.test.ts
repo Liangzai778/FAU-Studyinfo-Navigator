@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TimetableDay } from './planner';
-import { buildTimetable } from './planner';
+import { buildTimetable, findFreeStart } from './planner';
 import { timetableDayLabelKey } from './timetableLabels';
 
 const course = (id: string, title: string, ects: number | null) => ({
@@ -25,6 +25,8 @@ const attempt = (id: string, courseId: string, semesterId: string, location = ''
   requirementGroupId: null,
   location,
   day,
+  startMinutes: null,
+  durationMinutes: null,
   notes: '',
   createdAt: '2026-10-01T00:00:00.000Z',
   updatedAt: '2026-10-01T00:00:00.000Z',
@@ -79,6 +81,40 @@ describe('timetable', () => {
 
   it('drops attempts whose course was deleted', () => {
     expect(buildTimetable([attempt('a1', 'missing', '2026-winter')], [])).toEqual([]);
+  });
+
+  it('sorts courses on the same day by clock time, unscheduled ones last', () => {
+    const timed = (id: string, courseId: string, startMinutes: number | null) => ({
+      ...attempt(id, courseId, '2026-winter', 'Hörsaal A', 'mon'),
+      startMinutes,
+      durationMinutes: startMinutes === null ? null : 90,
+    });
+    const tables = buildTimetable(
+      [timed('a1', 'c1', 14 * 60), timed('a2', 'c2', 8 * 60), timed('a3', 'c3', null)],
+      [course('c1', 'Later', 5), course('c2', 'Early', 5), course('c3', 'NoTime', 5)],
+    );
+    expect(tables[0]!.entries.map((entry) => entry.title)).toEqual(['Early', 'Later', 'NoTime']);
+  });
+
+  it('carries the clock time onto the timetable entry', () => {
+    const tables = buildTimetable(
+      [{ ...attempt('a1', 'c1', '2026-winter', 'Hörsaal A', 'mon'), startMinutes: 555, durationMinutes: 90 }],
+      [course('c1', 'Biomathematik', 10)],
+    );
+    expect(tables[0]!.entries[0]).toMatchObject({ startMinutes: 555, durationMinutes: 90, status: 'planned' });
+  });
+
+  it('moves a block down instead of overlapping an existing one', () => {
+    const existing = [{ day: 'mon' as const, startMinutes: 9 * 60, durationMinutes: 90 }];
+    // 09:00 is taken, so the next free quarter hour is 10:30.
+    expect(findFreeStart('mon', 9 * 60, 90, existing)).toBe(10 * 60 + 30);
+    // A different day is untouched.
+    expect(findFreeStart('tue', 9 * 60, 90, existing)).toBe(9 * 60);
+  });
+
+  it('reports no free slot when the day is full', () => {
+    const full = [{ day: 'fri' as const, startMinutes: 8 * 60, durationMinutes: 13 * 60 }];
+    expect(findFreeStart('fri', 8 * 60, 90, full)).toBeNull();
   });
 
   it('labels an unassigned day separately from real weekdays', () => {
