@@ -21,7 +21,7 @@ const persistedResourceStateSchema = z.object({
   degreeType: degreeTypeSchema,
   favoriteIds: z.array(z.string().min(1)).max(500),
   favoritesFirst: z.boolean(),
-  sort: z.enum(['recommended', 'name', 'category']),
+  sort: z.enum(['recommended', 'name', 'category', 'deadline']),
   customResources: z.array(customResourceSchema).max(200),
   customCategories: z.array(resourceCategorySchema.extend({ builtIn: z.literal(false) })).max(50),
   categoryOrder: z.array(z.string().min(1)).max(100),

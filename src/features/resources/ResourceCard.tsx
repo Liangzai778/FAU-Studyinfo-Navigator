@@ -12,6 +12,13 @@ type ResourceCardProps = {
   onDelete?: () => void;
 };
 
+const KIND_STYLES: Record<NonNullable<Resource['opportunityKind']>, string> = {
+  funding: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200',
+  programme: 'bg-sky-100 text-sky-900 dark:bg-sky-950 dark:text-sky-200',
+  support: 'bg-violet-100 text-violet-900 dark:bg-violet-950 dark:text-violet-200',
+  career: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200',
+};
+
 export function ResourceCard({
   resource,
   category,
@@ -30,6 +37,11 @@ export function ResourceCard({
           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             {category?.name[language] ?? resource.categoryId}
           </span>
+          {resource.opportunityKind ? (
+            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${KIND_STYLES[resource.opportunityKind]}`}>
+              {t(`resources.kind.${resource.opportunityKind}`)}
+            </span>
+          ) : null}
           <span
             className={[
               'rounded-full px-2.5 py-1 text-xs font-semibold',
@@ -60,6 +72,47 @@ export function ResourceCard({
 
       <h3 className="mt-4 text-lg font-bold text-slate-950 dark:text-white">{resource.name[language]}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{resource.description[language]}</p>
+
+      {resource.benefit || resource.deadline ? (
+        <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-950/60">
+          {resource.benefit ? (
+            <p className="flex gap-2">
+              <span aria-hidden="true">💰</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-100">{resource.benefit[language]}</span>
+            </p>
+          ) : null}
+          {resource.deadline ? (
+            // Shown as a plain sentence, not a countdown: a deadline the
+            // student misreads is worse than none.
+            <p className="flex gap-2 text-amber-800 dark:text-amber-300">
+              <span aria-hidden="true">⏰</span>
+              <span>{resource.deadline[language]}</span>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {resource.audience.length > 0 ? (
+        <p className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-300">
+          <span className="font-semibold text-slate-500 dark:text-slate-400">{t('resources.audience')}: </span>
+          {resource.audience.map((item) => item[language]).join(' · ')}
+        </p>
+      ) : null}
+
+      {resource.documents.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {resource.documents.map((document) => (
+            <ExternalLink
+              key={document.url}
+              href={document.url}
+              className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <span aria-hidden="true">📄</span>
+              {document.title[language]} ({document.format})
+            </ExternalLink>
+          ))}
+        </div>
+      ) : null}
 
       <dl className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs leading-5 dark:border-slate-800">
         <div className="flex gap-2">

@@ -193,6 +193,7 @@ export function ResourcesPage() {
               <option value="recommended">{t('resources.sortRecommended')}</option>
               <option value="name">{t('resources.sortName')}</option>
               <option value="category">{t('resources.sortCategory')}</option>
+                <option value="deadline">{t('resources.sortDeadline')}</option>
             </select>
           </label>
 
