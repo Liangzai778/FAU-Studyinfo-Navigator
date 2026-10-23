@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { entrySemesterIdSchema, ruleVerificationStatusSchema } from './academic';
 import { DEFAULT_BLOCK_MINUTES, GRID_END_MINUTES, GRID_START_MINUTES, SLOT_MINUTES, clampDuration, snapToSlot } from './timetableGrid';
+import { TIMETABLE_DAYS } from './timetableLabels';
 
 export const studyStatusSchema = z.enum(['planned', 'in_progress', 'passed', 'failed', 'recognized']);
 export type StudyStatus = z.infer<typeof studyStatusSchema>;
@@ -32,7 +33,15 @@ export const courseAttemptSchema = z.object({
   // Room and weekday are personal timetable facts, recorded per attempt so a
   // course moved to another room next semester keeps both entries honest.
   location: z.string().max(160).default(''),
-  day: timetableDaySchema.nullable().default(null),
+  /**
+   * Every weekday this course meets on.
+   *
+   * A lecture can sit on Monday and Wednesday; keeping the list on one attempt
+   * means one course stays one record instead of being duplicated per day.
+   * The legacy single `day` column is still accepted in stored snapshots and
+   * folded into this list on read, so old data keeps working.
+   */
+  days: z.array(timetableDaySchema).max(5).default([]),
   // Clock times turn the weekday list into a real schedule. Both are optional:
   // a student may know the weekday before the time, and older saved attempts
   // simply have no time yet.
@@ -50,6 +59,13 @@ export const courseAttemptSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 export type CourseAttempt = z.infer<typeof courseAttemptSchema>;
+
+/** One course meeting on one weekday. A twice-weekly lecture yields two. */
+export type TimetableOccurrence = {
+  day: TimetableDay;
+  startMinutes: number | null;
+  durationMinutes: number | null;
+};
 
 export const plannerSnapshotSchema = z
   .object({
@@ -114,10 +130,13 @@ export type TimetableEntry = {
   ects: number | null;
   semesterId: string;
   location: string;
-  day: TimetableDay | null;
+  /** Every weekday the course meets; empty when the student has not said yet. */
+  days: TimetableDay[];
   startMinutes: number | null;
   durationMinutes: number | null;
   status: StudyStatus;
+  /** True when the room/time was filled in by hand rather than read from a handbook. */
+  isExtraCourse: boolean;
 };
 
 export type SemesterTimetable = {
@@ -133,11 +152,22 @@ type AttemptLike = {
   courseId: string;
   semesterId: string;
   location: string;
-  day: TimetableDay | null;
+  days?: TimetableDay[];
+  /** Legacy single weekday, still present in snapshots saved by older builds. */
+  day?: TimetableDay | null;
   status?: StudyStatus;
   startMinutes?: number | null;
   durationMinutes?: number | null;
 };
+
+/** Reads the weekday list, falling back to the legacy single-day column. */
+export function attemptDays(attempt: Pick<AttemptLike, 'days' | 'day'>): TimetableDay[] {
+  const fromList = attempt.days ?? [];
+  const legacy = attempt.day ? [attempt.day] : [];
+  return [...new Set([...fromList, ...legacy])].filter((day): day is TimetableDay =>
+    timetableDaySchema.safeParse(day).success,
+  );
+}
 
 /**
  * Groups course attempts into a per-semester timetable.
@@ -163,10 +193,11 @@ export function buildTimetable(
       ects: course.ects,
       semesterId: attempt.semesterId,
       location: attempt.location,
-      day: attempt.day,
+      days: attemptDays(attempt),
       startMinutes: attempt.startMinutes ?? null,
       durationMinutes: attempt.durationMinutes ?? null,
       status: attempt.status ?? 'planned',
+      isExtraCourse: course.isExtraCourse,
     });
     bySemester.set(attempt.semesterId, entries);
   });
@@ -190,14 +221,29 @@ function semesterSortKey(semesterId: string) {
 }
 
 function compareEntries(left: TimetableEntry, right: TimetableEntry) {
-  const leftDay = left.day ? timetableDaySchema.options.indexOf(left.day) : 5;
-  const rightDay = right.day ? timetableDaySchema.options.indexOf(right.day) : 5;
+  const leftDay = earliestDayIndex(left.days);
+  const rightDay = earliestDayIndex(right.days);
   if (leftDay !== rightDay) return leftDay - rightDay;
   const leftStart = left.startMinutes ?? Number.MAX_SAFE_INTEGER;
   const rightStart = right.startMinutes ?? Number.MAX_SAFE_INTEGER;
   if (leftStart !== rightStart) return leftStart - rightStart;
   if (left.location !== right.location) return left.location.localeCompare(right.location, 'de');
   return left.title.localeCompare(right.title, 'de');
+}
+
+/** Index of the first weekday a course meets; 5 means "no day set". */
+function earliestDayIndex(days: readonly TimetableDay[]) {
+  if (days.length === 0) return timetableDaySchema.options.length;
+  return Math.min(...days.map((day) => timetableDaySchema.options.indexOf(day)));
+}
+
+/** Expands courses into one block per meeting, which is what the grid draws. */
+export function timetableOccurrences(entry: TimetableEntry): TimetableOccurrence[] {
+  return entry.days.map((day) => ({
+    day,
+    startMinutes: entry.startMinutes,
+    durationMinutes: entry.durationMinutes,
+  }));
 }
 
 /**
@@ -211,10 +257,10 @@ export function findFreeStart(
   day: TimetableDay,
   requestedStart: number,
   duration: number,
-  taken: readonly { day: TimetableDay | null; startMinutes: number | null; durationMinutes: number | null }[],
+  taken: readonly { day?: TimetableDay | null; days?: readonly TimetableDay[]; startMinutes: number | null; durationMinutes: number | null }[],
 ): number | null {
   const blocked = taken
-    .filter((entry) => entry.day === day && entry.startMinutes !== null)
+    .filter((entry) => (entry.days ?? (entry.day ? [entry.day] : [])).includes(day) && entry.startMinutes !== null)
     .map((entry) => ({
       start: entry.startMinutes as number,
       end: (entry.startMinutes as number) + (entry.durationMinutes ?? DEFAULT_BLOCK_MINUTES),
@@ -226,6 +272,27 @@ export function findFreeStart(
     if (!overlaps) return start;
   }
   return null;
+}
+
+/** Course blocks that clash in a semester, so the page can warn about them. */
+export function findClashes(entries: readonly TimetableEntry[]): { day: TimetableDay; first: TimetableEntry; second: TimetableEntry }[] {
+  const clashes: { day: TimetableDay; first: TimetableEntry; second: TimetableEntry }[] = [];
+  for (const day of TIMETABLE_DAYS) {
+    const blocks = entries
+      .filter((entry) => entry.days.includes(day) && entry.startMinutes !== null)
+      .map((entry) => ({
+        entry,
+        start: entry.startMinutes as number,
+        end: (entry.startMinutes as number) + (entry.durationMinutes ?? DEFAULT_BLOCK_MINUTES),
+      }))
+      .sort((left, right) => left.start - right.start);
+    for (let index = 1; index < blocks.length; index += 1) {
+      const previous = blocks[index - 1]!;
+      const current = blocks[index]!;
+      if (current.start < previous.end) clashes.push({ day, first: previous.entry, second: current.entry });
+    }
+  }
+  return clashes;
 }
 
 

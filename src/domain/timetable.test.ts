@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TimetableDay } from './planner';
-import { buildTimetable, findFreeStart } from './planner';
+import { attemptDays, buildTimetable, findClashes, findFreeStart, timetableOccurrences } from './planner';
 import { timetableDayLabelKey } from './timetableLabels';
 
 const course = (id: string, title: string, ects: number | null) => ({
@@ -115,6 +115,59 @@ describe('timetable', () => {
   it('reports no free slot when the day is full', () => {
     const full = [{ day: 'fri' as const, startMinutes: 8 * 60, durationMinutes: 13 * 60 }];
     expect(findFreeStart('fri', 8 * 60, 90, full)).toBeNull();
+  });
+
+  it('keeps one record for a course that meets twice a week', () => {
+    const tables = buildTimetable(
+      [{ ...attempt('a1', 'c1', '2026-winter', 'Hörsaal A', 'mon'), days: ['mon', 'wed'], startMinutes: 8 * 60, durationMinutes: 90 }],
+      [course('c1', 'Biomathematik', 10)],
+    );
+    expect(tables[0]!.entries).toHaveLength(1);
+    expect(tables[0]!.entries[0]!.days).toEqual(['mon', 'wed']);
+    expect(timetableOccurrences(tables[0]!.entries[0]!)).toEqual([
+      { day: 'mon', startMinutes: 480, durationMinutes: 90 },
+      { day: 'wed', startMinutes: 480, durationMinutes: 90 },
+    ]);
+    // The ECTS are counted once, not once per meeting.
+    expect(tables[0]!.totalEcts).toBe(10);
+  });
+
+  it('folds a legacy single day into the day list', () => {
+    expect(attemptDays({ day: 'thu' })).toEqual(['thu']);
+    expect(attemptDays({ days: ['mon', 'wed'], day: 'wed' })).toEqual(['mon', 'wed']);
+    expect(attemptDays({ days: [] })).toEqual([]);
+  });
+
+  it('reports a clash only when two courses really overlap', () => {
+    const make = (id: string, start: number, duration: number, days: ('mon' | 'tue' | 'wed' | 'thu' | 'fri')[], title: string) => ({
+      attemptId: id,
+      courseId: id,
+      title,
+      ects: 5,
+      semesterId: '2026-winter',
+      location: '',
+      days,
+      startMinutes: start,
+      durationMinutes: duration,
+      status: 'planned' as const,
+      isExtraCourse: false,
+    });
+    const overlapping = [make('a', 9 * 60, 90, ['mon'], 'A'), make('b', 10 * 60, 90, ['mon'], 'B')];
+    expect(findClashes(overlapping)).toHaveLength(1);
+    expect(findClashes(overlapping)[0]!.day).toBe('mon');
+
+    const backToBack = [make('a', 9 * 60, 90, ['mon'], 'A'), make('b', 10 * 60 + 30, 90, ['mon'], 'B')];
+    expect(findClashes(backToBack)).toHaveLength(0);
+
+    const differentDays = [make('a', 9 * 60, 90, ['mon'], 'A'), make('b', 9 * 60, 90, ['tue'], 'B')];
+    expect(findClashes(differentDays)).toHaveLength(0);
+  });
+
+  it('treats every meeting day of a twice-weekly course as blocked', () => {
+    const taken = [{ days: ['mon', 'wed'] as const, startMinutes: 9 * 60, durationMinutes: 90 }];
+    expect(findFreeStart('mon', 9 * 60, 90, taken)).toBe(10 * 60 + 30);
+    expect(findFreeStart('wed', 9 * 60, 90, taken)).toBe(10 * 60 + 30);
+    expect(findFreeStart('tue', 9 * 60, 90, taken)).toBe(9 * 60);
   });
 
   it('labels an unassigned day separately from real weekdays', () => {

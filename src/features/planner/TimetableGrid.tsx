@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { SemesterTimetable, TimetableDay, TimetableEntry } from '../../domain/planner';
+import { findClashes } from '../../domain/planner';
 import {
   GRID_END_MINUTES,
   GRID_START_MINUTES,
@@ -12,7 +13,7 @@ import { useTranslation } from '../../i18n/useTranslation';
 
 type Patch = {
   location?: string;
-  day?: TimetableDay | null;
+  days?: TimetableDay[];
   startMinutes?: number | null;
   durationMinutes?: number | null;
 };
@@ -36,17 +37,18 @@ const SLOT_PX = 14;
 /**
  * Weekly grid from 08:00 to 21:00.
  *
- * Courses without a start time cannot be placed on the clock, so they sit in a
- * separate strip above the grid instead of being silently dropped. Their
- * weekday is still shown, which is the part the student already entered.
+ * A lecture that runs Monday and Wednesday is one record but two blocks, so
+ * every day column draws its own copy. Courses without a start time cannot be
+ * placed on the clock and sit in a strip above the grid instead of vanishing.
  */
 export function TimetableGrid({ table, onSave }: TimetableGridProps) {
   const { t } = useTranslation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftLocation, setDraftLocation] = useState('');
 
-  const placed = table.entries.filter((entry) => entry.day !== null && entry.startMinutes !== null);
-  const unplaced = table.entries.filter((entry) => !(entry.day !== null && entry.startMinutes !== null));
+  const placed = table.entries.filter((entry) => entry.days.length > 0 && entry.startMinutes !== null);
+  const unplaced = table.entries.filter((entry) => !(entry.days.length > 0 && entry.startMinutes !== null));
+  const clashes = findClashes(table.entries);
 
   const hourMarks = [];
   for (let minutes = GRID_START_MINUTES; minutes <= GRID_END_MINUTES; minutes += 60) hourMarks.push(minutes);
@@ -61,27 +63,40 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
     setEditingId(null);
   };
 
-  const renderCard = (entry: TimetableEntry, absolute: boolean) => {
-    const top = absolute && entry.startMinutes !== null
-      ? ((entry.startMinutes - GRID_START_MINUTES) / SLOT_MINUTES) * SLOT_PX
-      : 0;
-    const height = absolute
-      ? Math.max(46, ((entry.durationMinutes ?? 90) / SLOT_MINUTES) * SLOT_PX - 2)
-      : undefined;
+  const toggleDay = (entry: TimetableEntry, day: TimetableDay) => {
+    const next = entry.days.includes(day) ? entry.days.filter((item) => item !== day) : [...entry.days, day];
+    onSave(entry, { days: TIMETABLE_DAYS.filter((item) => next.includes(item)) });
+    setEditingId(null);
+  };
+
+  const renderCard = (entry: TimetableEntry, day: TimetableDay) => {
+    const top = ((entry.startMinutes as number) - GRID_START_MINUTES) / SLOT_MINUTES * SLOT_PX;
+    const height = Math.max(46, ((entry.durationMinutes ?? 90) / SLOT_MINUTES) * SLOT_PX - 2);
+    const clashing = clashes.some(
+      (clash) => clash.day === day && (clash.first.attemptId === entry.attemptId || clash.second.attemptId === entry.attemptId),
+    );
 
     return (
       <article
-        key={entry.attemptId}
-        className={`rounded-lg border p-1.5 text-[11px] leading-tight shadow-sm ${STATUS_STYLES[entry.status]} ${absolute ? 'absolute inset-x-1' : ''}`}
-        style={absolute ? { top, height } : undefined}
+        key={`${entry.attemptId}-${day}`}
+        className={`absolute inset-x-1 rounded-lg border p-1.5 text-[11px] leading-tight shadow-sm ${STATUS_STYLES[entry.status]} ${
+          clashing ? 'ring-2 ring-amber-500 ring-offset-1' : ''
+        }`}
+        style={{ top, height }}
       >
         {entry.startMinutes !== null ? (
           <p className="font-mono text-[10px] font-bold tracking-tight opacity-80">
             {minutesToLabel(entry.startMinutes)}–{minutesToLabel(entry.startMinutes + (entry.durationMinutes ?? 90))}
           </p>
         ) : null}
-        <p className="mt-0.5 font-semibold">{entry.title}</p>
-        <p className="opacity-75">{entry.ects ?? t('common.unknown')} ECTS</p>
+        <p className="mt-0.5 font-semibold">
+          {clashing ? <span aria-hidden="true" className="mr-0.5">⚠</span> : null}
+          {entry.title}
+        </p>
+        <p className="opacity-75">
+          {entry.ects ?? t('common.unknown')} ECTS
+          {entry.days.length > 1 ? ` · ${t('planner.timetable.timesPerWeek').replace('{count}', String(entry.days.length))}` : ''}
+        </p>
         {editingId === entry.attemptId ? (
           <div className="mt-1 space-y-1">
             <input
@@ -96,6 +111,21 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
               }}
               className="w-full rounded border border-slate-300 bg-white px-1 py-0.5 text-[11px] text-slate-900 dark:border-slate-600 dark:bg-slate-950 dark:text-white"
             />
+            <div className="flex flex-wrap gap-1">
+              {TIMETABLE_DAYS.map((weekday) => (
+                <button
+                  key={weekday}
+                  type="button"
+                  onClick={() => toggleDay(entry, weekday)}
+                  aria-pressed={entry.days.includes(weekday)}
+                  className={`rounded px-1.5 py-0.5 font-semibold ${
+                    entry.days.includes(weekday) ? 'bg-sky-700 text-white' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
+                  }`}
+                >
+                  {t(timetableDayLabelKey(weekday))}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={() => commitLocation(entry)}
@@ -122,6 +152,19 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
 
   return (
     <div className="mt-4">
+      {clashes.length > 0 ? (
+        <div className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs dark:border-amber-800 dark:bg-amber-950/40">
+          <p className="font-semibold text-amber-900 dark:text-amber-200">{t('planner.timetable.clashTitle')}</p>
+          <ul className="mt-1 space-y-0.5 text-amber-900 dark:text-amber-200">
+            {clashes.map((clash, index) => (
+              <li key={`${clash.day}-${clash.first.attemptId}-${clash.second.attemptId}-${index}`}>
+                {t(timetableDayLabelKey(clash.day))}：{clash.first.title} ↔ {clash.second.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       {unplaced.length > 0 ? (
         <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/40">
           <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">{t('planner.timetable.noTimeYet')}</p>
@@ -135,7 +178,10 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
               >
                 <span className="font-semibold text-slate-900 dark:text-white">{entry.title}</span>
                 <span className="ml-1 text-slate-500 dark:text-slate-400">
-                  · {t(timetableDayLabelKey(entry.day))} · {entry.ects ?? t('common.unknown')} ECTS
+                  {entry.days.length > 0
+                    ? `· ${entry.days.map((day) => t(timetableDayLabelKey(day))).join(' / ')}`
+                    : `· ${t('planner.timetable.day.unassigned')}`}{' '}
+                  · {entry.ects ?? t('common.unknown')} ECTS
                 </span>
               </button>
             ))}
@@ -168,7 +214,7 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
             </div>
 
             {TIMETABLE_DAYS.map((day) => {
-              const dayEntries = placed.filter((entry) => entry.day === day);
+              const dayEntries = placed.filter((entry) => entry.days.includes(day));
               return (
                 <div
                   key={day}
@@ -178,7 +224,7 @@ export function TimetableGrid({ table, onSave }: TimetableGridProps) {
                     backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${(4 * SLOT_PX) - 1}px, rgba(100,116,139,0.18) ${(4 * SLOT_PX) - 1}px, rgba(100,116,139,0.18) ${4 * SLOT_PX}px)`,
                   }}
                 >
-                  {dayEntries.map((entry) => renderCard(entry, true))}
+                  {dayEntries.map((entry) => renderCard(entry, day))}
                   {dayEntries.length === 0 ? (
                     <span className="absolute inset-x-0 top-1 text-center text-[10px] text-slate-300 dark:text-slate-700">—</span>
                   ) : null}

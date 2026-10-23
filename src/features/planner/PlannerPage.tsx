@@ -122,7 +122,7 @@ export function PlannerPage() {
   // about the attempt is preserved as-is.
   const onTimetablePatch = async (
     attemptId: string,
-    patch: { location?: string; day?: TimetableDay | null; startMinutes?: number | null; durationMinutes?: number | null },
+    patch: { location?: string; days?: TimetableDay[]; startMinutes?: number | null; durationMinutes?: number | null },
   ) => {
     const attempt = attempts.find((item) => item.id === attemptId);
     if (!attempt) return;
@@ -138,7 +138,7 @@ export function PlannerPage() {
       poVersionId: attempt.poVersionId,
       requirementGroupId: attempt.requirementGroupId,
       location: attempt.location,
-      day: attempt.day,
+      days: attempt.days,
       startMinutes: attempt.startMinutes,
       durationMinutes: attempt.durationMinutes,
       notes: attempt.notes,
@@ -156,7 +156,7 @@ export function PlannerPage() {
       poVersionId: selectedPoId,
       requirementGroupId: selectedPoId === previousAttempt.poVersionId ? previousAttempt.requirementGroupId : null,
       location: '',
-      day: null,
+      days: [],
       startMinutes: null,
       durationMinutes: null,
       notes: '',

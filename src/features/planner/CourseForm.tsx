@@ -48,7 +48,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
   const [recognitionConfirmed, setRecognitionConfirmed] = useState(false);
   const [requirementGroupId, setRequirementGroupId] = useState(() => (editingCourse ? '' : ''));
   const [location, setLocation] = useState('');
-  const [day, setDay] = useState<TimetableDay | ''>('');
+  const [days, setDays] = useState<TimetableDay[]>([]);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('10:30');
   const [isExtraCourse, setIsExtraCourse] = useState(() => editingCourse?.isExtraCourse ?? false);
@@ -126,7 +126,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
     let durationMinutes: number | null = null;
     const startRaw = parseTimeOfDay(startTime);
     const endRaw = parseTimeOfDay(endTime);
-    if (startRaw !== null && endRaw !== null) {
+    if (days.length > 0 && startRaw !== null && endRaw !== null) {
       const snappedStart = snapToSlot(startRaw);
       if (endRaw <= startRaw || snappedStart + 15 > GRID_END_MINUTES) {
         setError(t('planner.timeRangeInvalid'));
@@ -143,7 +143,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
       poVersionId: selectedPo?.examinationRegulationVersionId ?? null,
       requirementGroupId: requirementGroupId && groupIdsInScope.has(requirementGroupId) ? requirementGroupId : null,
       location: location.trim(),
-      day: day || null,
+      days: TIMETABLE_DAYS.filter((value) => days.includes(value)),
       startMinutes,
       durationMinutes,
       notes: '',
@@ -160,7 +160,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
     setRecognitionConfirmed(false);
     setRequirementGroupId('');
     setLocation('');
-    setDay('');
+    setDays([]);
     setStartTime('09:00');
     setEndTime('10:30');
     setIsExtraCourse(false);
@@ -318,13 +318,34 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
             <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.location')}</span>
             <input value={location} maxLength={160} placeholder={t('planner.timetable.locationPlaceholder')} onChange={(event) => setLocation(event.target.value)} className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950" />
           </label>
-          <label>
+          <div className="md:col-span-2 xl:col-span-4">
             <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.weekday')}</span>
-            <select value={day} onChange={(event) => setDay(event.target.value as TimetableDay | '')} className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950">
-              <option value="">{t('planner.timetable.day.unassigned')}</option>
-              {TIMETABLE_DAYS.map((value) => <option key={value} value={value}>{t(timetableDayLabelKey(value))}</option>)}
-            </select>
-          </label>
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t('planner.timetable.weekday')}>
+              {TIMETABLE_DAYS.map((value) => {
+                const active = days.includes(value);
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() =>
+                      setDays((current) =>
+                        current.includes(value) ? current.filter((item) => item !== value) : TIMETABLE_DAYS.filter((item) => item === value || current.includes(item)),
+                      )
+                    }
+                    className={`h-11 rounded-xl border px-4 text-sm font-semibold transition ${
+                      active
+                        ? 'border-sky-700 bg-sky-700 text-white'
+                        : 'border-slate-300 bg-white text-slate-700 hover:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200'
+                    }`}
+                  >
+                    {t(timetableDayLabelKey(value))}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t('planner.timetable.weekdayHint')}</p>
+          </div>
           <label>
             <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('planner.timetable.startTime')}</span>
             <input
@@ -333,7 +354,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
               min="08:00"
               max="20:45"
               step="900"
-              disabled={!day}
+              disabled={days.length === 0}
               onChange={(event) => setStartTime(event.target.value)}
               className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
             />
@@ -346,7 +367,7 @@ export function CourseForm({ selectedPo, groups, catalogue, plannedModuleVersion
               min="08:15"
               max="21:00"
               step="900"
-              disabled={!day}
+              disabled={days.length === 0}
               onChange={(event) => setEndTime(event.target.value)}
               className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950"
             />
