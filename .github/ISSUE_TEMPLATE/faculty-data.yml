@@ -1,0 +1,59 @@
+name: My faculty is missing
+description: Offer to add data for a faculty or programme that is not in the app yet
+title: "[faculty] "
+labels: ["coverage", "help wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The app currently covers only three master programmes in the Faculty of
+        Sciences (Biology). Adding another faculty is the most useful
+        contribution there is.
+
+        Read the [adding a faculty guide](https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/blob/main/docs/ADDING_A_FACULTY.md)
+        first. You do not have to finish everything — one programme with its
+        current PO is enough to start.
+  - type: dropdown
+    id: faculty
+    attributes:
+      label: Faculty
+      options:
+        - Humanities, Social Sciences and Theology
+        - Business, Economics and Law
+        - Medicine
+        - Sciences (another programme in this faculty)
+        - Engineering
+        - Other / not FAU
+    validations:
+      required: true
+  - type: textarea
+    id: programmes
+    attributes:
+      label: Which programmes, and which PO versions
+      description: List what the faculty actually offers, and which document version is current.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Official links you found
+      description: Examination regulation, module handbook, faculty programme index. https only.
+    validations:
+      required: true
+  - type: dropdown
+    id: intent
+    attributes:
+      label: What do you want to do
+      options:
+        - I will transcribe the data and open a pull request
+        - I can provide the documents but not the data entry
+        - I am only requesting that someone else adds it
+    validations:
+      required: true
+  - type: checkboxes
+    id: read-guide
+    attributes:
+      label: Confirmation
+      options:
+        - label: I understand that no value may be guessed and unverified rules must stay marked as such.
+          required: true

@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contribution guide
+    url: https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/blob/main/CONTRIBUTING.md
+    about: How to run the project, the data rules, and what a good pull request looks like.
+  - name: Adding your faculty
+    url: https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/blob/main/docs/ADDING_A_FACULTY.md
+    about: Step-by-step guide for transcribing a faculty that is not covered yet.
+  - name: What the data package covers
+    url: https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/blob/main/README.md
+    about: Current coverage (three biology master programmes), and why other faculties are empty on purpose.

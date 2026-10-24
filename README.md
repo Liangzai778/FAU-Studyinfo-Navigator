@@ -1,161 +1,166 @@
 # FAU Study Navigator
 
-FAU Study Navigator 是面向 FAU 学生的本地优先学习导航与个人规划工具。项目独立开发，与 Friedrich-Alexander-Universität Erlangen-Nürnberg（FAU）没有官方隶属或认可关系。考试报名、课程注册、成绩、学分认定及具有法律效力的要求始终以 FAU 官方文件和 Campo 为准。
+[![CI](https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-应用不会连接后端、云数据库、分析服务或在线 API。FAU 外链只会在用户主动点击后打开。
+面向 FAU（Friedrich-Alexander-Universität Erlangen-Nürnberg）学生的**本地优先**学习导航与个人规划工具。无后端、无账号、无遥测，所有个人数据只存在你自己的浏览器里。
 
-## 本地环境要求
+**在线使用：** https://fau-studyinfo-navigator.pages.dev
 
-- Node.js `>= 22.13.0`
-- npm 10 或更新版本
-- 支持 IndexedDB、localStorage、Blob 下载和现代 `Intl` 时区数据的浏览器
-- 可选：本机已有 Playwright Chromium 浏览器，用于 E2E 测试
+> 独立学生工具，与 FAU 没有官方隶属或认可关系。考试报名、课程注册、成绩、学分认定以及具有法律效力的要求，一律以 FAU 官方文件和 Campo 为准。
 
-依赖从 npm 官方注册表安装。`package-lock.json` 已随仓库提交，请使用 `npm ci` 以获得可复现的依赖版本。
+---
 
-## 安装、启动与构建
+## 这个项目现在覆盖什么
+
+**本项目主要聚焦自然科学学院（生物系）的三个硕士专业。** 这不是「还没做完」，而是当前版本的明确范围：每一条学业规则都必须对照官方考试条例逐条转录、并经过人工核实，没有捷径。
+
+| 专业 | 学位 | 当前 PO | 已录入模块 | 状态 |
+|---|---|---|---|---|
+| 细胞与分子生物学 Cell and Molecular Biology | M.Sc. | FPO BAMA Bio 2026（另有 2019 版仅登记来源） | 13 | 已核实 |
+| 整合生命科学 Integrated Life Sciences | M.Sc. | FPO BAMA ILS 2026 | 32 | 已核实，逐模块对照 SoSe 2026 模块手册 |
+| 整合免疫学 Integrated Immunology | M.Sc. | FPO iImmune 2026 | 11 | 已核实（1 个模块 ECTS 待确认） |
+
+数据包里共 **56 个模块、15 个要求组、4 个 PO 版本、17 条官方来源**。
+
+### 其他学院？还没有，位置留给你
+
+人文、经济、医学、工程四个学院，以及自然科学学院的其余专业，**目前完全没有培养计划与 PO 数据**。应用不会编造它们，而是明确显示「该学院尚未录入」并给出贡献入口。
+
+这是有意设计的扩展点：
+
+- 数据集中在 [`src/data/academic/academic-data.json`](src/data/academic/academic-data.json)，不需要改 React 组件；
+- 首页的「当前数据覆盖范围」直接从数据推导，录入后自动从「待补充」变成「已录入」；
+- 具体步骤见 **[docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md)**，一次录一个专业就够；
+- 也可以只提交资料：[「我的学院缺失」issue 模板](.github/ISSUE_TEMPLATE/faculty-data.yml)。
+
+---
+
+## What this is (English)
+
+A local-first study planner and resource navigator for FAU students. It has no
+backend, no accounts and no analytics; every personal record stays in the
+browser's IndexedDB or localStorage.
+
+**Coverage is deliberately narrow:** the data package transcribes the
+examination regulations and module tables of three master programmes in the
+Faculty of Sciences, Department of Biology (Cell and Molecular Biology,
+Integrated Life Sciences, Integrated Immunology). Every other faculty is empty
+and shows an explicit "not entered yet" notice instead of guessed rules.
+
+The extension point is the data file, not the UI: see
+[docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md) and
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## 功能
+
+- 六个页面：概览、专业要求、学期规划、考试与期限、校园导航、设置，外加 404。
+- 专业要求按 `学位类型 + 学院 + 专业 + 入学学期 + PO 版本` 解析；系统不会替你选中「最新 PO」。
+- 规则按树形渲染：父组显示 ECTS 与子组，子组列出模块、ECTS 与开课学期；每张卡片附官方来源。
+- 验证状态可见：已核实 / 暂定 / 待复核 / 未核实 / 来源冲突。
+- 学期规划：课程目录选择器（带模块代码、ECTS、开课学期、可计入的要求组）、手动录入额外课程、重修记录。
+- 08:00–21:00 周课程表：一门课可跨多个星期、每个星期独立时间、冲突高亮、剩余时间提示。
+- ECTS 引擎（纯函数，有测试）：区分 planned / enrolled / passed / failed / recognized；规则不完整时结论保持 `unknown`。
+- 考试与学习任务、`Europe/Berlin` 墙钟校验（含夏令时边界）、本地生成 ICS。
+- 30 条资源、7 个分类（含 17 条国际学生资助与支持入口）、机会徽章、按截止日排序、收藏与自定义网站。
+- 版本化 JSON 备份导出与恢复，带大小、结构、冲突校验；设置页可二次确认清空本地数据。
+- 严格 CSP、无 CDN/远程字体/远程脚本、禁止后台远程请求（有静态扫描测试保护）。
+- 简体中文默认，英文完全对等（键集不一致会导致测试失败）。
+
+## 技术栈
+
+React 19 · Vite 8 · TypeScript strict · Tailwind CSS 4 · React Router 7 · Zod · Zustand · IndexedDB · Vitest · Playwright
+
+领域规则放在 `src/domain/` 的纯函数里，React 组件不承担学分或 PO 判断。
+
+## 本地开发
+
+要求 Node.js `>= 22.13.0`、npm 10+。
 
 ```bash
 npm ci
-npm run dev
+npm run dev      # http://127.0.0.1:5173
 ```
 
-开发服务器只监听 `127.0.0.1`，默认地址为 `http://127.0.0.1:5173`。
-建议始终使用同一地址访问，不要与 `localhost` 交替，否则浏览器会视为不同站点，看到不同的本地数据。
+始终使用 `127.0.0.1`，不要和 `localhost` 交替访问：浏览器视为不同站点，你会看到不同的本地数据。
 
-执行全部本地质量门禁：
+### 质量门禁
 
 ```bash
 npm run lint
 npm run typecheck
-npm run test
-npm run test:e2e
+npm run test        # 静态检查 32 项 + 单元测试
+npm run test:data   # 学术数据引用完整性、PO 范围、ECTS 算术
+npm run test:e2e    # 需要先执行 npx playwright install chromium
 npm run build
 ```
 
-首次运行 E2E 前需安装浏览器：
+E2E 会自己构建并用 `npm run preview` 起服务，测试的是真实生产包。
 
-```bash
-npx playwright install chromium
-```
+## 部署
 
-不依赖第三方 npm 包的静态和核心领域测试：
-
-```bash
-npm run test:static
-```
-
-构建结果位于 `dist/`。只在本机预览生产构建：
-
-```bash
-npm run preview
-```
-
-## 已实现功能
-
-- React、Vite、TypeScript strict、Tailwind CSS、React Router、Zod 和 Zustand 本地应用。
-- Dashboard、Degree、Semester Planner、Exams、Resources、Settings 及 404 路由。
-- 响应式顶部栏、桌面侧边栏、平板/手机底部导航和深浅主题。
-- 默认简体中文，当前全部界面键提供英文版本；语言和主题刷新后保留。
-- 五大学院及 Bachelor/Master 资源筛选、搜索、排序、收藏置顶。
-- 用户个人网站与自定义分类的添加、编辑、删除和排序，所有外链要求 HTTPS。
-- Faculty、Programme、ProgrammeTrack、PO、ModuleVersion、RequirementGroup、AcademicSource 等版本化 Zod 模型。
-- 入学学期只筛选候选 PO；系统不会自动选中最新版，必须由用户确认。
-- 独立于 React 的 ECTS 引擎：区分计划与获得学分，处理失败、认定、重修、PO 不匹配、额外课程和互斥分组防重复计分。
-- 课程和学期计划的添加、编辑、调整、重修与删除。
-- 个人考试、手动报名状态、课程关联、地点、备注和学习任务。
-- `Europe/Berlin` 墙钟时间校验，包括夏令时不存在时刻与重复时段。
-- 个人考试和任务时间线，以及完全本地生成的 ICS 日历。
-- 版本化 JSON 备份、结构与大小校验、冲突保护及 IndexedDB 单事务合并恢复。
-- 设置页提供二次确认后的本地数据彻底清空。
-- CSP、本地静态资源、禁止后台远程请求扫描、错误边界与安全外链处理。
-- Vitest/Testing Library 测试、无依赖静态测试及 Playwright 本地 E2E 配置。
-
-## 数据保存位置
-
-| 数据 | 浏览器位置 | 说明 |
-|---|---|---|
-| 语言、主题 | `localStorage: fau-study-navigator.preferences.v1` | 低敏界面偏好 |
-| 资源范围、排序、收藏、个人网站、分类 | `localStorage: fau-study-navigator.resources.v1` | 仅当前浏览器 |
-| 专业范围与已确认 PO | IndexedDB `fau-study-navigator / academic-profile` | 不根据入学年份自动改写 |
-| 课程与重修记录 | IndexedDB `planner-courses`、`planner-attempts` | PO 变化不会覆盖历史记录 |
-| 个人考试与学习任务 | IndexedDB `personal-exams`、`study-tasks` | 日期固定为 Europe/Berlin 语义 |
-| 公共学院、来源与学术规则 | 随构建发布的本地 TypeScript/JSON | 只读且版本化 |
-
-所有个人数据都停留在当前浏览器。清除浏览器站点数据、卸载浏览器或更换设备可能造成永久丢失。
-
-## 数据备份与恢复
-
-在“设置”页面选择“导出 JSON 备份”。文件在浏览器内存中生成并直接下载，不会上传。当前 schema v1 备份包含：
-
-- 专业/PO 范围；
-- 课程和重修记录；
-- 个人考试和学习任务。
-
-恢复时先进行 2 MiB 大小限制、JSON 安全键、嵌套深度、schemaVersion 和 Zod 结构校验，再要求用户确认。记录按稳定 ID 合并；相同 ID 内容冲突会拒绝整个恢复，不会静默覆盖现有数据。
-
-语言、主题、收藏、个人网站和自定义分类目前不包含在 JSON 备份中。彻底清空会删除这些数据；执行前请自行记录仍需保留的设置和链接。
-
-## 学术数据和真实性
-
-生产学术数据包有意保持为空：当前没有录入任何具体专业、PO、课程模块、ECTS、毕业要求或官方考试日期。五学院与通用资源入口来自保留的项目 PRD；本地包只包含一个标记为 `unverified` 的考试条例导航来源。
-
-用户输入的课程、ECTS、考试和任务始终显示为个人数据，不会作为 FAU 官方资料。规则或来源不完整时，毕业条件结果保持 `unknown`；即使全部本地计算条件满足，界面也只显示“可能满足”，并要求以官方文件和 Campo 为准。
-
-## 部署为在线站点
-
-应用是纯静态前端，构建产物在 `dist/`，可部署到任意静态托管。所有用户数据保存在各自浏览器的 IndexedDB / localStorage 中，不会上传到服务器。
-
-构建会自动生成 SPA 回退文件：
-
-- `dist/_redirects`：Cloudflare Pages / Netlify 使用
-- `dist/404.html`：GitHub Pages 使用
-
-### 部署到 GitHub Pages
+纯静态前端，构建产物在 `dist/`。生产环境使用 Cloudflare Pages（`wrangler.jsonc` 中 `not_found_handling: "single-page-application"`）。
 
 ```bash
 npm run build
+npx wrangler pages deploy dist --project-name fau-studyinfo-navigator
 ```
 
-将 `dist/` 发布到 `gh-pages` 分支，或在仓库 Settings → Pages 中选择 GitHub Actions 并由 CI 构建。
+**不要生成 `dist/404.html`。** Cloudflare Pages 会把它当作权威的 404 响应体，导致 `/degree` 等深链接返回 404 状态码。这个坑已经踩过并写进 `scripts/postbuild.mjs` 的注释。GitHub Pages 工作流已移除：它的 SPA 回退方式与本项目的部署目标冲突。
 
-### 部署到 Cloudflare Pages / Netlify
+## 数据来源与真实性
 
-构建命令 `npm run build`，输出目录 `dist`。两者都支持连接本仓库自动部署。
+- 每条规则绑定至少一个 `AcademicSource`，来源必须是 HTTPS 官方地址。
+- 无法确认的数值保持 `null`：例如整合免疫学的「项目工作研讨课」ECTS 至今未确认，界面会显示「ECTS 待确认」而不是猜一个数字。
+- 2019 版 ZMB 条例只登记来源、未转录模块表；选中它的老生会看到「此版本尚未逐条录入……你的选择仍然有效」，而不是「没有规则」。
+- ILS 的 32 个模块逐条对照 SoSe 2026 模块手册，手册 SHA-256、页码和 35 条断言都在测试里，数据与 PDF 漂移会直接让构建失败。
+- 「schema 通过」不等于「内容真实」；只有人工复核后才能标 `verified`。
 
-> 公网部署后，README 顶部的免责声明同样适用于在线版本：本工具与 FAU 无官方隶属关系，所有考试与学分要求以官方文件和 Campo 为准。
+官方 PDF 与手册存放在 `sources/`，用于核对，版权归 FAU，不在 MIT 许可范围内。
+
+## 数据存储位置
+
+| 数据 | 位置 |
+|---|---|
+| 语言、主题 | `localStorage: fau-study-navigator.preferences.v1` |
+| 资源范围、排序、收藏、自定义分类与网站 | `localStorage: fau-study-navigator.resources.v1` |
+| 专业范围与已确认 PO | IndexedDB `academic-profile` |
+| 课程、学期时间与重修记录 | IndexedDB `planner-courses` / `planner-attempts` |
+| 个人考试与学习任务 | IndexedDB `personal-exams` / `study-tasks` |
+| 学院、来源与学业规则 | 随构建发布的只读数据包 |
+
+所有个人数据都在当前浏览器。换设备看不到，清站点数据会丢；迁移用设置页的 JSON 备份。
+
+## 贡献
+
+欢迎三类贡献：
+
+1. **补你所在学院的数据**（最有价值）：[docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md)
+2. **纠错**：用「Wrong academic data」模板，给出官方链接和页码
+3. **改代码 / 翻译 / 文档**：[CONTRIBUTING.md](CONTRIBUTING.md)
+
+唯一不能破的规则：**不猜测学术数据**。看起来合理的 ECTS 比一个明显的空白更危险。
+
+## 许可证
+
+代码以 [MIT License](LICENSE) 发布。FAU 官方文件与手册版权归 FAU。
 
 ## 已知限制
 
-- 已完整录入 FAU 自然科学学院生物系三个硕士项目：细胞与分子生物学（德语）、Integrated Life Sciences（英语）、Integrated Immunology（英语）。每个项目含 120 ECTS 总学分、模块清单、PO 版本、适用入学学期与逐条规则说明，全部转录自官方考试条例原文。
-- 当前已转录的是 **2026 年版**条例：ZMB 的 FPO BAMA Bio（2026-03-31）、ILS 的 FPO BAMA ILS（2026-03-31 修订）、iImmune 的 FPO（2026-02-13）。ZMB 的 2019 旧版仅登记来源，模块表未转录，因此 2026/27 冬季学期之前入学的学生无法用本工具核对旧版要求。
-- ILS 的三个模块组（生物数学建模与系统生物学、生物成像与生物物理、生物结构与过程）在数据中登记为可选轨道，具体选修模块清单以模块手册为准，本工具未逐条录入。
-- 只做了自然科学学院的生物系。其他四个学院及自然科学学院的其他专业仍无数据。
-- 尚无官方考试日期或报名期限；考试页只显示用户个人填写的数据。
-- 无 FAU 登录、Campo/StudOn 数据读取、考试报名、自动同步或后台通知。
-- JSON 备份暂不包含 localStorage 中的界面偏好和资源导航自定义数据。
-- 弹窗具备语义、Escape 关闭与键盘可操作控件，但尚未完成独立屏幕阅读器和 400% 缩放人工认证。
-- 首次运行 E2E 需手动执行 `npx playwright install chromium`；项目不会在安装依赖时自动下载浏览器。
-- 生产包为单一 JS 文件（约 494 kB / gzip 140 kB），尚未做代码分割。
+- 只覆盖自然科学学院生物系的三个硕士专业；其余学院与专业为空。
+- 2026/27 冬季学期之前入学的 ZMB 学生只能看到「旧版未转录」的提示，看不到 2019 版模块表。
+- 整合免疫学的「项目工作研讨课」ECTS 未确认，界面显示「ECTS 待确认」且该模块不计入学分。同组其余三个模块刚好凑满 35 ECTS，所以它不会单独卡住毕业判断，但这一项仍需对照 iImmune 模块手册补齐。
+- 没有 FAU 登录、Campo/StudOn 读取、考试报名、多设备同步或自动更新；学术数据随版本发布，不联网抓取。
+- 备份暂不含界面偏好与资源自定义数据。
+- 弹窗具备语义与键盘操作，但未完成独立屏幕阅读器与 400% 缩放的人工认证。
+- 学术数据的「每字段证据」（RuleEvidence）尚未实现，PDF 改版后无法逐字段 diff。
 
-## 如何添加真实 FAU 专业数据
+## 历史文档
 
-不得根据专业名称、入学年份或“最新 PO”猜测数据。新增真实数据必须在应用之外人工取得官方材料，并全部在本地完成：
-
-1. 在 `src/data/academic/academic-data.json` 的 `academicSources` 中登记官方 HTTPS 来源、发布者、文档类型、适用 scope、版本/章节、核对日期和核实状态。
-2. 添加 Programme，并明确 `facultyId`、`degreeType`、方向和对应 PO ID。
-3. 每个 ExaminationRegulationVersion 明确所属专业、适用入学学期范围、说明和至少一个来源 ID。
-4. Module 与 ModuleVersion 分开录入；版本必须声明适用 PO、有效学期、来源及核实状态。无法确认的 ECTS 保持 `null`。
-5. RequirementGroup 按各专业实际结构建立必修、限定选修、自由选修、论文、实习或附加要求；每条规则必须关联来源，未核实数据不得标为 `verified`。
-6. 运行 schema、引用、PO 匹配、ECTS、翻译和构建测试。
-7. 由人工逐项复核原文、页码/章节、适用专业和 PO。只有复核完成后才能更新 `lastVerifiedAt` 和 `verificationStatus`。
-
-详细模型与政策见：
-
-- `docs/ACADEMIC_DATA_MODEL.md`
-- `docs/ECTS_ENGINE.md`
-- `docs/EXAMS_TASKS.md`
-- `docs/DATA_POLICY.md`
-- `docs/TEST_PLAN.md`
-
-原始需求文件保留在 `upload/PRD(1).md`，不得删除、覆盖或移动。
+- [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md) — 项目日志与决策记录
+- [docs/SCALABILITY_AUDIT.md](docs/SCALABILITY_AUDIT.md) — 源码级审计
+- [docs/ACADEMIC_DATA_MODEL.md](docs/ACADEMIC_DATA_MODEL.md) — 数据模型
+- [docs/DATA_POLICY.md](docs/DATA_POLICY.md) — 数据政策
+- [upload/PRD(1).md](<upload/PRD(1).md>) — 最初的需求文档（保留原样）

@@ -1,0 +1,55 @@
+name: Bug report
+description: Something in the app is broken or looks wrong
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please do not paste personal data (grades, name, email, screenshots with your name).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the behaviour you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open /planner
+        2. Add a course that meets twice a week
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+  - type: input
+    id: route
+    attributes:
+      label: Route
+      description: Which page? For example /degree, /planner, /resources.
+    validations:
+      required: false
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Firefox 131, Chrome 130, Safari 18 ...
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I did not include personal data.
+          required: true
+        - label: This is not an academic-data error (those have their own template).
+          required: false

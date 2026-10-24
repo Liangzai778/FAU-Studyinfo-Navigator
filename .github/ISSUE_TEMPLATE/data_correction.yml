@@ -1,0 +1,70 @@
+name: Wrong academic data
+description: The app shows a module, ECTS value, PO range or rule that contradicts an official document
+title: "[data] "
+labels: ["academic-data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A correction is only actionable with the official source. Please include the document link and the page.
+
+        Do **not** submit personal records from Campo. We only need the public regulation text.
+  - type: dropdown
+    id: programme
+    attributes:
+      label: Programme
+      options:
+        - Cell and Molecular Biology (M.Sc.)
+        - Integrated Life Sciences (M.Sc.)
+        - Integrated Immunology (M.Sc.)
+        - Another programme (not in the app yet)
+    validations:
+      required: true
+  - type: input
+    id: po
+    attributes:
+      label: PO version
+      description: For example FPO BAMA Bio 2026, po-zmb-2026.
+    validations:
+      required: false
+  - type: input
+    id: module
+    attributes:
+      label: Module
+      description: Module name and number, if the issue is about one module.
+    validations:
+      required: false
+  - type: textarea
+    id: current
+    attributes:
+      label: What the app currently shows
+      description: Quote the exact text or number.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: What the official document says
+      description: Quote the exact sentence or table row.
+    validations:
+      required: true
+  - type: input
+    id: source-url
+    attributes:
+      label: Official source URL (https)
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page or section
+      placeholder: p. 21, § 4 Abs. 2, ...
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I read this in the official document myself, not in a summary or another student's notes.
+          required: true

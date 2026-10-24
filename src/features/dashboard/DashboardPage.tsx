@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { academicData } from '../../data/academicData';
+import { facultyCoverage, projectLinks } from '../../data/coverage';
 import { calculateEctsProgress } from '../../domain/ectsEngine';
 import type { TranslationKey } from '../../i18n/messages';
 import { useTranslation } from '../../i18n/useTranslation';
@@ -8,6 +9,7 @@ import { useAcademicProfileStore } from '../../store/academicProfile';
 import { useExamsTasksStore } from '../../store/examsTasks';
 import { usePlannerStore } from '../../store/planner';
 import { EmptyState } from '../../components/common/EmptyState';
+import { ExternalLink } from '../../components/common/ExternalLink';
 import { Icon } from '../../components/common/Icon';
 import { PageHeader } from '../../components/common/PageHeader';
 
@@ -67,7 +69,7 @@ const quickLinks: Array<{
 ];
 
 export function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const profile = useAcademicProfileStore((state) => state.profile);
   const hydrateProfile = useAcademicProfileStore((state) => state.hydrate);
   const courses = usePlannerStore((state) => state.courses);
@@ -156,6 +158,60 @@ export function DashboardPage() {
             </a>
           ))}
         </div>
+      </section>
+
+      <section aria-labelledby="coverage-heading" className="mb-10">
+        <h2 id="coverage-heading" className="mb-1 text-lg font-semibold text-slate-950 dark:text-white">
+          {t('dashboard.coverageTitle')}
+        </h2>
+        <p className="mb-4 max-w-4xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+          {t('dashboard.coverageBody')}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          {facultyCoverage.map((faculty) => {
+            const covered = faculty.status === 'covered';
+            const moduleCount = faculty.programmes.reduce((sum, programme) => sum + programme.moduleCount, 0);
+            return (
+              <article
+                key={faculty.facultyId}
+                className={`rounded-2xl border p-4 ${
+                  covered
+                    ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30'
+                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-slate-950 dark:text-white">{faculty.name[language]}</h3>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                      covered
+                        ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                    }`}
+                  >
+                    {t(covered ? 'dashboard.coverageStatusCovered' : 'dashboard.coverageStatusPending')}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                  {faculty.programmes.length} {t('dashboard.coverageProgrammeUnit')} · {moduleCount}{' '}
+                  {t('dashboard.coverageModuleUnit')}
+                </p>
+                {covered ? (
+                  <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                    {faculty.programmes.map((programme) => (
+                      <li key={programme.programmeId}>{programme.name[language]}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-sm font-semibold">
+          <ExternalLink href={projectLinks.contributing} className="text-sky-700 underline dark:text-sky-300">
+            {t('dashboard.coverageCta')}
+          </ExternalLink>
+        </p>
       </section>
 
       {hasPersonalData ? (

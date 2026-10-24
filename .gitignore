@@ -34,29 +34,20 @@ desktop.ini
 # TypeScript build info
 *.tsbuildinfo
 
-# transient files
+# Local scratch files (commit messages, ad-hoc screenshots, probes)
 .commitmsg.tmp
 shot-*.png
-
-
-# local verification scripts
-scripts/verify-live.mjs
-scripts/probe.mjs
-
-
-# extracted regulation text and local probes
 .po-cache/
+scripts/verify-live.mjs
+scripts/verify-online.mjs
+scripts/probe.mjs
 scripts/check-*.mjs
 scripts/probe-*.mjs
 scripts/dump-*.mjs
-shot-*.png
 
-
-scripts/verify-online.mjs
-
-
-# wrangler local dev state
+# Wrangler local dev state
 .wrangler/
-# keep the extracted handbook text out of git, keep the PDF reference record
+
+# Keep the extracted handbook text out of git; the PDF itself is the reference record
 sources/ils/*.txt
 sources/ils/*.extraction.json

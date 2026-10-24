@@ -82,6 +82,23 @@ for (const rg of data.requirementGroups) {
   }
 }
 
+// A group that lists modules must be able to reach its own minimum with them.
+// This is the check that catches a mistyped threshold: rg-ils-abschluss once
+// demanded 60 ECTS while listing only 55 ECTS of modules, so the degree could
+// never be satisfied even though every other number looked plausible.
+console.log('\nReachability of each group minimum:');
+for (const rg of data.requirementGroups) {
+  if (rg.eligibleModuleVersionIds.length === 0 || rg.minEcts === null) continue;
+  const reachable = rg.eligibleModuleVersionIds.reduce((sum, id) => {
+    const ects = ectsOf.get(id);
+    if (ects === undefined) return sum;
+    return sum + (ects ?? 0);
+  }, 0);
+  const ok = reachable >= rg.minEcts;
+  console.log(`  ${ok ? 'OK  ' : 'FAIL'} ${rg.id}: needs ${rg.minEcts}, offers ${reachable}`);
+  if (!ok) bad += 1;
+}
+
 const ilsGroupExpectations = [
   { id: 'rg-ils-mg1-wahlpflicht', core: ['ils-m2-biomathematik-v1', 'ils-b1-systems-biology-v1'], coreEcts: 15, label: 'MG1' },
   { id: 'rg-ils-mg2-wahlpflicht', core: ['ils-i1a-bioimaging-v1', 'ils-i1b-bioimaging-v1'], coreEcts: 15, label: 'MG2' },

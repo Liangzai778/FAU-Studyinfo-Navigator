@@ -1,11 +1,11 @@
 # FAU Study Navigator — 项目日志
 
-> 日期：2026-10-22
+> 日期：2026-10-24（最近更新，变更历史见第十节）
 > 项目路径：`D:\dev\FAU-Study-Navigator`（原 `C:\dev\FAU-Study-Navigator`，已迁移）
 > 线上地址：https://fau-studyinfo-navigator.pages.dev
-> 仓库：https://github.com/tommy2345-art/FAU-Studyinfo-Navigator（私有）
-> 当前提交：`d502b91` — Refresh the project log after adding FAUmail
-> 另有未提交改动：修复 2019 PO 空状态误导（见第十节）
+> 仓库：https://github.com/tommy2345-art/FAU-Studyinfo-Navigator（**公开，MIT 许可**）
+> 当前状态：工作区干净，`main` 与 `origin/main` 同步
+> 覆盖范围：自然科学学院生物系 3 个硕士专业，其余学院留作贡献接口（见第十二节）
 
 ---
 
@@ -50,7 +50,9 @@
 - 所有外链强制 HTTPS，`noopener` 安全处理
 - 数据存 `localStorage: fau-study-navigator.resources.v1`
 
-**已收录的官方资源（13 条，按优先级排序）**：
+**已收录的基础资源（13 条，按优先级排序）**：
+
+> 2026-10-24 起另增 17 条国际学生资源（`international` 分类），总条目 30 条、7 个分类。详见第十二节。
 
 | 优先级 | ID | 名称 | 分类 |
 |---|---|---|---|
@@ -103,18 +105,21 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 - 入学学期只筛选**候选** PO，系统**不会**自动选最新版，必须用户确认
 - 每条正式规则必须可追溯到至少一个 `AcademicSource`
 - 验证状态分 `verified` / `tentative` / `needs_review`，界面可见
-- 数据版本通过 `dataReleaseId` 管理（当前 `2026-10-22.2`）
+- 数据版本通过 `dataReleaseId` 管理（当前 `2026-10-24.1`）
 
-**当前数据规模**：
+**当前数据规模**（2026-10-24 实测，脚本核对）：
 
 | 项目 | 数量 |
 |---|---|
-| 模块（Module） | 65 |
-| 模块版本（ModuleVersion） | 65 |
+| 模块（Module） | 56 |
+| 模块版本（ModuleVersion） | 56 |
 | 要求组（RequirementGroup） | 15 |
 | 官方来源（AcademicSource） | 17 |
 | 专业（Programme） | 3 |
 | 学院（Faculty） | 5 |
+| PO 版本（ExaminationRegulationVersion） | 4（含 2019 空壳） |
+
+> 模块数从 65 降到 56：删除了 9 个重复登记、且不属于任何要求组的 ILS 目录条目。现在 56 个模块全部可从要求组到达，见第十二节与 `docs/SCALABILITY_AUDIT.md`。
 
 ### 2.4 专业要求页面（本轮重点完成）
 
@@ -222,10 +227,10 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 | 类型检查 | `npm run typecheck` | ✅ 0 错误 |
 | 代码规范 | `npm run lint` | ✅ 0 错误 |
 | 静态测试 | `npm run test:static` | ✅ 32/32 |
-| 单元测试 | `npm test` | ✅ 40/40 |
+| 单元测试 | `npm test` | ✅ 136/136（21 个测试文件，含 ECTS 引擎行为测试） |
 | E2E | `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
 | 数据校验 | `npm run test:data` | ✅ ALL CHECKS PASSED |
-| 构建 | `npm run build` | ✅ 成功 |
+| 构建 | `npm run build` | ✅ 成功（已拆分 vendor chunk，无体积告警） |
 
 **数据校验包含的额外检查**：
 
@@ -294,13 +299,20 @@ npm run preview      # 本地预览生产构建
 
 ## 五、未实现内容
 
-### 5.1 学术数据覆盖不足（最大缺口）
+### 5.1 学术数据覆盖：只做生物系三个硕士专业（有意为之）
 
-自然科学学院共有 **15 个硕士专业**，目前只录入了 **3 个**（生物系）。
+数据包里只有 **3 个专业**，全部属于自然科学学院生物系。这不是遗漏，而是当前版本明确的范围：每一条学业规则都要对照官方考试条例逐条转录、人工核实，没有快捷方式。
 
-**待录入的 12 个**：
+**其他四个学院完全空白**：
 
-| 专业 | 所属系 |
+- 人文、社会科学与神学学院
+- 经济、管理与法律学院
+- 医学院
+- 工程学院
+
+**生物系之外的专业也没有录入。** 以下是维护者早前手工整理的候选清单，**未经逐条核实**：数据包里没有登记「自然科学学院一共有多少个硕士专业」，因此这个数字无法从代码验证（见 `docs/SCALABILITY_AUDIT.md` 第 2 节）。原表写「12 个」但实际列了 13 行，这里按实际条目列出，不猜数字：
+
+| 候选专业 | 所属系 |
 |---|---|
 | Chemistry (M.Sc.) | 化学与药学 |
 | Molecular Science (M.Sc.) | 化学与药学 |
@@ -316,13 +328,14 @@ npm run preview      # 本地预览生产构建
 | Physical Geography: Climate and Environmental Sciences (M.Sc.) | 地理与地球科学 |
 | Geographie: Kulturgeographie (M.A.) | 地理与地球科学 |
 
-**其他四个学院完全空白**：
-- 人文、社会科学与神学学院
-- 经济、管理与法律学院
-- 医学院
-- 工程学院
+**2026-10-24 起，这个问题改由界面和贡献流程处理，而不是假装不存在**：
 
-用户影响：非生物系学生点进去会看到空白，不报错但看起来像网站没做完。
+- 首页新增「当前数据覆盖范围」区块，逐学院显示「已录入 / 待补充」；
+- 选中没有数据的学院时，专业页显示「该学院尚未录入培养计划与 PO」，附贡献指南和「申请录入我的学院」两个入口；
+- 覆盖率由 `src/data/coverage.ts` 从数据推导，录入数据后自动变化；
+- 外部贡献者按 `docs/ADDING_A_FACULTY.md` 补数据即可，不需要改 React 组件。
+
+用户影响：非生物系学生点进去会看到明确的空白说明和贡献入口，而不是一个看起来没做完的页面。
 
 ### 5.1.1 已录入但不完整的 PO 版本
 
@@ -342,14 +355,19 @@ npm run preview      # 本地预览生产构建
 
 注意：`po-zmb-2019` 与 `po-zmb-2026` 同时挂在同一个专业下，入学期决定匹配哪个 —— 2026 冬季及之后 → 2026 版；之前 → 2019 版。两条路径均已实测正确。
 
-### 5.2 HTTP 状态码问题
+### 5.2 HTTP 状态码问题（2026-10-23 已修复）
 
-`/degree`、`/planner`、`/exams` 等子路径**渲染正常**，但返回 HTTP **404** 而不是 200。
+~~`/degree`、`/planner`、`/exams` 等子路径渲染正常，但返回 HTTP 404。~~
 
-- 用户实际无感：浏览器正常渲染 404 状态下的 HTML，点击、刷新、分享都能打开
-- 影响：搜索引擎会视为「页面不存在」，部分聊天软件分享预览异常
-- 原因：Cloudflare Pages 的 `_routes.json` 对纯静态站点不做任意路径回退，`_redirects` 规则未被消费
-- 修法：Cloudflare 后台加 Bulk Redirects / Transform Rules，或调整 `_redirects` 写法
+**已解决。** 根因不是 `_routes.json`，也不是 `_redirects` 写法，而是 `scripts/postbuild.mjs` 把 `index.html` 复制成了 `dist/404.html`。Cloudflare Pages 会把根目录的 `404.html` 当作权威的 not-found 响应体，用 404 状态码返回，从而覆盖 `wrangler.jsonc` 里的 `not_found_handling: "single-page-application"`。
+
+修复（`d03ff0f`）：
+
+- 停止生成 `dist/404.html`；
+- 删除 `public/_redirects`（wrangler 会把它判为无限循环并忽略）；
+- 线上实测 `/degree`、`/planner`、`/exams`、`/resources`、`/settings`、任意未知路径全部返回 **200**。
+
+完整复现与验证记录见 `docs/SCALABILITY_AUDIT.md` 第 7 节。
 
 ### 5.3 其他未实现
 
@@ -361,34 +379,26 @@ npm run preview      # 本地预览生产构建
 
 ## 六、期望内容与所需工序
 
-### 6.1 补齐自然科学学院 12 个硕士专业
+### 6.1 补齐自然科学学院其他硕士专业
 
-**建议策略：先骨架后深度（2+1 组合）**
+**2026-10-24 更新：策略已改，不再「先铺骨架」。**
 
-理由：学生点进去发现空白专业，比找不到专业更糟。
+原来的建议是「先让 12 个专业都能被选到，再逐个深度录入」。审计后的结论是反过来的：一个没有模块表、没有 PO 来源的空壳专业，会让数据看起来比实际更完整，学生点进去仍然什么都得不到，而维护者会误以为覆盖已经扩大。
 
-#### 阶段 A：骨架覆盖（约 1-2 天）
+现在的做法：
 
-让 12 个专业都能被选到、都有基本信息，不转录模块。
+1. **一个专业做透**——来源、PO 有效区间、模块表、要求组、ECTS 核对、逐条断言，全部到位才标 `verified`；
+2. 没做的学院在界面上**明确显示为空**，并给出贡献入口，而不是放一个点不到东西的空壳；
+3. 外部贡献者按 `docs/ADDING_A_FACULTY.md` 接手自己学院，一次一个专业即可。
 
-每个专业需要：
+如果确实要先登记一个专业的基本信息，最小合法集合是：
 
-1. 在 `src/data/academic/academic-data.json` 添加 `Programme` 条目
-   - `id`、`facultyId: 'nat'`、`degreeType: 'master'`
-   - `name` 中英文
-   - `websiteSourceIds` 指向官方页面
-2. 添加 `ExaminationRegulationVersion`（PO）
-   - 版本号、有效学期范围
-   - `ectsTotal`
-3. 添加 `AcademicSource` 指向官方考试条例 PDF
-   - 状态先标 `needs_review`
-4. 跑 `npm run test:data` 验证引用完整性
+1. `academicSources` 里登记官方考试条例（HTTPS、版本日期、`needs_review`）；
+2. `programmes` 里加专业：`id`、`facultyId`、`degreeType`、中英文名称、`websiteSourceIds`、`dataStatus: "partial"`；
+3. `examinationRegulationVersions` 里加 PO：`code`、`title`、`entrySemesterFrom` / `entrySemesterUntil`、`applicabilityNotes`、`sourceIds`、`verificationStatus: "needs_review"`；
+4. 跑 `npm run test:data` 与 `npm run test`。
 
-**工序**：
-- 从 nat.fau.de 各系页面找每个专业的考试条例（Prüfungsordnung）
-- 下载 PDF，记录 URL 和版本日期
-- 录入基本信息
-- 数据校验必须通过
+注意：PO 没有 `ectsTotal` 字段。总学分写在根要求组的 `minEcts` / `maxEcts` 里，不要往 PO 上塞不存在的属性。
 
 #### 阶段 B：深度录入（每个专业约 4-8 小时）
 
@@ -408,27 +418,26 @@ npm run preview      # 本地预览生产构建
 - 部分专业可能是纯德语手册
 - 联合学位（如 Computational Molecular and Materials Science）可能跨学院
 
-### 6.2 修复 HTTP 状态码（约 1-2 小时）
+### 6.2 修复 HTTP 状态码（已完成）
 
-方案 A：Cloudflare 后台 Transform Rules
-- 新建规则：路径匹配 `/degree*`、`/planner*`、`/exams*`、`/resources*`、`/settings*`
-- 操作：Rewrite URL 为 `/index.html`，状态码保持 200
+2026-10-23 已修复，根因是 `dist/404.html` 覆盖了 SPA 回退，与 Transform Rules / Functions 无关。以下三种方案已作废，仅保留为历史记录：
 
-方案 B：改用 Cloudflare Functions
-- 加 `functions/_middleware.ts`，做 SPA 回退
+- ~~方案 A：Cloudflare 后台 Transform Rules~~ 不需要
+- ~~方案 B：Cloudflare Functions 中间件~~ 不需要
+- ~~方案 C：接受现状~~ 已彻底解决
 
-方案 C：接受现状
-- 功能已正常，仅 SEO 和分享预览受影响
+现状：所有子路径线上返回 200，见 5.2 节。
 
-### 6.3 扩展其他学院（大工程，需分阶段）
+### 6.3 扩展其他学院（现在改为贡献驱动）
 
-四个学院全部空白。每个学院需要：
+四个学院全部空白。**2026-10-24 起，这项工作不再只由维护者承担**：
 
-1. 摸清有多少专业（各学院官网）
-2. 按学院分批做骨架
-3. 再按系逐个深度录入
+1. 贡献者按 `docs/ADDING_A_FACULTY.md` 的操作顺序录入一个专业；
+2. `src/data/coverage.ts` 从数据推导学院状态，录入后首页和专页自动从「待补充」变成「已录入」；
+3. `coverage.test.ts` 钉住当前覆盖数字，数据变了测试会提示同步；
+4. 审核重点只有两件事：来源是否可追溯、有没有猜测的数值。
 
-**建议顺序**（按学生需求量和数据可得性）：
+**建议接手顺序**（按学生需求量和数据可得性）：
 1. 工程学院（专业多，学生基数大）
 2. 医学院（人最多，但考试条例可能不公开）
 3. 经济、管理与法律学院
@@ -451,9 +460,13 @@ npm run preview      # 本地预览生产构建
 
 ```
 D:\dev\FAU-Study-Navigator\
-├── .github\workflows\deploy-pages.yml   GitHub Pages 工作流（备用，当前未用）
-├── docs\                                9 份项目文档
+├── .github\
+│   ├── ISSUE_TEMPLATE\                  bug / 数据纠错 / 学院缺失 三个表单
+│   ├── pull_request_template.md
+│   └── workflows\ci.yml                 typecheck + lint + 数据 + 测试 + 构建 + E2E
+├── docs\                                12 份项目文档
 │   ├── ACADEMIC_DATA_MODEL.md
+│   ├── ADDING_A_FACULTY.md              给其他学院贡献者的完整手册
 │   ├── ARCHITECTURE.md
 │   ├── DATA_POLICY.md
 │   ├── DEVELOPMENT_PLAN.md              P0-P6 计划
@@ -461,41 +474,54 @@ D:\dev\FAU-Study-Navigator\
 │   ├── EXAMS_TASKS.md
 │   ├── LOCAL_VERIFICATION.md
 │   ├── P6_ACCEPTANCE_REPORT.md
+│   ├── PROJECT_LOG.md                   本文件
+│   ├── SCALABILITY_AUDIT.md             源码级审计
 │   └── TEST_PLAN.md
 ├── public\
-│   ├── _redirects                       SPA 回退（Cloudflare 未消费）
 │   ├── _routes.json                     Pages 路由声明
-│   └── manifest.json
+│   ├── icon.svg                         站点图标（manifest / favicon）
+│   └── manifest.json                    Web App Manifest（合法 JSON）
 ├── scripts\
 │   ├── manual-verify.mjs
-│   ├── postbuild.mjs                    复制 404.html + .nojekyll
-│   └── validate-academic.mjs            数据校验（32 项检查）
+│   ├── postbuild.mjs                    只写 .nojekyll，不生成 404.html
+│   └── validate-academic.mjs            数据校验（引用、PO 范围、ECTS 算术）
 ├── src\
 │   ├── app\                             路由与 App 入口
 │   ├── components\                      通用组件与布局
 │   ├── data\
-│   │   ├── academic\academic-data.json  65 模块 / 15 要求组 / 17 来源
+│   │   ├── academic\academic-data.json  56 模块 / 15 要求组 / 17 来源 / 4 PO
 │   │   ├── academicData.ts
+│   │   ├── coverage.ts                  覆盖率推导（哪些学院已录入）
 │   │   ├── faculties.ts
 │   │   ├── officialAcademicDates.ts
 │   │   ├── resourceCategories.ts
-│   │   └── resources.ts
+│   │   └── resources.ts                 30 条资源 / 7 个分类
 │   ├── domain\                          纯函数领域逻辑
 │   │   ├── academic.ts                  PO 模型
 │   │   ├── academicMatching.ts          规则匹配
 │   │   ├── berlinDateTime.ts            时区
 │   │   ├── calendarExport.ts            ICS 生成
+│   │   ├── courseCatalogue.ts           课程目录
 │   │   ├── ectsEngine.ts                ECTS 引擎
 │   │   ├── exams.ts
 │   │   ├── planner.ts
-│   │   └── resources.ts
-│   ├── features\                        六个功能页面
+│   │   ├── resources.ts
+│   │   ├── timetableGrid.ts             周网格布局
+│   │   └── timetableLabels.ts
+│   ├── features\                        六个功能页面（含 TimetableGrid 等）
 │   ├── i18n\                            中英文消息
 │   ├── storage\                         IndexedDB / localStorage
 │   └── store\                           Zustand 状态
+├── sources\ils\                         ILS 模块手册 PDF（核对用，版权归 FAU）
 ├── tests\static.test.mjs                32 项静态检查
+├── upload\PRD(1).md                     最初的需求文档（保留原样）
+├── AGENTS.md                            本地开发与开源协作约束
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── LICENSE                              MIT
+├── SECURITY.md
 ├── package.json
-├── vite.config.ts                       含 GITHUB_PAGES 条件 base
+├── vite.config.ts                       含 GITHUB_PAGES 条件 base 与 vendor 拆分
 └── wrangler.jsonc                       Cloudflare 配置
 ```
 
@@ -654,7 +680,7 @@ errors: none
 
 ### 2026-10-22 · `faf9e7d` GitHub Pages 工作流
 
-`.github/workflows/deploy-pages.yml`。因私有仓库 + 免费账号不支持 Pages，改用 Cloudflare，此工作流保留但未启用。
+`.github/workflows/deploy-pages.yml`。因私有仓库 + 免费账号不支持 Pages，改用 Cloudflare，此工作流保留但未启用。**2026-10-24 已删除**：它部署时会 `cp index.html 404.html`，正是 5.2 的 404 根因，且与 Cloudflare 部署目标冲突；接替者是只做验证的 `ci.yml`。
 
 ### 2026-10-22 · `970bf85` ILS 模块手册录入
 
@@ -664,12 +690,116 @@ errors: none
 
 ## 十一、下一步待办（按优先级）
 
-| 优先级 | 事项 | 预估工时 |
-|---|---|---|
-| 高 | 补齐自然科学学院 12 个硕士专业骨架 | 1-2 天 |
-| 中 | 修复子路径 HTTP 404 状态码 | 1-2 小时 |
-| 中 | 深度录入 1-2 个用户关心的专业 | 每个 4-8 小时 |
-| 低 | 扩展其他四个学院 | 按学院分批 |
-| 低 | 建立条例版本追踪机制 | 每学期一次 |
+| 优先级 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| 高 | 补 `iimmun-m8-v1`（项目工作研讨课）的 ECTS | 未完成 | 该模块 `ects: null`，会显示「ECTS 待确认」且不计入任何学分。同组其余三个模块（5+25+5）刚好凑满 35，所以它不会单独让毕业判断停在 `unknown`；但若学生必须依赖它，就会显示缺口。需要 iImmune 模块手册 |
+| 中 | 补 2019 版 ZMB 条例的模块表 | 未完成 | 已有来源记录，缺逐条转录；老生目前只能看到「此版本未转录」 |
+| 中 | 补自然科学学院其他专业骨架 | 未开始 | 现在有贡献指南和覆盖率 UI，可由外部贡献者接手 |
+| 中 | 为每条规则建立逐字段证据（RuleEvidence） | 未开始 | PDF 改版后目前无法 diff 出哪个数值变了 |
+| 低 | 扩四个学院 | 未开始 | 按学院分批，接口已留好 |
+| 低 | 条例版本追踪机制 | 部分 | ILS 手册已有 SHA-256 + 页码 + 35 条断言，可作模板 |
+| 低 | 独立屏幕阅读器与 400% 缩放人工认证 | 未完成 | 弹窗已有语义与键盘支持 |
+
+已完成的旧待办：子路径 404（见 5.2）、ILS 数据重复与轨道串组（见第十二节）、开源化（LICENSE、贡献指南、CI）。
 
 详见第六节「期望内容与所需工序」。
+
+---
+
+## 十二、2026-10-23 / 10-24：功能推进与开源化
+
+### 12.1 2026-10-23 · `d03ff0f` 子路径 404 根因修复
+
+见 5.2 节。新增 `docs/SCALABILITY_AUDIT.md`（源码级审计），删除无用的 `public/_redirects` 与 GitHub Pages 部署方式。
+
+### 12.2 2026-10-23 · `4f3acb1` ILS 数据修正 + 课程目录选择器 + 课程表初版
+
+- 删除 9 个不属于任何要求组的重复 ILS 目录条目；
+- `rg-ils-abschluss` 改为指向真实的统计／深化／论文模块；
+- 三个模块组各自绑定自己的 track，修复「选 MG1+MG2 也把 MG3 模块算进去」；
+- 模块组 ECTS 改为真实区间（每组 30–40，成对 60–65）；
+- 课程录入从自由文本改为可搜索的目录选择器，携带模块代码、ECTS、开课学期与可计入要求组；
+- 每学期新增课程表（星期 + 教室）。
+
+### 12.3 2026-10-23 · `6482c44` ILS 32 个模块逐条核对
+
+- 打开官方模块手册（SoSe 2026，70 页，SHA-256 `4a04ccdf…`），逐模块核对 ECTS，全部一致；
+- 补齐 32 个模块原本全为 `null` 的 `offeringTerms`；
+- `versionLabel` 标注每个模块出自手册第几页；
+- 新增 `src/data/ilsHandbook.test.ts`：35 条断言把每个模块绑到手册页码，数据与 PDF 漂移会直接构建失败。
+
+### 12.4 2026-10-23 至 10-24 · `6a07c70` `73b5212` `bef1df4` 课程表
+
+- 08:00–21:00 五列周网格，按开始时间定位、按课时拉伸；
+- 一门课可跨多个星期，每个星期独立开始/结束时间；
+- 冲突检测：琥珀色描边 + 点名两门课；
+- 旧数据迁移：第一版的 `day` 字符串、第二版的共享 `startMinutes` 都会在读取时折叠进 `meetings`，避免升级后整个计划读不出来；
+- 表单改为本地草稿 + blur 提交，修复「输入 11:00-12:30 却存成 09:00-12:30」的写入回弹。
+
+### 12.5 2026-10-24 · `70820dc` 国际学生专区
+
+17 条资源，7 个分类新增 `international`；机会徽章（资助／项目／支持／职业）、受众、资助内容、申请窗口、文件链接；新增按截止日排序（按日期比较，不是按文本）。修了两个排序 bug：无日期条目被当作相等导致比较器提前返回；日期解析误把学期标签 `2027/28` 当日期。
+
+### 12.6 2026-10-24 · 开源化整理（本次）
+
+**细节修复**：
+
+| 文件 | 问题 | 修复 |
+|---|---|---|
+| `public/manifest.json` | 文件开头误带 `/* ... */` JS 注释，整份 JSON 非法；`index.html` 也没引用它 | 改为合法 JSON，补 description、scope、icon；在 `index.html` 中引用 |
+| `index.html` | 无 favicon、无 manifest | 新增 `public/icon.svg`，补 `<link rel="icon">` 与 `<link rel="manifest">` |
+| `public/_routes.json` | `exclude` 里挂着不存在的 `/favicon.ico` | 换成 `/icon.svg` |
+| `src/features/degree/DegreePage.tsx` | 默认学位类型是 `bachelor`，而数据只有硕士，首次进入必然看到空列表 | 默认落在有数据的学位类型 |
+| `src/features/degree/DegreePage.tsx` | 选了没有数据的学院，只有一个灰掉的选项，看不出是缺数据还是坏了 | 增加「该学院尚未录入」卡片 + 贡献指南 + 申请入口 |
+| `src/features/degree/DegreePage.tsx` | `ects: null` 只显示 `—`，像显示故障 | 增加「ECTS 待确认」徽章 |
+| `src/i18n/messages.ts` | 「本地数据包尚无已核实专业」「生产数据包有意保持为空」等描述已过期 | 改为当前真实覆盖范围（中英同步） |
+| `package.json` | `private: true`，无 license/repository/homepage/keywords，版本 0.1.0 | 改为公开包元数据，版本 0.2.0，MIT |
+| `vite.config.ts` | 单一 620 kB bundle，触发体积告警 | 拆分 `react-vendor` / `schema-vendor`，最大 chunk 降到 313 kB，告警消失 |
+| `.gitignore` | `shot-*.png` 重复、条目散乱 | 去重并归并注释 |
+| `AGENTS.md` | 仓库名写成 `FAU-Study-Navigator`（实际 `FAU-Studyinfo-Navigator`），且仍写「禁止公开仓库」 | 更正仓库名，更新为公开 + MIT 的协作约定 |
+| `docs/PROJECT_LOG.md` | 数据规模 65／测试 40／PO 数量等全部过期；「15 个硕士专业」「12 个待录入」与实际 13 行表格自相矛盾 | 全部按实测更新，并标注未核实来源 |
+| `.github/workflows/deploy-pages.yml` | 部署时会 `cp index.html 404.html`，正是 5.2 的根因；且与本项目 Cloudflare 部署冲突 | 删除，换成 `ci.yml` |
+| `src/data/academic/academic-data.json` | **ILS 两个组门槛写错**：`rg-ils-abschluss` 规则文本写 5+20+30=55，门槛却是 60；`rg-ils-modulgruppen` 规则文本写 65，门槛却是 60。两者刚好凑成 120，所以校验没发现 | 按官方 § 51 Abs. 2 改为 65 + 55，并同步规则文本 |
+| `src/data/academic/academic-data.json` | ILS PO 的 `entrySemesterFrom` 是 `null`，2023 冬季之前入学的学生会被错误地套用当前条例 | 按 § 54 改为 `2023-winter`，并在 `applicabilityNotes` 写明旧版尚未录入 |
+| `src/domain/ectsEngine.ts` | **父组永远 0 学分**：引擎逐组独立结算，而 120 学分总组本身没有模块，只有子组。结果所有专业结构上都不可能「满足毕业」 | 子组学分向上汇总到父组；状态与缺分按汇总值计算，循环依赖有防护 |
+| `scripts/validate-academic.mjs` | 只检查根组子项合计，不检查「组内模块能否凑够门槛」，所以 55<60 的错误躲过了 32 项检查 | 新增逐组可达性检查（needs N, offers M），上面两个门槛错误现在会被直接抓住 |
+| `src/i18n/messages.ts` | `degree.noProgrammes` 等描述与实际不符 | 同步更新 |
+
+**新增行为测试**（之前核心 ECTS 引擎只有源码正则检查，没有行为测试）：
+
+| 文件 | 覆盖 |
+|---|---|
+| `src/domain/ectsEngine.test.ts` | 7 条：子组学分汇总到父组、缺一组则整体不满足、计划学分不计入已得、`ects: null` 不按 0 计、跨 PO 课程被排除、来源未核实则结论 unknown、无要求组则 unknown |
+| `src/data/fullPlan.test.ts` | 2 条真数据集成：按 ILS § 51 Abs. 2 拼出 35+30+55 的完整计划，断言 `graduationStatus = satisfied`；少 5 学分时断言缺口被准确报告 |
+
+**数据版本**：`dataReleaseId` 从 `2026-10-22.2` 升至 `2026-10-24.1`。此前模块从 65 减到 56、ILS 数据全部重核，但发布号没递增。
+
+### 12.7 开源化：新增文件
+
+| 文件 | 作用 |
+|---|---|
+| `LICENSE` | MIT；附注说明 `sources/` 下 FAU 官方文件版权归 FAU，不在 MIT 范围 |
+| `CONTRIBUTING.md` | 中英双语：开发、门禁、数据红线、提交信息风格、PR 检查表 |
+| `docs/ADDING_A_FACULTY.md` | 给其他学院贡献者的完整手册：找条例、登记来源、加专业/PO/模块/要求组、跑校验、常见坑 |
+| `CODE_OF_CONDUCT.md` | 行为准则（含「不猜测数据」与「不要上传 FAU 凭据」） |
+| `SECURITY.md` | 漏洞范围（XSS、CSP、备份导入、静默请求）与报告方式 |
+| `.github/ISSUE_TEMPLATE/*` | bug、学术数据纠错、学院缺失三个表单 + 联系链接 |
+| `.github/pull_request_template.md` | PR 检查表，含数据变更必填项 |
+| `.github/workflows/ci.yml` | 每次 push/PR 跑 typecheck、lint、数据校验、单元测试、构建；单独 job 跑 E2E |
+
+**覆盖率模块**（`src/data/coverage.ts`）：从数据包推导每个学院的状态，`coverage.test.ts` 用 8 条断言钉住当前覆盖（nat 3 个专业 / 13+32+11 个模块 / 其余四学院为空），新增学院时必须同步更新——这是有意的护栏。
+
+### 12.8 本轮验证结果
+
+| 检查 | 结果 |
+|---|---|
+| `npm run typecheck` | ✅ 0 错误 |
+| `npm run lint` | ✅ 0 错误 |
+| `npm run test:static` | ✅ 32/32 |
+| `npm test`（含单元） | ✅ 136/136，21 个文件 |
+| `npm run test:data` | ✅ ALL CHECKS PASSED |
+| `npm run build` | ✅ 成功，无体积告警 |
+| `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
+| 线上子路径 | ✅ 全部 200 |
+
+**未做**：没有伪造任何学术数据；`iimmun-m8-v1` 的 ECTS 仍然保持 `null`，原因与补救方式写在 11 节待办。

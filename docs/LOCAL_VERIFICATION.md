@@ -89,7 +89,7 @@ tablet 与 mobile 结果相同。共 21 次页面加载，**无 console 错误�
 
 - **真实 FAU 学术数据仍为空。** 这是有意的设计决定，避免把演示数据误认为官方规定。应用可用于个人规划，但**目前不能判定毕业条件**。
 - 专业、PO、课程、ECTS 与考试规则需依据官方文件人工录入，并登记来源、适用范围和核验状态。
-- 生产包 JS 单文件 494 kB（gzip 140 kB），未做代码分割。对当前功能规模可接受，后续可优化。
+- ~~生产包 JS 单文件 494 kB（gzip 140 kB），未做代码分割。~~ 2026-10-24 已拆分为 `react-vendor` / `schema-vendor` / 主包三个 chunk，最大 313 kB，构建无体积告警。
 - 浏览器端人工验收由脚本完成（含截图），尚未进行真人逐项点击检查。
 
 ## 6. 发布记录
@@ -97,7 +97,7 @@ tablet 与 mobile 结果相同。共 21 次页面加载，**无 console 错误�
 | 项目 | 值 |
 |---|---|
 | 仓库 | `https://github.com/tommy2345-art/FAU-Studyinfo-Navigator` |
-| 可见性 | 私有 |
+| 可见性 | 私有 → **公开（2026-10-24，MIT 许可）** |
 | 分支 | `main` |
 | 首次提交 | `ca1ed21` Initial commit |
 | 文档更新提交 | `6e67c7d` Align README with the actual install workflow |

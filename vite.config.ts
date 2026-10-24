@@ -14,6 +14,20 @@ export default defineConfig({
   preview: {
     host: '127.0.0.1',
   },
+  build: {
+    // Shipping everything as one chunk tripped the 500 kB warning. Splitting the
+    // runtime libraries keeps the application code small and lets a data-only
+    // release reuse the vendor chunks from the browser cache.
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/scheduler')) return 'react-vendor';
+          if (id.includes('node_modules/zod')) return 'schema-vendor';
+          return undefined;
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

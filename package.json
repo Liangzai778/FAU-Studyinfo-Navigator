@@ -1,7 +1,27 @@
 {
   "name": "fau-study-navigator",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "private": false,
+  "description": "Local-first study planning and resource navigation for FAU students, with source-backed academic rules.",
+  "license": "MIT",
+  "author": "tommy2345-art",
+  "homepage": "https://fau-studyinfo-navigator.pages.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tommy2345-art/FAU-Studyinfo-Navigator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/issues"
+  },
+  "keywords": [
+    "fau",
+    "study-planner",
+    "ects",
+    "local-first",
+    "react",
+    "typescript",
+    "academic-data"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22.13.0"

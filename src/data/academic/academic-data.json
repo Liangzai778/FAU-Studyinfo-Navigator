@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataReleaseId": "2026-10-22.2",
+  "dataReleaseId": "2026-10-24.1",
   "createdAt": "2026-10-22",
   "faculties": [
     {
@@ -205,11 +205,11 @@
         "zh-CN": "整合生命科学硕士考试条例（2026-03-31 修订版）",
         "en": "M.Sc. ILS Examination Regulations (as amended 31 March 2026)"
       },
-      "entrySemesterFrom": null,
+      "entrySemesterFrom": "2023-winter",
       "entrySemesterUntil": null,
       "applicabilityNotes": {
-        "zh-CN": "当前适用版本。冬季和夏季都可入学，两种学期的学习计划分别见附录 2a 与 2b。",
-        "en": "Currently applicable. Entry is possible in winter and summer semester; the study plans are in Annexes 2a and 2b."
+        "zh-CN": "§ 54：本条例自公布次日起生效，首次适用于 2023/24 冬季学期起入学的学生。冬季和夏季都可入学，两种学期的学习计划分别见附录 2a 与 2b。2023 冬季之前入学的学生适用更早的版本，本工具尚未录入。",
+        "en": "§ 54: in force from the day after publication, first applied to students enrolled from winter semester 2023/24. Entry is possible in winter and summer semester; the study plans are in Annexes 2a and 2b. Students who enrolled before winter 2023 fall under an earlier version that this tool does not transcribe yet."
       },
       "sourceIds": [
         "fau-fpo-ils-2026"
@@ -1929,10 +1929,10 @@
       },
       "kind": "restricted_elective",
       "ruleText": {
-        "zh-CN": "从三个模块组中选两个：生物数学建模与系统生物学、生物成像与生物物理、生物结构与过程。每组至少 30 ECTS、最多 40 ECTS，两组合计 60–70 ECTS。模块组选择在报名第一门考试时确定，之后不可更改。",
-        "en": "Choose two of the three module groups. Each group requires at least 30 and at most 40 ECTS; the two groups together make 60-70 ECTS. The group choice is fixed when the first examination in the group is registered."
+        "zh-CN": "从三个模块组中选两个：生物数学建模与系统生物学、生物成像与生物物理、生物结构与过程。§ 51 Abs. 2 规定一组 30 ECTS、另一组 35 ECTS，两组合计 65 ECTS；组内选修可让单组达到 40 ECTS，但毕业只要求 65。模块组选择在报名第一门考试时确定，之后不可更改。",
+        "en": "Choose two of the three module groups. § 51 (2) fixes one group at 30 ECTS and the other at 35 ECTS, 65 ECTS together; electives inside a group may take it to 40, but only 65 count towards the degree. The group choice is fixed when the first examination in the group is registered."
       },
-      "minEcts": 60,
+      "minEcts": 65,
       "maxEcts": 65,
       "eligibleModuleVersionIds": [],
       "exclusiveCounting": false,
@@ -1955,8 +1955,8 @@
         "zh-CN": "统计与统计编程 5 ECTS（90 分钟笔试 + 练习作业），深化模块 20 ECTS，硕士论文 30 ECTS，合计 55 ECTS；加上模块组最低合计 65 ECTS 共 120 ECTS。",
         "en": "Statistics 5 ECTS, advanced module 20 ECTS, master's thesis 30 ECTS = 55 ECTS; together with the module groups the total is 120 ECTS."
       },
-      "minEcts": 60,
-      "maxEcts": 60,
+      "minEcts": 55,
+      "maxEcts": 55,
       "eligibleModuleVersionIds": [
         "ils-m1-statistics-v1",
         "ils-vertiefungsmodul-v1",

@@ -5,6 +5,12 @@ Scope: source-level audit of the local repository, not an inference from `PROJEC
 Every claim below was produced by running code against the real data at
 `src/data/academic/academic-data.json` (release `2026-10-22.2`).
 
+> **Status update 2026-10-24.** Items 1, 3 and 6 below were fixed in `4f3acb1`
+> and `d03ff0f`; item 8 was made moot by deriving coverage from data
+> (`src/data/coverage.ts`). Items 2, 4, 5 and 7 are still open. See §10 for the
+> per-item resolution. The audit body is left as written so the reasoning can
+> be checked against the commit that changed it.
+
 Working tree state before this audit: clean (`git status --short` empty, HEAD `3fbe58d`).
 Verification run before changes: `npm run typecheck` clean, `npx vitest run` 40/40 passed,
 `npm run test:data` all checks passed.
@@ -230,3 +236,55 @@ handbooks for the 12+ programmes that are not yet in the catalogue, and the
 existing gaps above (items 1-3) show what happens when a handbook is only
 partially read. Adding more programmes at that quality level would make the
 data look broader while being less trustworthy.
+
+---
+
+## 10. Resolution status, 2026-10-24
+
+| # | Item | Status | Where |
+| --- | --- | --- | --- |
+| 1 | ILS: 9 curriculum modules unreachable from any requirement group | **Fixed.** The 9 duplicate catalogue entries were removed (module count 65 → 56) and all 32 ILS modules are now reachable from a group. | `4f3acb1`, `coverage.test.ts` |
+| 2 | `iimmun-m8-v1` has `ects: null` | **Open, but narrower than stated.** Deliberately not guessed. The Degree page now shows an "ECTS unconfirmed" badge. Correction: it does **not** permanently block a satisfied status — the other three modules in `rg-iimmun-projekt` add up to exactly 35 ECTS, so the group minimum is reachable without it. | `DegreePage.tsx`, i18n |
+| 3 | `rg-ils-abschluss` points at the wrong module versions | **Fixed.** It now references the real statistics / advanced module / thesis versions (5 + 20 + 30 = 55 ECTS against `minEcts` 60 with an elective remainder). | `4f3acb1` |
+| 4 | No per-field evidence (`RuleEvidence`) | **Open.** Unchanged. | — |
+| 5 | Covered-module catalogue not split per programme/PO | **Partly addressed.** `src/data/coverage.ts` derives per-programme and per-faculty coverage, which is what the UI needed. Per-PO evidence is still missing. | `coverage.ts` |
+| 6 | `public/_redirects` obsolete and warns on every wrangler run | **Fixed.** File deleted. | `d03ff0f` |
+| 7 | Engine cannot suggest a satisfying allocation | **Open by design.** Documented in §4; the user still assigns groups. | — |
+| 8 | Faculty master's programme count unverifiable from data | **Made moot in the UI, still true in the data.** The app no longer claims a total; it reports what is actually entered, per faculty, and marks the rest "not yet". The audit's point stands: a number in a markdown log is not a source. | `coverage.ts`, `README.md` |
+
+Correction to §1: after the dedupe the package has 56 modules, not 65. The
+"41 ILS modules, 32 electable" split described there no longer exists; ILS now
+carries exactly the 32 modules that its requirement groups reference.
+
+Correction to the release id: the data changed twice after `2026-10-22.2`
+(ILS fixes, then the coverage release), so the current release is
+`2026-10-24.1`.
+
+### 10.1 Two defects this audit did not catch
+
+Both were found on 2026-10-24 while preparing the open-source release, and both
+would have kept every student from ever seeing a satisfying graduation result.
+
+**The threshold contradiction in `rg-ils-abschluss`.** The group's own rule text
+said 5 + 20 + 30 = 55 ECTS, but `minEcts` was 60. `rg-ils-modulgruppen` said 65
+in its rule text but carried `minEcts: 60`. The two wrong numbers summed to the
+correct 120, so the root-total check in `validate-academic.mjs` passed. § 51 (2)
+of the FPO BAMA ILS (checked against the PDF on 2026-10-24) states one module
+group at 30 ECTS, another at 35, statistics 5, advanced module 20 and thesis 30.
+The data now matches: 65 + 55.
+
+`validate-academic.mjs` gained a per-group reachability check (`needs N, offers
+M`) so a threshold larger than the modules it governs can no longer hide.
+
+**Parent groups were never credited.** `calculateEctsProgress` summed each
+requirement group independently, matching only courses whose
+`attempt.requirementGroupId` equalled that group. Every programme's 120-ECTS
+root group is a container with no modules of its own, so its earned total was
+always 0 and `graduationStatus` could never be `satisfied`. Child credits now
+roll up into the parent. Behavioural tests live in
+`src/domain/ectsEngine.test.ts`, and `src/data/fullPlan.test.ts` builds a
+complete ILS plan from the real data and asserts a satisfied result.
+
+This corrects §4's conclusion in one respect: allocation is still user-driven
+and the engine still does not guess, but the result it reports is now the whole
+tree, not just the leaves.

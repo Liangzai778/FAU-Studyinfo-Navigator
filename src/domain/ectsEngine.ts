@@ -197,9 +197,56 @@ export function calculateEctsProgress(input: EctsEngineInput): EctsEngineResult 
   const allocatedEarnedEcts = graduationEligible
     .filter((item) => allocatedEarnedIdentities.has(item.identity))
     .reduce((sum, item) => sum + (item.course.ects ?? 0), 0);
-  const graduationStatus = groups.length === 0 || groups.some((group) => group.status === 'unknown')
+
+  // A requirement group can be a container. The 120-ECTS total of every
+  // programme has no modules of its own, only child groups. Counting only
+  // modules assigned to the group itself left every parent at 0/120, so a
+  // student who met every module-level requirement still saw "not satisfied"
+  // forever. Child progress must roll up into the parent.
+  const childrenByParent = new Map<string, string[]>();
+  for (const group of groupsForPo) {
+    if (!group.parentRequirementGroupId) continue;
+    const siblings = childrenByParent.get(group.parentRequirementGroupId) ?? [];
+    siblings.push(group.id);
+    childrenByParent.set(group.parentRequirementGroupId, siblings);
+  }
+
+  const rolledUp = new Map<string, { earnedEcts: number; plannedEcts: number }>();
+  const rollUp = (groupId: string, visiting: Set<string>): { earnedEcts: number; plannedEcts: number } => {
+    const cached = rolledUp.get(groupId);
+    if (cached) return cached;
+    const own = groups.find((group) => group.groupId === groupId);
+    // The visiting set also stops a malformed cycle from recursing forever.
+    if (!own || visiting.has(groupId)) return { earnedEcts: 0, plannedEcts: 0 };
+    visiting.add(groupId);
+    let earnedEcts = own.earnedEcts;
+    let plannedEcts = own.plannedEcts;
+    for (const childId of childrenByParent.get(groupId) ?? []) {
+      const child = rollUp(childId, visiting);
+      earnedEcts += child.earnedEcts;
+      plannedEcts += child.plannedEcts;
+    }
+    visiting.delete(groupId);
+    const total = { earnedEcts, plannedEcts };
+    rolledUp.set(groupId, total);
+    return total;
+  };
+
+  const groupsWithChildren = groups.map((group) => {
+    const total = rollUp(group.groupId, new Set());
+    const missingEcts = group.requiredEcts === null ? null : Math.max(0, group.requiredEcts - total.earnedEcts);
+    const status: RequirementGroupProgress['status'] =
+      group.status === 'unknown' || group.requiredEcts === null
+        ? 'unknown'
+        : total.earnedEcts >= group.requiredEcts
+          ? 'satisfied'
+          : 'not_satisfied';
+    return { ...group, earnedEcts: total.earnedEcts, plannedEcts: total.plannedEcts, missingEcts, status };
+  });
+
+  const graduationStatus = groupsWithChildren.length === 0 || groupsWithChildren.some((group) => group.status === 'unknown')
     ? 'unknown'
-    : groups.every((group) => group.status === 'satisfied')
+    : groupsWithChildren.every((group) => group.status === 'satisfied')
       ? 'satisfied'
       : 'not_satisfied';
 
@@ -208,7 +255,7 @@ export function calculateEctsProgress(input: EctsEngineInput): EctsEngineResult 
     earnedEcts,
     plannedEcts,
     unallocatedEarnedEcts: Math.max(0, earnedEcts - allocatedEarnedEcts),
-    groups,
+    groups: groupsWithChildren,
     graduationStatus,
     risks,
   };

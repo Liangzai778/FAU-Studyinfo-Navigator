@@ -3,6 +3,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { ExternalLink } from '../../components/common/ExternalLink';
 import { PageHeader } from '../../components/common/PageHeader';
 import { academicData, academicDataSummary } from '../../data/academicData';
+import { availableDegreeTypes, projectLinks } from '../../data/coverage';
 import {
   entrySemesterIdSchema,
   findCandidatePoVersions,
@@ -33,7 +34,9 @@ export function DegreePage() {
   const saveScopedProfile = useAcademicProfileStore((state) => state.saveScopedProfile);
   const clearProfile = useAcademicProfileStore((state) => state.clearProfile);
 
-  const [degreeType, setDegreeType] = useState<DegreeType>('bachelor');
+  // Start on a degree type that has data. The package covers master programmes
+  // only, so defaulting to "bachelor" made every first visit look empty.
+  const [degreeType, setDegreeType] = useState<DegreeType>(availableDegreeTypes[0] ?? 'master');
   const [facultyId, setFacultyId] = useState<FacultyId | ''>('');
   const [programmeId, setProgrammeId] = useState('');
   const [trackIds, setTrackIds] = useState<string[]>([]);
@@ -255,6 +258,27 @@ export function DegreePage() {
           </div>
         </div>
 
+        {facultyId && programmes.length === 0 ? (
+          // The faculty exists in the data package but has no transcribed
+          // programme. Saying nothing here would look like a broken page, and
+          // inventing rules would be worse, so the gap is stated and the
+          // contribution path is one click away.
+          <section className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/40">
+            <h3 className="font-semibold text-amber-950 dark:text-amber-100">{t('degree.facultyMissingTitle')}</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-amber-900/80 dark:text-amber-200/80">
+              {t('degree.facultyMissingBody')}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-4 text-sm font-semibold">
+              <ExternalLink href={projectLinks.facultyGuide} className="text-amber-900 underline dark:text-amber-100">
+                {t('degree.contributeCta')}
+              </ExternalLink>
+              <ExternalLink href={projectLinks.newFacultyIssue} className="text-amber-900 underline dark:text-amber-100">
+                {t('degree.requestFacultyCta')}
+              </ExternalLink>
+            </div>
+          </section>
+        ) : null}
+
         {tracks.length > 0 ? (
           <fieldset className="mt-5">
             <legend className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('degree.tracks')}</legend>
@@ -427,6 +451,14 @@ export function DegreePage() {
                                 {module.offeringTerms ? (
                                   <span className="rounded-full bg-slate-200 px-2 py-0.5 font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
                                     {module.offeringTerms.map((term) => t(term === 'summer' ? 'degree.summerSemester' : 'degree.winterSemester')).join(' / ')}
+                                  </span>
+                                ) : null}
+                                {module.ects === null ? (
+                                  // A null ECTS is not zero and must not look like a
+                                  // display glitch: it blocks ECTS progress until the
+                                  // module handbook confirms the number.
+                                  <span className="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                                    {t('degree.ectsUnconfirmed')}
                                   </span>
                                 ) : null}
                                 <span className="font-mono font-semibold">{module.ects ?? '—'}</span>
