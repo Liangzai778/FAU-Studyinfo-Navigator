@@ -16,6 +16,32 @@ documents carefully.
 
 ---
 
+## Quick start
+
+| Step | What you do | Where |
+| --- | --- | --- |
+| 1 | Pick one programme and its current PO | — |
+| 2 | Download the PO and the module handbook | faculty pages, `doc.zuv.fau.de` |
+| 3 | Register both documents as sources | `academicSources` |
+| 4 | Add the programme | `programmes` |
+| 5 | Add the PO version with its entry-semester range | `examinationRegulationVersions` |
+| 6 | Add modules, then module versions | `modules`, `moduleVersions` |
+| 7 | Build the requirement-group tree from the study plan | `requirementGroups` |
+| 8 | Bump `dataReleaseId` | top of the JSON |
+| 9 | Run `npm run test:data`, `npm run test`, `npm run build` | terminal |
+| 10 | Open a pull request with the PR template | GitHub |
+
+Everything happens in one file:
+[`src/data/academic/academic-data.json`](../src/data/academic/academic-data.json).
+The UI picks it up automatically; the coverage badge flips from *待补充* to
+*已录入* as soon as a programme has a PO with requirement groups.
+
+A realistic first pull request is **one programme at skeleton-plus-modules
+level**, which takes roughly half a day if the PO and handbook are readable.
+Do not try to do a whole faculty in one go.
+
+---
+
 ## 0. Choose a scope you can finish
 
 Start with **one programme** and its current PO. A single programme with a
@@ -37,6 +63,25 @@ You need, in this order:
    that page as a source even though it is not a rule.
 
 Save the PDFs. Do not transcribe from memory or from a third-party summary.
+
+**Do I upload the PDF to the repository?** Usually no.
+
+- The **source record** (URL, version, check date) is what the app needs, and it
+  is enough to verify a transcription later.
+- Official regulations are generally not protected by copyright (§ 5 UrhG), so
+  keeping a copy is defensible, but a link plus a SHA-256 is lighter and always
+  current.
+- Module handbooks are **protected works**. Do not commit the full PDF; record
+  the URL, the version and the SHA-256, and keep the file locally while you
+  work. The ILS handbook is the one exception already in the repo, and it will
+  be removed on request by the rights holder.
+
+Recommended source record for a document you do not store:
+
+```json
+"documentVersion": "2025-08-01, SHA-256 4a04ccdf…",
+"url": "https://www.doc.zuv.fau.de/…/FPO_Physik_2025.pdf"
+```
 
 ## 2. Register every source
 
@@ -221,11 +266,42 @@ Notes that come from real mistakes made in this repo:
 - **Do not duplicate a module in both a parent and a child.** The UI hides
   duplicates, but the data should not rely on that.
 
+### From the Studienverlaufsplan to requirement groups
+
+The "培养计划" is usually a table (Anlage / Studienverlaufsplan) with rows like
+"Pflichtmodule 45 ECTS", "Wahlpflichtmodule 30 ECTS", "Masterarbeit 30 ECTS".
+Do not paste the table into the app. Map each row to one group:
+
+| In the study plan | `kind` | `minEcts` / `maxEcts` | `eligibleModuleVersionIds` |
+| --- | --- | --- | --- |
+| Total of the degree ("insgesamt 120 ECTS") | `mandatory` | 120 / 120 | `[]` — it is the root, its children carry the modules |
+| Pflichtmodule (all must be taken) | `mandatory` | sum of those modules | the modules in that block |
+| Wahlpflichtbereich / module group | `restricted_elective` | the range the PO states | every module the handbook lists for it |
+| Freier Wahlbereich ("any module") | `free_elective` | the block's ECTS | `[]` — an empty list means "anything" for this kind |
+| Masterarbeit / Bachelorarbeit | `thesis` | thesis ECTS | the thesis module version |
+| Pflichtpraktikum | `internship` | internship ECTS | `[]` or the internship module |
+| Schlüsselqualifikationen / soft skills | `additional` or `mandatory` | block ECTS | the listed modules |
+
+Two things the table does not tell you:
+
+1. **Root groups have no modules of their own.** Give the root `minEcts` equal
+   to the degree total and let the child groups add up to it. The ECTS engine
+   rolls child credits up into the parent, so a student who satisfies every
+   child also satisfies the root.
+2. **"Choose 2 of 3" is not a sum.** If the PO lets a student pick two of three
+   module groups, create one parent (the pair, e.g. 65 ECTS) and three child
+   groups of 30–40 ECTS. Do not set the parent minimum to the sum of all three
+   children, and do not hang all three groups on every track — see the ILS
+   `programmeTrackIds` example above, where a wrong scoping once counted all
+   three groups for every student.
+
 ## 7. Fill in the release metadata
 
 - Bump `dataReleaseId` (for example `2026-10-24.1` → `2026-11-01.1`).
-- Add or adjust the numbers in `src/data/coverage.test.ts` if you added
-  programmes; the test pins the currently known coverage.
+- You do **not** need to touch `src/data/coverage.test.ts`. It pins the three
+  biology programmes and structural invariants, and is written so that adding
+  another faculty is a data change only. If it fails, the failure names the
+  broken invariant — fix the data, not the test.
 
 ## 8. Run the gates
 

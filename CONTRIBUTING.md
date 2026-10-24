@@ -100,7 +100,9 @@ of the thing.
       approximation of it.
 - [ ] A human read the regulation and recorded the page/section for each rule.
 - [ ] `npm run test:data` and `npm run test` pass.
-- [ ] `src/data/coverage.test.ts` is updated if the coverage numbers changed.
+- [ ] `src/data/coverage.test.ts` needed no edit. It pins the three biology
+      programmes and structural invariants, not the absence of other faculties;
+      if you had to weaken it, something is wrong with the change.
 
 ## Commit messages
 

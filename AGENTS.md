@@ -81,7 +81,7 @@ npm run build
 
 - 代码以 MIT 发布；FAU 官方文件与手册版权归 FAU，只作核对用途存放在 `sources/`。
 - 新增学院数据不需要改 React 组件：数据由 `src/data/academic/academic-data.json` 驱动，覆盖率由 `src/data/coverage.ts` 推导。
-- 新增学院时必须同步更新 `src/data/coverage.test.ts` 中固定的覆盖数字，否则测试会失败——这是有意的护栏，不是障碍。
+- `src/data/coverage.test.ts` 只钉住「结构不变量 + 三个生物专业」，不应为了通过测试而放宽它；新增其他学院数据时它必须照常通过。
 - 面向外部贡献者的说明维护在 `README.md`、`CONTRIBUTING.md` 与 `docs/ADDING_A_FACULTY.md`，三者与代码同步更新。
 
 ## 9. 法律与合规约束（德国法背景）
