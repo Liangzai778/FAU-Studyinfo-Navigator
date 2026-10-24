@@ -108,7 +108,14 @@ npm run build
 npx wrangler pages deploy dist --project-name fau-studyinfo-navigator
 ```
 
-**不要生成 `dist/404.html`。** Cloudflare Pages 会把它当作权威的 404 响应体，导致 `/degree` 等深链接返回 404 状态码。这个坑已经踩过并写进 `scripts/postbuild.mjs` 的注释。GitHub Pages 工作流已移除：它的 SPA 回退方式与本项目的部署目标冲突。
+**不要给 Cloudflare 生成 `dist/404.html`。** Cloudflare Pages 会把它当作权威的 404 响应体，导致 `/degree` 等深链接返回 404 状态码。这个坑已经踩过并写进 `scripts/postbuild.mjs` 的注释。
+
+### GitHub Pages 镜像
+
+`main` 每次推送会顺带部署一份 GitHub Pages 镜像：
+https://tommy2345-art.github.io/FAU-Studyinfo-Navigator/
+
+GitHub Pages 没有服务端 SPA 回退，只能靠根目录的 `404.html`，因此该镜像的深链接（如 `/degree`）**返回 404 状态码但页面能正常渲染**。这是平台限制，Cloudflare 上不存在这个问题。需要干净的 200 状态码和搜索引擎收录时用主站。
 
 ## 数据来源与真实性
 

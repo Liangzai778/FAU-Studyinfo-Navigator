@@ -1,0 +1,68 @@
+name: Deploy to GitHub Pages
+
+# Secondary mirror of the app. The primary deployment is Cloudflare Pages
+# (see wrangler.jsonc and README). This workflow exists because the mirror was
+# already live; it keeps the two in sync.
+#
+# GitHub Pages has no server-side SPA fallback, so a root-level 404.html is the
+# only way a deep link such as /degree renders. Pages serves that file with
+# status 404 even when it renders fine. Cloudflare does not have this problem
+# and must NOT get a 404.html (see scripts/postbuild.mjs).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check data
+        run: npm run test:data
+
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+
+      - name: Build for the /<repo>/ base path
+        run: npm run build
+        env:
+          GITHUB_PAGES: 'true'
+
+      - name: Add the SPA fallback Pages needs
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -463,7 +463,9 @@ D:\dev\FAU-Study-Navigator\
 ├── .github\
 │   ├── ISSUE_TEMPLATE\                  bug / 数据纠错 / 学院缺失 三个表单
 │   ├── pull_request_template.md
-│   └── workflows\ci.yml                 typecheck + lint + 数据 + 测试 + 构建 + E2E
+│   └── workflows\
+│       ├── ci.yml                       typecheck + lint + 数据 + 测试 + 构建 + E2E
+│       └── deploy-pages.yml             GitHub Pages 镜像（备用站点）
 ├── docs\                                12 份项目文档
 │   ├── ACADEMIC_DATA_MODEL.md
 │   ├── ADDING_A_FACULTY.md              给其他学院贡献者的完整手册
@@ -680,7 +682,7 @@ errors: none
 
 ### 2026-10-22 · `faf9e7d` GitHub Pages 工作流
 
-`.github/workflows/deploy-pages.yml`。因私有仓库 + 免费账号不支持 Pages，改用 Cloudflare，此工作流保留但未启用。**2026-10-24 已删除**：它部署时会 `cp index.html 404.html`，正是 5.2 的 404 根因，且与 Cloudflare 部署目标冲突；接替者是只做验证的 `ci.yml`。
+`.github/workflows/deploy-pages.yml`。因私有仓库 + 免费账号不支持 Pages，改用 Cloudflare，此工作流当时未启用。**2026-10-24 重写并保留**：它其实一直在成功部署 `tommy2345-art.github.io/FAU-Studyinfo-Navigator/` 镜像，只是缺少测试步骤；重写后补上 `test:data`、`lint`、`typecheck`、`test`，并注明 GitHub Pages 必须靠 `404.html` 做 SPA 回退，而 Cloudflare 必须没有它。
 
 ### 2026-10-22 · `970bf85` ILS 模块手册录入
 
@@ -746,7 +748,7 @@ errors: none
 
 | 文件 | 问题 | 修复 |
 |---|---|---|
-| `public/manifest.json` | 文件开头误带 `/* ... */` JS 注释，整份 JSON 非法；`index.html` 也没引用它 | 改为合法 JSON，补 description、scope、icon；在 `index.html` 中引用 |
+| `public/manifest.json` | 文件开头误带 `/* ... */` JS 注释，整份 JSON 非法；`index.html` 也没引用它 | 改为合法 JSON，补 description、scope、icon，路径改相对以便 Pages 子路径镜像使用；在 `index.html` 中引用 |
 | `index.html` | 无 favicon、无 manifest | 新增 `public/icon.svg`，补 `<link rel="icon">` 与 `<link rel="manifest">` |
 | `public/_routes.json` | `exclude` 里挂着不存在的 `/favicon.ico` | 换成 `/icon.svg` |
 | `src/features/degree/DegreePage.tsx` | 默认学位类型是 `bachelor`，而数据只有硕士，首次进入必然看到空列表 | 默认落在有数据的学位类型 |
@@ -758,7 +760,7 @@ errors: none
 | `.gitignore` | `shot-*.png` 重复、条目散乱 | 去重并归并注释 |
 | `AGENTS.md` | 仓库名写成 `FAU-Study-Navigator`（实际 `FAU-Studyinfo-Navigator`），且仍写「禁止公开仓库」 | 更正仓库名，更新为公开 + MIT 的协作约定 |
 | `docs/PROJECT_LOG.md` | 数据规模 65／测试 40／PO 数量等全部过期；「15 个硕士专业」「12 个待录入」与实际 13 行表格自相矛盾 | 全部按实测更新，并标注未核实来源 |
-| `.github/workflows/deploy-pages.yml` | 部署时会 `cp index.html 404.html`，正是 5.2 的根因；且与本项目 Cloudflare 部署冲突 | 删除，换成 `ci.yml` |
+| `.github/workflows/deploy-pages.yml` | 审计时以为「未启用」，实际每次推送都在成功部署镜像；且缺少测试步骤 | 保留并重写：补 `test:data` / `lint` / `typecheck` / `test`，注释说明 GitHub Pages 需要 `404.html` 而 Cloudflare 绝对不能有；新增 `ci.yml` 负责 PR 校验 |
 | `src/data/academic/academic-data.json` | **ILS 两个组门槛写错**：`rg-ils-abschluss` 规则文本写 5+20+30=55，门槛却是 60；`rg-ils-modulgruppen` 规则文本写 65，门槛却是 60。两者刚好凑成 120，所以校验没发现 | 按官方 § 51 Abs. 2 改为 65 + 55，并同步规则文本 |
 | `src/data/academic/academic-data.json` | ILS PO 的 `entrySemesterFrom` 是 `null`，2023 冬季之前入学的学生会被错误地套用当前条例 | 按 § 54 改为 `2023-winter`，并在 `applicabilityNotes` 写明旧版尚未录入 |
 | `src/domain/ectsEngine.ts` | **父组永远 0 学分**：引擎逐组独立结算，而 120 学分总组本身没有模块，只有子组。结果所有专业结构上都不可能「满足毕业」 | 子组学分向上汇总到父组；状态与缺分按汇总值计算，循环依赖有防护 |
