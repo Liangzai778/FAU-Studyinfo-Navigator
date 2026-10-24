@@ -109,54 +109,6 @@ export function monthGrid(year: number, monthIndex: number): MonthCell[] {
   });
 }
 
-export type SemesterDateInfo = {
-  /** Default start is the 1st of the month the semester usually begins in. */
-  defaultStart: string;
-  startIso: string;
-};
-
-/** Winter starts in October, summer in April; both on the 1st by default. */
-export function defaultSemesterStart(semesterId: string): string {
-  const [yearText, term] = semesterId.split('-');
-  const year = Number(yearText);
-  if (!Number.isFinite(year)) return formatIsoDate(startOfMonth(new Date()));
-  const month = term === 'summer' ? 3 : 9;
-  return formatIsoDate(new Date(year, month, 1));
-}
-
-/**
- * Natural end of a semester, used to stop drawing weekly courses after term.
- * Winter runs to 31 March, summer to 30 September.
- */
-export function defaultSemesterEnd(semesterId: string): string {
-  const [yearText, term] = semesterId.split('-');
-  const year = Number(yearText);
-  if (!Number.isFinite(year)) return `${new Date().getFullYear()}-12-31`;
-  return term === 'summer' ? `${year}-09-30` : `${year + 1}-03-31`;
-}
-
-export function isWithinSemester(dateIso: string, startIso: string, endIso: string): boolean {
-  return dateIso >= startIso && dateIso <= endIso;
-}
-
-/**
- * 1-based teaching week for a date, aligned to calendar weeks.
- *
- * The week containing the semester start is week 1, so a Monday row and its
- * "week N" label always agree. Counting seven-day blocks from the start date
- * instead would split the first week across two calendar rows.
- */
-export function teachingWeekNumber(dateIso: string, startIso: string): number | null {
-  const date = parseIsoDate(dateIso);
-  const start = parseIsoDate(startIso);
-  if (!date || !start) return null;
-  const dateWeek = mondayOfWeek(date);
-  const startWeek = mondayOfWeek(start);
-  const diff = Math.round((dateWeek.getTime() - startWeek.getTime()) / 86_400_000);
-  if (diff < 0) return null;
-  return Math.floor(diff / 7) + 1;
-}
-
 /** Events on one date, sorted by start time (all-day events first). */
 export function eventsOnDate(events: readonly CalendarEvent[], dateIso: string): CalendarEvent[] {
   return events

@@ -15,13 +15,14 @@ import {
   emptyExamsTasksSnapshot,
   putExam,
   putTask,
-  readExamsTasksSnapshot,
+  readExamsTasksResult,
 } from '../storage/examsTasksStorage';
 import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
 type ExamsTasksState = ExamsTasksSnapshot & {
   hydrated: boolean;
   storageError: boolean;
+  unreadableRows: number;
   hydrate: (force?: boolean) => Promise<void>;
   addExam: (input: PersonalExamInput) => Promise<string | null>;
   updateExam: (id: string, input: PersonalExamInput) => Promise<boolean>;
@@ -52,11 +53,12 @@ export const useExamsTasksStore = create<ExamsTasksState>((set, get) => {
     ...emptyExamsTasksSnapshot,
     hydrated: false,
     storageError: false,
+    unreadableRows: 0,
     hydrate: async (force = false) => {
       if (get().hydrated && !force) return;
       try {
-        const snapshot = await readExamsTasksSnapshot();
-        set({ ...snapshot, hydrated: true, storageError: false });
+        const result = await readExamsTasksResult();
+        set({ ...result.snapshot, hydrated: true, storageError: false, unreadableRows: result.rejected });
       } catch {
         set({ hydrated: true, storageError: true });
       }

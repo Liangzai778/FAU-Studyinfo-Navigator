@@ -12,6 +12,7 @@ import {
   type LocalStorageStatus,
 } from '../../storage/localStorageStatus';
 import { useAcademicProfileStore } from '../../store/academicProfile';
+import { useCalendarEventsStore } from '../../store/calendarEvents';
 import { useExamsTasksStore } from '../../store/examsTasks';
 import { usePlannerStore } from '../../store/planner';
 import { usePreferenceStore } from '../../store/preferences';
@@ -27,6 +28,11 @@ export function SettingsPage() {
   const hydrateAcademicProfile = useAcademicProfileStore((state) => state.hydrate);
   const hydratePlanner = usePlannerStore((state) => state.hydrate);
   const hydrateExamsTasks = useExamsTasksStore((state) => state.hydrate);
+  const hydrateCalendar = useCalendarEventsStore((state) => state.hydrate);
+  const unreadableRows =
+    usePlannerStore((state) => state.unreadableRows) +
+    useExamsTasksStore((state) => state.unreadableRows) +
+    useCalendarEventsStore((state) => state.unreadableRows);
   const [resetMessage, setResetMessage] = useState(false);
   const [clearMessage, setClearMessage] = useState('');
   const [clearing, setClearing] = useState(false);
@@ -36,6 +42,12 @@ export function SettingsPage() {
   useEffect(() => {
     void readLocalStorageStatus().then(setStorageStatus);
   }, []);
+
+  useEffect(() => {
+    void hydratePlanner();
+    void hydrateExamsTasks();
+    void hydrateCalendar();
+  }, [hydratePlanner, hydrateExamsTasks, hydrateCalendar]);
 
   const requestPersistence = async () => {
     const granted = await requestPersistentLocalStorage();
@@ -184,6 +196,21 @@ export function SettingsPage() {
             <p aria-live="polite" className="mt-2 min-h-5 text-sm font-semibold text-emerald-700 dark:text-emerald-300">{persistMessage}</p>
           </div>
         </div>
+      </section>
+
+      <section
+        className={`mt-5 rounded-2xl border p-6 ${
+          unreadableRows > 0
+            ? 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40'
+            : 'border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40'
+        }`}
+      >
+        <h2 className={`font-semibold ${unreadableRows > 0 ? 'text-amber-950 dark:text-amber-100' : 'text-emerald-950 dark:text-emerald-100'}`}>
+          {t('settings.dataCheckTitle')}
+        </h2>
+        <p className={`mt-2 text-sm leading-6 ${unreadableRows > 0 ? 'text-amber-900/85 dark:text-amber-200/85' : 'text-emerald-900/80 dark:text-emerald-200/80'}`}>
+          {unreadableRows > 0 ? `${t('settings.dataCheckWarning')} (${unreadableRows})` : t('settings.dataCheckOk')}
+        </p>
       </section>
 
       <div className="mt-5"><BackupPanel /></div>

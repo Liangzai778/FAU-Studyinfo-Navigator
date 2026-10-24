@@ -59,6 +59,24 @@ npm run test:e2e      # needs: npx playwright install chromium
 Please run at least `lint`, `typecheck`, `test`, `test:data` and `build`.
 End-to-end tests take a few seconds once Chromium is installed.
 
+## Changing stored data (read this before touching a schema)
+
+A student's saved courses, exams and plans live in their browser. A refactor
+that changes a field name can make that data unreadable, and "just clear it" is
+not an acceptable fix.
+
+- Migrate, do not wipe. Add a function to `src/storage/migrations.ts` that turns
+  the old shape into the new one and fills defaults.
+- Never `clear()` a store during a database upgrade. Write row by row.
+- Add a test with the old shape and prove it loads. `migrations.test.ts` has
+  examples.
+- If a row still cannot be parsed, skip it and count it (`unreadableRows`) —
+  never delete it. The settings page shows a data check when this happens.
+- Bump `STORAGE_SCHEMA_VERSION` when the shape changes.
+
+A pull request that silently drops saved rows will be rejected, even if the
+new code is cleaner.
+
 ## Ways to contribute
 
 ### 1. Add your faculty's programmes (most valuable)

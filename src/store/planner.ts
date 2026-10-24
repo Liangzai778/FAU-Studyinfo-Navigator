@@ -14,7 +14,7 @@ import {
   emptyPlannerSnapshot,
   putPlannerAttempt,
   putPlannerCourse,
-  readPlannerSnapshot,
+  readPlannerSnapshotResult,
 } from '../storage/plannerStorage';
 import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
@@ -22,6 +22,8 @@ type PlannerState = PlannerSnapshot & {
   hydrated: boolean;
   storageError: boolean;
   lastSavedAt: string | null;
+  /** Rows that could not be read but are still stored in the browser. */
+  unreadableRows: number;
   hydrate: (force?: boolean) => Promise<void>;
   addCourseWithAttempt: (course: LocalCourseInput, attempt: Omit<CourseAttemptInput, 'courseId'>) => Promise<string | null>;
   updateCourse: (courseId: string, input: LocalCourseInput) => Promise<boolean>;
@@ -54,11 +56,12 @@ export const usePlannerStore = create<PlannerState>((set, get) => {
     hydrated: false,
     storageError: false,
     lastSavedAt: null,
+    unreadableRows: 0,
     hydrate: async (force = false) => {
       if (get().hydrated && !force) return;
       try {
-        const snapshot = await readPlannerSnapshot();
-        set({ ...snapshot, hydrated: true, storageError: false });
+        const result = await readPlannerSnapshotResult();
+        set({ ...result.snapshot, hydrated: true, storageError: false, unreadableRows: result.rejected });
       } catch {
         set({ hydrated: true, storageError: true });
       }

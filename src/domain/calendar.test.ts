@@ -3,15 +3,11 @@ import {
   addDays,
   addMonths,
   calendarEventSchema,
-  defaultSemesterEnd,
-  defaultSemesterStart,
   eventsOnDate,
   formatIsoDate,
-  isWithinSemester,
   mondayOfWeek,
   monthGrid,
   parseIsoDate,
-  teachingWeekNumber,
 } from './calendar';
 import type { CalendarEvent } from './calendar';
 
@@ -53,27 +49,6 @@ describe('calendar date helpers', () => {
     expect(cells.filter((cell) => cell.inMonth)).toHaveLength(28);
     expect(cells[0]?.iso).toBe('2026-01-26');
     expect(cells.at(-1)?.iso).toBe('2026-03-08');
-  });
-
-  it('defaults a semester to the first of October or April', () => {
-    expect(defaultSemesterStart('2026-winter')).toBe('2026-10-01');
-    expect(defaultSemesterStart('2026-summer')).toBe('2026-04-01');
-    expect(defaultSemesterEnd('2026-winter')).toBe('2027-03-31');
-    expect(defaultSemesterEnd('2026-summer')).toBe('2026-09-30');
-  });
-
-  it('only treats dates inside the semester range as teaching days', () => {
-    expect(isWithinSemester('2026-10-01', '2026-10-01', '2027-03-31')).toBe(true);
-    expect(isWithinSemester('2026-09-30', '2026-10-01', '2027-03-31')).toBe(false);
-    expect(isWithinSemester('2027-04-01', '2026-10-01', '2027-03-31')).toBe(false);
-  });
-
-  it('counts teaching weeks from the calendar week that contains the start', () => {
-    expect(teachingWeekNumber('2026-10-01', '2026-10-01')).toBe(1);
-    expect(teachingWeekNumber('2026-09-28', '2026-10-01')).toBe(1);
-    expect(teachingWeekNumber('2026-10-04', '2026-10-01')).toBe(1);
-    expect(teachingWeekNumber('2026-10-05', '2026-10-01')).toBe(2);
-    expect(teachingWeekNumber('2026-09-27', '2026-10-01')).toBeNull();
   });
 });
 

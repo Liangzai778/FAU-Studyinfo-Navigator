@@ -7,7 +7,7 @@ import {
 import {
   deleteCalendarEventRow,
   putCalendarEvent,
-  readCalendarEvents,
+  readCalendarEventsResult,
 } from '../storage/calendarStorage';
 import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
@@ -16,6 +16,7 @@ type CalendarEventsState = {
   hydrated: boolean;
   storageError: boolean;
   lastSavedAt: string | null;
+  unreadableRows: number;
   hydrate: (force?: boolean) => Promise<void>;
   addEvent: (input: CalendarEventInput) => Promise<string | null>;
   updateEvent: (id: string, input: CalendarEventInput) => Promise<boolean>;
@@ -44,11 +45,12 @@ export const useCalendarEventsStore = create<CalendarEventsState>((set, get) => 
     hydrated: false,
     storageError: false,
     lastSavedAt: null,
+    unreadableRows: 0,
     hydrate: async (force = false) => {
       if (get().hydrated && !force) return;
       try {
-        const events = await readCalendarEvents();
-        set({ events, hydrated: true, storageError: false });
+        const result = await readCalendarEventsResult();
+        set({ events: result.events, hydrated: true, storageError: false, unreadableRows: result.rejected });
       } catch {
         set({ hydrated: true, storageError: true });
       }

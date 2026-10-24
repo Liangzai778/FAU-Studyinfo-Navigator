@@ -6,17 +6,20 @@ import {
   eventsOnDate,
   formatIsoDate,
   formatMinutes,
-  isWithinSemester,
   mondayOfWeek,
   monthGrid,
   parseIsoDate,
-  teachingWeekNumber,
   weekdayIndex,
 } from '../../domain/calendar';
+import {
+  getSemesterSchedule,
+  isLectureDay,
+  lectureWeekNumber,
+  semesterIdForDate,
+} from '../../data/academicCalendar';
 import { minutesToLabel, parseTimeOfDay } from '../../domain/timetableGrid';
 import { TIMETABLE_DAYS } from '../../domain/timetableLabels';
 import { useTranslation } from '../../i18n/useTranslation';
-import { readSemesterRange, writeSemesterRange, type SemesterRange } from '../../storage/calendarSettings';
 import { useCalendarEventsStore } from '../../store/calendarEvents';
 
 type SemesterCalendarProps = {
@@ -33,32 +36,30 @@ type EventDraft = {
   notes: string;
 };
 
-function currentSemesterId() {
-  const now = new Date();
-  const term = now.getMonth() >= 8 ? 'winter' : 'summer';
-  return `${now.getFullYear()}-${term}`;
-}
-
 function draftTime(value: string): number | null {
   if (!value) return null;
   return parseTimeOfDay(value);
 }
 
 /**
- * Month, week and day views from the semester range.
+ * Month, week and day views driven by the official FAU calendar.
  *
- * Courses repeat by weekday because that is how the regulation describes them;
- * they are only drawn inside the semester range, and the range itself is
- * editable because faculties do not all start on the same day.
+ * The lecture period, not "today" or the calendar month, defines week 1. A
+ * course is drawn only on a real teaching day: inside the lecture period and
+ * not on a weekend, public holiday, Christmas/Easter break or the free days
+ * decided by the university management.
  */
 export function SemesterCalendar({ tables }: SemesterCalendarProps) {
   const { language, t } = useTranslation();
   const todayIso = formatIsoDate(new Date());
-  const fallbackSemester = currentSemesterId();
+  const currentSemester = semesterIdForDate(todayIso);
 
-  const [semesterId, setSemesterId] = useState(() => tables.at(-1)?.semesterId ?? fallbackSemester);
-  const [range, setRange] = useState<SemesterRange>(() => readSemesterRange(semesterId));
-  const [viewDate, setViewDate] = useState(() => parseIsoDate(range.start) ?? new Date());
+  const [semesterId, setSemesterId] = useState(() => {
+    if (tables.some((item) => item.semesterId === currentSemester)) return currentSemester;
+    return tables.at(-1)?.semesterId ?? currentSemester;
+  });
+  const schedule = getSemesterSchedule(semesterId);
+  const [viewDate, setViewDate] = useState(() => parseIsoDate(schedule.lectureStart) ?? new Date());
   const [view, setView] = useState<CalendarView>('month');
   const [draft, setDraft] = useState<EventDraft>({
     title: '',
@@ -128,15 +129,8 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
 
   const changeSemester = (nextId: string) => {
     setSemesterId(nextId);
-    const nextRange = readSemesterRange(nextId);
-    setRange(nextRange);
-    setViewDate(parseIsoDate(nextRange.start) ?? new Date());
-  };
-
-  const changeRange = (field: 'start' | 'end', value: string) => {
-    const saved = writeSemesterRange(semesterId, { ...range, [field]: value });
-    setRange(saved);
-    setViewDate(parseIsoDate(saved.start) ?? new Date());
+    const nextSchedule = getSemesterSchedule(nextId);
+    setViewDate(parseIsoDate(nextSchedule.lectureStart) ?? new Date());
   };
 
   const shift = (direction: number) => {
@@ -197,9 +191,10 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
       : `${formatMinutes(event.startMinutes)}${event.endMinutes === null ? '' : `–${formatMinutes(event.endMinutes)}`}`;
 
   const renderChips = (date: Date, limit?: number) => {
-    const inSemester = isWithinSemester(formatIsoDate(date), range.start, range.end);
-    const courses = inSemester ? coursesForDate(date) : [];
-    const dayEvents = eventsOnDate(events, formatIsoDate(date));
+    const isoDate = formatIsoDate(date);
+    const teachingDay = isLectureDay(isoDate, schedule);
+    const courses = teachingDay ? coursesForDate(date) : [];
+    const dayEvents = eventsOnDate(events, isoDate);
     const shownCourses = limit ? courses.slice(0, limit) : courses;
     const shownEvents = limit ? dayEvents.slice(0, limit) : dayEvents;
     return (
@@ -242,26 +237,16 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
               </select>
             </label>
           ) : null}
-          <label className="block text-sm">
-            <span className="mb-1 block font-semibold text-slate-700 dark:text-slate-200">{t('calendar.startDate')}</span>
-            <input
-              type="date"
-              value={range.start}
-              onChange={(event) => changeRange('start', event.target.value)}
-              aria-label={t('calendar.startDate')}
-              className="h-10 rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block font-semibold text-slate-700 dark:text-slate-200">{t('calendar.endDate')}</span>
-            <input
-              type="date"
-              value={range.end}
-              onChange={(event) => changeRange('end', event.target.value)}
-              aria-label={t('calendar.endDate')}
-              className="h-10 rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
-            />
-          </label>
+          <div className="text-sm">
+            <p className="font-semibold text-slate-700 dark:text-slate-200">
+              {t('calendar.semester')}: {schedule.semesterStart} – {schedule.semesterEnd}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {t('calendar.lecturePeriod')}: {schedule.lectureStart} – {schedule.lectureEnd}
+              {' · '}
+              {schedule.source === 'ul-decision' ? t('calendar.sourceDecision') : t('calendar.sourceStatute')}
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex overflow-hidden rounded-xl border border-slate-300 dark:border-slate-700">
@@ -301,9 +286,7 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
           />
         </div>
       </div>
-      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-        {t('calendar.startHint')} · {range.start} – {range.end}
-      </p>
+      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('calendar.lectureHint')}</p>
 
       {view === 'month' ? (
         <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
@@ -314,7 +297,7 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
           </div>
           <div className="grid grid-cols-7">
             {cells.map((cell) => {
-              const week = cell.date.getDay() === 1 ? teachingWeekNumber(cell.iso, range.start) : null;
+              const week = cell.date.getDay() === 1 ? lectureWeekNumber(cell.iso, schedule) : null;
               const isToday = cell.iso === todayIso;
               return (
                 <button
@@ -330,7 +313,7 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
                 >
                   <div className="flex items-baseline justify-between gap-1">
                     <span className={`text-sm font-bold ${isToday ? 'text-sky-700 dark:text-sky-300' : ''}`}>{cell.date.getDate()}</span>
-                    {week && week > 0 ? (
+                    {week && week > 0 && week <= 17 ? (
                       <span className="text-[10px] font-semibold text-slate-400">
                         {language === 'zh-CN' ? `第 ${week} 周` : `Week ${week}`}
                       </span>
@@ -371,19 +354,24 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
           <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{dayLabel(viewDate)}</p>
           {(() => {
             const iso = formatIsoDate(viewDate);
-            const week = teachingWeekNumber(iso, range.start);
-            const inSemester = isWithinSemester(iso, range.start, range.end);
-            const courses = inSemester ? coursesForDate(viewDate) : [];
+            const week = lectureWeekNumber(iso, schedule);
+            const teachingDay = isLectureDay(iso, schedule);
+            const courses = teachingDay ? coursesForDate(viewDate) : [];
             const dayEvents = eventsOnDate(events, iso);
             return (
               <>
                 {week && week > 0 ? (
                   <p className="mt-1 text-xs font-semibold text-slate-400">
                     {language === 'zh-CN' ? `第 ${week} 周` : `Week ${week}`}
+                    {!teachingDay ? ` · ${t('calendar.noLecture')}` : ''}
                   </p>
-                ) : null}
+                ) : (
+                  <p className="mt-1 text-xs font-semibold text-slate-400">{t('calendar.noLecture')}</p>
+                )}
                 {courses.length === 0 && dayEvents.length === 0 ? (
-                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{t('calendar.dayEmpty')}</p>
+                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                    {teachingDay ? t('calendar.dayEmpty') : t('calendar.noLecture')}
+                  </p>
                 ) : (
                   <ul className="mt-3 space-y-2">
                     {courses.map(({ entry, meeting }) => (

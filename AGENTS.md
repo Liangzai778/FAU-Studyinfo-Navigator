@@ -92,3 +92,11 @@ npm run build
 - 官方考试条例通常属于 § 5 UrhG 的官方作品，可以引用；模块手册等受保护材料只作核对，控制在必要范围，权利人要求时移除。
 - 任何改变数据存储、托管商、第三方请求或商业模式的功能，必须同步更新 `LEGAL.md`、`/legal` 页面文案与 `tests/static.test.mjs` 中的合规检查；法律声明与实现不一致视为缺陷。
 
+## 10. 本地数据迁移红线
+
+- 用户已保存的课程、考试、任务与日程不可因 schema 变更而丢失。升级只能逐行迁移，禁止在 `onupgradeneeded` 中 `clear()` 任何 store。
+- 新增或更名字段时，必须在 `src/storage/migrations.ts` 添加旧格式迁移并补默认值，同时提升 `STORAGE_SCHEMA_VERSION`。
+- 每条存储读取都必须逐行迁移、逐行校验；无法识别的行跳过并计入 `unreadableRows`，原始行保留在 IndexedDB，不得删除。
+- 每次 schema 变更必须新增一条使用旧格式数据的测试（参见 `src/storage/migrations.test.ts`），否则视为未完成。
+- 设置页的「数据自检」必须能反映无法识别的记录数量；提交前确认它仍显示“全部可读”。
+

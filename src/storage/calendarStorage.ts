@@ -1,5 +1,11 @@
 import { calendarEventSchema, type CalendarEvent } from '../domain/calendar';
 import { calendarEventsStoreName, openLocalDatabase } from './database';
+import { migrateCalendarEvent, salvageRows } from './migrations';
+
+export type CalendarReadResult = {
+  events: CalendarEvent[];
+  rejected: number;
+};
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -8,16 +14,28 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
   });
 }
 
-export async function readCalendarEvents(): Promise<CalendarEvent[]> {
-  if (typeof indexedDB === 'undefined') return [];
+function dedupeById(items: readonly CalendarEvent[]): CalendarEvent[] {
+  const seen = new Set<string>();
+  return items.filter((item) => (seen.has(item.id) ? false : (seen.add(item.id), true)));
+}
+
+/** Reads what it can; a malformed plan is counted, not allowed to hide the rest. */
+export async function readCalendarEventsResult(): Promise<CalendarReadResult> {
+  if (typeof indexedDB === 'undefined') return { events: [], rejected: 0 };
   const database = await openLocalDatabase();
   try {
     const transaction = database.transaction(calendarEventsStoreName, 'readonly');
     const rows = await requestResult(transaction.objectStore(calendarEventsStoreName).getAll());
-    return (rows as unknown[]).map((row) => calendarEventSchema.parse(row));
+    const salvaged = salvageRows(rows as unknown[], calendarEventSchema, migrateCalendarEvent);
+    const events = dedupeById(salvaged.items);
+    return { events, rejected: salvaged.rejected + (salvaged.items.length - events.length) };
   } finally {
     database.close();
   }
+}
+
+export async function readCalendarEvents(): Promise<CalendarEvent[]> {
+  return (await readCalendarEventsResult()).events;
 }
 
 export async function writeCalendarEvents(events: readonly CalendarEvent[]): Promise<void> {

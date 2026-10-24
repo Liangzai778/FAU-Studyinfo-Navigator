@@ -7,11 +7,17 @@ import {
   type StudyTask,
 } from '../domain/exams';
 import { openLocalDatabase, personalExamsStoreName, studyTasksStoreName } from './database';
+import { migrateExam, migrateTask, salvageRows } from './migrations';
 
 export const emptyExamsTasksSnapshot: ExamsTasksSnapshot = {
   schemaVersion: 1,
   exams: [],
   tasks: [],
+};
+
+export type ExamsTasksReadResult = {
+  snapshot: ExamsTasksSnapshot;
+  rejected: number;
 };
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {
@@ -21,21 +27,41 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
   });
 }
 
-export async function readExamsTasksSnapshot(): Promise<ExamsTasksSnapshot> {
-  if (typeof indexedDB === 'undefined') return emptyExamsTasksSnapshot;
+function dedupeById<T extends { id: string }>(items: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => (seen.has(item.id) ? false : (seen.add(item.id), true)));
+}
+
+/** Per-row parsing, so one unreadable exam does not empty the whole page. */
+export async function readExamsTasksResult(): Promise<ExamsTasksReadResult> {
+  if (typeof indexedDB === 'undefined') return { snapshot: emptyExamsTasksSnapshot, rejected: 0 };
   const database = await openLocalDatabase();
   try {
     const transaction = database.transaction([personalExamsStoreName, studyTasksStoreName], 'readonly');
-    const [exams, tasks] = await Promise.all([
+    const [rawExams, rawTasks] = await Promise.all([
       requestResult(transaction.objectStore(personalExamsStoreName).getAll()),
       requestResult(transaction.objectStore(studyTasksStoreName).getAll()),
     ]);
-    const parsed = examsTasksSnapshotSchema.safeParse({ schemaVersion: 1, exams, tasks });
-    if (!parsed.success) throw new Error('Stored exam/task data failed schema validation.');
-    return parsed.data;
+    const exams = salvageRows(rawExams as unknown[], personalExamSchema, migrateExam);
+    const tasks = salvageRows(rawTasks as unknown[], studyTaskSchema, migrateTask);
+    const uniqueExams = dedupeById(exams.items);
+    const uniqueTasks = dedupeById(tasks.items);
+    const snapshot = examsTasksSnapshotSchema.parse({ schemaVersion: 1, exams: uniqueExams, tasks: uniqueTasks });
+    return {
+      snapshot,
+      rejected:
+        exams.rejected +
+        tasks.rejected +
+        (exams.items.length - uniqueExams.length) +
+        (tasks.items.length - uniqueTasks.length),
+    };
   } finally {
     database.close();
   }
+}
+
+export async function readExamsTasksSnapshot(): Promise<ExamsTasksSnapshot> {
+  return (await readExamsTasksResult()).snapshot;
 }
 
 export async function writeExamsTasksSnapshot(snapshot: ExamsTasksSnapshot): Promise<void> {

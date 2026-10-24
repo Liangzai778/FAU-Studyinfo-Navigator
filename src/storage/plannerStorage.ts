@@ -7,11 +7,18 @@ import {
   type PlannerSnapshot,
 } from '../domain/planner';
 import { openLocalDatabase, plannerAttemptsStoreName, plannerCoursesStoreName } from './database';
+import { migratePlannerAttempt, migratePlannerCourse, salvageRows } from './migrations';
 
 export const emptyPlannerSnapshot: PlannerSnapshot = {
   schemaVersion: 1,
   courses: [],
   attempts: [],
+};
+
+export type PlannerReadResult = {
+  snapshot: PlannerSnapshot;
+  /** Rows that could not be read but are still stored in IndexedDB. */
+  rejected: number;
 };
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {
@@ -21,70 +28,58 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
   });
 }
 
-/**
- * Reshapes rows written by earlier builds into the current one.
- *
- * Two older shapes exist: a single `day` string (first timetable build) and a
- * `days` array sharing one start time (second build). Both are folded into a
- * meeting list here. Throwing away a student's saved plan because a field was
- * renamed would lose real work, so this migrates instead of rejecting.
- */
-function migrateAttempt(raw: unknown): unknown {
-  if (!raw || typeof raw !== 'object') return raw;
-  const attempt = { ...(raw as Record<string, unknown>) };
-
-  const legacyDays: string[] = [];
-  if (Array.isArray(attempt.days)) {
-    legacyDays.push(...attempt.days.filter((value): value is string => typeof value === 'string'));
-  }
-  if (typeof attempt.day === 'string') legacyDays.push(attempt.day);
-  delete attempt.day;
-
-  const startMinutes = attempt.startMinutes;
-  const durationMinutes = typeof attempt.durationMinutes === 'number' ? attempt.durationMinutes : null;
-  delete attempt.startMinutes;
-  delete attempt.durationMinutes;
-
-  // A time recorded by an older build is shared by every weekday it knew about.
-  const sharedStart = typeof startMinutes === 'number' ? startMinutes : null;
-  const meetings: unknown[] = Array.isArray(attempt.meetings) ? attempt.meetings : [];
-  const alreadyScheduled = new Set(
-    meetings.map((meeting) => (meeting && typeof meeting === 'object' ? (meeting as Record<string, unknown>).day : null)),
-  );
-
-  const daysWithoutTime: string[] = [];
-  for (const day of legacyDays) {
-    if (alreadyScheduled.has(day)) continue;
-    alreadyScheduled.add(day);
-    if (sharedStart === null) {
-      daysWithoutTime.push(day);
-    } else {
-      meetings.push({ day, startMinutes: sharedStart, durationMinutes });
-    }
-  }
-
-  return { ...attempt, meetings, days: daysWithoutTime };
+function dedupeById<T extends { id: string }>(items: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => (seen.has(item.id) ? false : (seen.add(item.id), true)));
 }
 
-export async function readPlannerSnapshot(): Promise<PlannerSnapshot> {
-  if (typeof indexedDB === 'undefined') return emptyPlannerSnapshot;
+/**
+ * Reads whatever is readable and reports the rest.
+ *
+ * A single malformed row used to throw and turn the whole plan into a storage
+ * error. Now every row is migrated and parsed on its own, so one bad course
+ * cannot hide the other thirty.
+ */
+export async function readPlannerSnapshotResult(): Promise<PlannerReadResult> {
+  if (typeof indexedDB === 'undefined') return { snapshot: emptyPlannerSnapshot, rejected: 0 };
   const database = await openLocalDatabase();
   try {
     const transaction = database.transaction([plannerCoursesStoreName, plannerAttemptsStoreName], 'readonly');
-    const [courses, attempts] = await Promise.all([
+    const [rawCourses, rawAttempts] = await Promise.all([
       requestResult(transaction.objectStore(plannerCoursesStoreName).getAll()),
       requestResult(transaction.objectStore(plannerAttemptsStoreName).getAll()),
     ]);
-    const parsed = plannerSnapshotSchema.safeParse({
+
+    const courses = salvageRows(rawCourses as unknown[], localCourseSchema, migratePlannerCourse);
+    const attempts = salvageRows(rawAttempts as unknown[], courseAttemptSchema, migratePlannerAttempt);
+
+    const uniqueCourses = dedupeById(courses.items);
+    const duplicateCourses = courses.items.length - uniqueCourses.length;
+    const courseIds = new Set(uniqueCourses.map((course) => course.id));
+    const uniqueAttempts = dedupeById(attempts.items);
+    const duplicateAttempts = attempts.items.length - uniqueAttempts.length;
+    const validAttempts = uniqueAttempts.filter((attempt) => courseIds.has(attempt.courseId));
+
+    const rejected =
+      courses.rejected +
+      attempts.rejected +
+      duplicateCourses +
+      duplicateAttempts +
+      (uniqueAttempts.length - validAttempts.length);
+
+    const snapshot = plannerSnapshotSchema.parse({
       schemaVersion: 1,
-      courses,
-      attempts: (attempts as unknown[]).map(migrateAttempt),
+      courses: uniqueCourses,
+      attempts: validAttempts,
     });
-    if (!parsed.success) throw new Error('Stored planner data failed schema validation.');
-    return parsed.data;
+    return { snapshot, rejected };
   } finally {
     database.close();
   }
+}
+
+export async function readPlannerSnapshot(): Promise<PlannerSnapshot> {
+  return (await readPlannerSnapshotResult()).snapshot;
 }
 
 export async function writePlannerSnapshot(snapshot: PlannerSnapshot): Promise<void> {

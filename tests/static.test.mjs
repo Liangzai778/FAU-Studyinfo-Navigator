@@ -83,7 +83,9 @@ test('wires the semester calendar, autosave and storage persistence', async () =
   assert.match(planner, /lastSavedAt/);
 
   const calendar = await readFile('src/features/planner/SemesterCalendar.tsx', 'utf8');
-  assert.match(calendar, /readSemesterRange/);
+  assert.match(calendar, /getSemesterSchedule/);
+  assert.match(calendar, /isLectureDay/);
+  assert.match(calendar, /lectureWeekNumber/);
   assert.match(calendar, /eventsOnDate/);
   assert.match(calendar, /monthGrid/);
   assert.match(calendar, /calendar\.viewWeek/);
@@ -100,6 +102,18 @@ test('wires the semester calendar, autosave and storage persistence', async () =
   assert.match(plannerStorage, /putPlannerCourse/);
   const calendarStorage = await readFile('src/storage/calendarStorage.ts', 'utf8');
   assert.match(calendarStorage, /putCalendarEvent/);
+
+  const migrations = await readFile('src/storage/migrations.ts', 'utf8');
+  assert.match(migrations, /STORAGE_SCHEMA_VERSION/);
+  assert.match(migrations, /export function salvageRows/);
+  assert.match(migrations, /migratePlannerAttempt/);
+  const settingsPage = await readFile('src/features/settings/SettingsPage.tsx', 'utf8');
+  assert.match(settingsPage, /dataCheckTitle/);
+  assert.match(settingsPage, /unreadableRows/);
+
+  const academicCalendar = await readFile('src/data/academicCalendar.ts', 'utf8');
+  assert.match(academicCalendar, /lectureStart/);
+  assert.match(academicCalendar, /ul-decision/);
 });
 
 test('publishes the project design, roadmap and README screenshots', async () => {
