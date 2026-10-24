@@ -1,5 +1,6 @@
 import {
   academicProfileStoreName,
+  calendarEventsStoreName,
   openLocalDatabase,
   personalExamsStoreName,
   plannerAttemptsStoreName,
@@ -13,6 +14,7 @@ const personalStoreNames = [
   plannerAttemptsStoreName,
   personalExamsStoreName,
   studyTasksStoreName,
+  calendarEventsStoreName,
 ] as const;
 
 export async function clearIndexedDbPersonalData(): Promise<void> {

@@ -73,6 +73,27 @@ test('uses no cookies, beacons or tracking scripts', async () => {
   assert.doesNotMatch(source, /\bgtag\b|\bdataLayer\b|\bplausible\b|\bmatomo\b|google-analytics/i);
 });
 
+test('wires the semester calendar, autosave and storage persistence', async () => {
+  const database = await readFile('src/storage/database.ts', 'utf8');
+  assert.match(database, /localDatabaseVersion = 4/);
+  assert.match(database, /calendarEventsStoreName = 'calendar-events'/);
+
+  const planner = await readFile('src/features/planner/PlannerPage.tsx', 'utf8');
+  assert.match(planner, /SemesterCalendar/);
+  assert.match(planner, /lastSavedAt/);
+
+  const calendar = await readFile('src/features/planner/SemesterCalendar.tsx', 'utf8');
+  assert.match(calendar, /readSemesterStart/);
+  assert.match(calendar, /eventsOnDate/);
+  assert.match(calendar, /monthGrid/);
+
+  const settings = await readFile('src/features/settings/SettingsPage.tsx', 'utf8');
+  assert.match(settings, /requestPersistentLocalStorage/);
+
+  const backup = await readFile('src/storage/backup.ts', 'utf8');
+  assert.match(backup, /calendarEvents/);
+});
+
 test('publishes the project design, roadmap and README screenshots', async () => {
   const design = await readFile('docs/DESIGN.md', 'utf8');
   assert.match(design, /## 2\. 总体架构/);
@@ -88,6 +109,7 @@ test('publishes the project design, roadmap and README screenshots', async () =>
     'coverage.png',
     'degree-rules.png',
     'resources-international.png',
+    'calendar.png',
   ];
   for (const file of screenshots) {
     assert.ok(readme.includes(`docs/screenshots/${file}`), `README must embed ${file}`);
@@ -299,7 +321,7 @@ test('models P4 planner states, pure ECTS calculation, and transactional Indexed
   assert.match(engine, /unconfirmed_recognition/);
   assert.match(engine, /duplicate_course/);
   assert.match(storage, /transaction\(\[plannerCoursesStoreName, plannerAttemptsStoreName\], 'readwrite'\)/);
-  assert.match(database, /localDatabaseVersion = 3/);
+  assert.match(database, /localDatabaseVersion = 4/);
   assert.match(page, /calculateEctsProgress/);
   assert.match(page, /addRetake/);
 });

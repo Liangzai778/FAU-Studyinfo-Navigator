@@ -13,6 +13,7 @@ import { emptyPlannerSnapshot, readPlannerSnapshot, writePlannerSnapshot } from 
 type PlannerState = PlannerSnapshot & {
   hydrated: boolean;
   storageError: boolean;
+  lastSavedAt: string | null;
   hydrate: (force?: boolean) => Promise<void>;
   addCourseWithAttempt: (course: LocalCourseInput, attempt: Omit<CourseAttemptInput, 'courseId'>) => Promise<string | null>;
   updateCourse: (courseId: string, input: LocalCourseInput) => Promise<boolean>;
@@ -45,7 +46,7 @@ async function persistPatch(
   const snapshot = snapshotFromState(state, patch);
   try {
     await writePlannerSnapshot(snapshot);
-    set({ ...patch, storageError: false });
+    set({ ...patch, storageError: false, lastSavedAt: new Date().toISOString() });
     return true;
   } catch {
     set({ storageError: true });
@@ -53,10 +54,23 @@ async function persistPatch(
   }
 }
 
+/**
+ * Any mutation waits for the stored snapshot first.
+ *
+ * Without this, a fast first click (before hydration finished) wrote
+ * `courses: [newCourse]` to disk and then hydration replaced the in-memory
+ * state with the stored one, losing the click. The guard makes the stored list
+ * the base of every write.
+ */
+async function ensureHydrated(get: () => PlannerState, hydrate: (force?: boolean) => Promise<void>) {
+  if (!get().hydrated) await hydrate();
+}
+
 export const usePlannerStore = create<PlannerState>((set, get) => ({
   ...emptyPlannerSnapshot,
   hydrated: false,
   storageError: false,
+  lastSavedAt: null,
   hydrate: async (force = false) => {
     if (get().hydrated && !force) return;
     try {
@@ -67,6 +81,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     }
   },
   addCourseWithAttempt: async (courseInput, attemptInput) => {
+    await ensureHydrated(get, get().hydrate);
     const parsedCourse = localCourseInputSchema.safeParse(courseInput);
     if (!parsedCourse.success) return null;
     const courseId = createLocalId('course');
@@ -84,6 +99,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     return saved ? courseId : null;
   },
   updateCourse: async (courseId, input) => {
+    await ensureHydrated(get, get().hydrate);
     const parsed = localCourseInputSchema.safeParse(input);
     if (!parsed.success) return false;
     const state = get();
@@ -93,6 +109,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     }, set);
   },
   deleteCourse: async (courseId) => {
+    await ensureHydrated(get, get().hydrate);
     const state = get();
     return persistPatch(state, {
       courses: state.courses.filter((course) => course.id !== courseId),
@@ -100,6 +117,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     }, set);
   },
   addAttempt: async (input) => {
+    await ensureHydrated(get, get().hydrate);
     const parsed = courseAttemptInputSchema.safeParse(input);
     if (!parsed.success || !get().courses.some((course) => course.id === parsed.data.courseId)) return null;
     const id = createLocalId('attempt');
@@ -110,6 +128,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     return saved ? id : null;
   },
   updateAttempt: async (attemptId, input) => {
+    await ensureHydrated(get, get().hydrate);
     const parsed = courseAttemptInputSchema.safeParse(input);
     if (!parsed.success) return false;
     const state = get();
@@ -119,6 +138,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     }, set);
   },
   deleteAttempt: async (attemptId) => {
+    await ensureHydrated(get, get().hydrate);
     const state = get();
     return persistPatch(state, { attempts: state.attempts.filter((attempt) => attempt.id !== attemptId) }, set);
   },

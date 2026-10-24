@@ -37,6 +37,51 @@ test('language, theme, and favorites survive reloads', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Remove from favorites' }).first()).toBeVisible();
 });
 
+test('a course and a personal plan survive a reload', async ({ page }) => {
+  // A course needs a confirmed programme/PO before the catalogue is usable.
+  await page.goto('/degree');
+  await page.locator('select').nth(0).selectOption('master');
+  await page.locator('select').nth(1).selectOption('nat');
+  await page.locator('select').nth(2).selectOption('nat-biologie-zell-molekularbiologie-msc');
+  await page.getByLabel('入学年份').fill('2026');
+  await page.getByLabel('选择学期').selectOption('winter');
+  await page.getByLabel('PO 版本', { exact: true }).selectOption('po-zmb-2026');
+  await page.getByRole('checkbox').last().check();
+  await page.getByRole('button', { name: '保存专业与 PO' }).click();
+  await expect(page.getByText('专业与 PO 组合已保存')).toBeVisible();
+
+  await page.goto('/planner');
+  await page.getByLabel('手动录入其他课程').check();
+  await page.getByLabel('课程名称').fill('E2E persistence course');
+  await page.getByLabel('ECTS', { exact: true }).fill('5');
+  await page.getByLabel('学期年份').fill('2026');
+  await page.getByLabel('学期类型').selectOption('winter');
+  await page.getByRole('button', { name: '添加到计划' }).click();
+  await expect(page.getByText('E2E persistence course').first()).toBeVisible();
+
+  const form = page.locator('#calendar-event-form');
+  await form.getByLabel('事由').fill('E2E personal plan');
+  await form.getByLabel('日期').fill('2026-10-20');
+  await form.getByRole('button', { name: '保存日程' }).click();
+  await expect(page.getByText('E2E personal plan').first()).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText('E2E persistence course').first()).toBeVisible();
+  await expect(page.getByText('E2E personal plan').first()).toBeVisible();
+});
+
+test('calendar moves by month and returns to today', async ({ page }) => {
+  await page.goto('/planner');
+  const calendar = page.locator('section', { has: page.getByRole('heading', { name: '学期日历' }) }).first();
+  await expect(calendar).toBeVisible();
+  const title = calendar.getByText(/\d{4}年\d{1,2}月|\w+ \d{4}/).first();
+  const before = await title.innerText();
+  await page.getByRole('button', { name: '下个月' }).click();
+  await expect(title).not.toHaveText(before);
+  await page.getByRole('button', { name: '上个月' }).click();
+  await expect(title).toHaveText(before);
+});
+
 test('mobile navigation remains usable at the smallest supported width', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium');
   await page.setViewportSize({ width: 320, height: 568 });

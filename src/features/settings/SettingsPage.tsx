@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon';
 import { PageHeader } from '../../components/common/PageHeader';
 import { BackupPanel } from '../exams/BackupPanel';
 import { useTranslation } from '../../i18n/useTranslation';
 import { clearIndexedDbPersonalData } from '../../storage/clearLocalData';
+import {
+  formatBytes,
+  readLocalStorageStatus,
+  requestPersistentLocalStorage,
+  type LocalStorageStatus,
+} from '../../storage/localStorageStatus';
 import { useAcademicProfileStore } from '../../store/academicProfile';
 import { useExamsTasksStore } from '../../store/examsTasks';
 import { usePlannerStore } from '../../store/planner';
@@ -24,6 +30,18 @@ export function SettingsPage() {
   const [resetMessage, setResetMessage] = useState(false);
   const [clearMessage, setClearMessage] = useState('');
   const [clearing, setClearing] = useState(false);
+  const [storageStatus, setStorageStatus] = useState<LocalStorageStatus | null>(null);
+  const [persistMessage, setPersistMessage] = useState('');
+
+  useEffect(() => {
+    void readLocalStorageStatus().then(setStorageStatus);
+  }, []);
+
+  const requestPersistence = async () => {
+    const granted = await requestPersistentLocalStorage();
+    setStorageStatus(await readLocalStorageStatus());
+    setPersistMessage(granted ? t('settings.persistentGranted') : t('settings.persistentDenied'));
+  };
 
   const resetPreferences = () => {
     reset();
@@ -128,6 +146,42 @@ export function SettingsPage() {
             <Link to="/legal" className="mt-2 inline-block text-sm font-semibold text-sky-700 underline underline-offset-2 dark:text-sky-300">
               {t('settings.legalLink')}
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-start gap-3">
+          <Icon name="shield" className="mt-0.5 h-6 w-6 text-sky-700 dark:text-sky-300" />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-slate-950 dark:text-white">{t('settings.persistenceTitle')}</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{t('settings.persistenceBody')}</p>
+            <dl className="mt-3 grid gap-1 text-sm text-slate-600 dark:text-slate-300">
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="font-semibold">{t('settings.requestPersistent')}:</dt>
+                <dd>
+                  {!storageStatus
+                    ? '…'
+                    : !storageStatus.supported
+                      ? t('settings.storageUnsupported')
+                      : storageStatus.persisted
+                        ? t('settings.persistentGranted')
+                        : t('settings.persistentDenied')}
+                </dd>
+              </div>
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="font-semibold">{t('settings.storageUsage')}:</dt>
+                <dd>{formatBytes(storageStatus?.usage ?? null)} / {formatBytes(storageStatus?.quota ?? null)}</dd>
+              </div>
+            </dl>
+            <button
+              type="button"
+              onClick={() => void requestPersistence()}
+              className="mt-3 rounded-xl border border-sky-700 px-4 py-2 text-sm font-semibold text-sky-800 hover:bg-sky-50 dark:text-sky-200 dark:hover:bg-sky-950"
+            >
+              {t('settings.requestPersistent')}
+            </button>
+            <p aria-live="polite" className="mt-2 min-h-5 text-sm font-semibold text-emerald-700 dark:text-emerald-300">{persistMessage}</p>
           </div>
         </div>
       </section>

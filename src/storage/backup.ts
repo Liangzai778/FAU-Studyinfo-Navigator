@@ -1,15 +1,18 @@
 import { z } from 'zod';
+import { calendarEventSchema } from '../domain/calendar';
 import { examsTasksSnapshotSchema } from '../domain/exams';
 import { plannerSnapshotSchema } from '../domain/planner';
 import { storedAcademicProfileSchema, readAcademicProfile, type StoredAcademicProfile } from './academicProfileStorage';
 import {
   academicProfileStoreName,
+  calendarEventsStoreName,
   openLocalDatabase,
   personalExamsStoreName,
   plannerAttemptsStoreName,
   plannerCoursesStoreName,
   studyTasksStoreName,
 } from './database';
+import { readCalendarEvents } from './calendarStorage';
 import { readExamsTasksSnapshot } from './examsTasksStorage';
 import { readPlannerSnapshot } from './plannerStorage';
 
@@ -25,6 +28,9 @@ export const localBackupSchema = z.object({
     academicProfile: storedAcademicProfileSchema.nullable(),
     planner: plannerSnapshotSchema,
     examsAndTasks: examsTasksSnapshotSchema,
+    // Added later; `default([])` keeps backups exported before calendar events
+    // existed readable instead of failing on a missing key.
+    calendarEvents: z.array(calendarEventSchema).default([]),
   }).strict(),
 }).strict();
 export type LocalBackup = z.infer<typeof localBackupSchema>;
@@ -34,6 +40,7 @@ export type RestoreSummary = {
   addedAttempts: number;
   addedExams: number;
   addedTasks: number;
+  addedEvents: number;
   academicProfilePreserved: boolean;
 };
 
@@ -51,17 +58,18 @@ function assertSafeJson(value: unknown, depth = 0) {
 }
 
 export async function createLocalBackup(now = new Date()): Promise<LocalBackup> {
-  const [academicProfile, planner, examsAndTasks] = await Promise.all([
+  const [academicProfile, planner, examsAndTasks, calendarEvents] = await Promise.all([
     readAcademicProfile(),
     readPlannerSnapshot(),
     readExamsTasksSnapshot(),
+    readCalendarEvents(),
   ]);
   return localBackupSchema.parse({
     schemaVersion: BACKUP_SCHEMA_VERSION,
     application: 'fau-study-navigator',
-    applicationVersion: '0.1.0',
+    applicationVersion: '0.2.0',
     exportedAt: now.toISOString(),
-    data: { academicProfile, planner, examsAndTasks },
+    data: { academicProfile, planner, examsAndTasks, calendarEvents },
   });
 }
 
@@ -102,16 +110,18 @@ function replaceStore<T>(store: IDBObjectStore, items: readonly T[]) {
 
 export async function restoreLocalBackup(backup: LocalBackup): Promise<RestoreSummary> {
   const imported = localBackupSchema.parse(backup);
-  const [currentAcademicProfile, currentPlanner, currentExamsAndTasks] = await Promise.all([
+  const [currentAcademicProfile, currentPlanner, currentExamsAndTasks, currentEvents] = await Promise.all([
     readAcademicProfile(),
     readPlannerSnapshot(),
     readExamsTasksSnapshot(),
+    readCalendarEvents(),
   ]);
 
   const courses = mergeById(currentPlanner.courses, imported.data.planner.courses, 'course');
   const attempts = mergeById(currentPlanner.attempts, imported.data.planner.attempts, 'attempt');
   const exams = mergeById(currentExamsAndTasks.exams, imported.data.examsAndTasks.exams, 'exam');
   const tasks = mergeById(currentExamsAndTasks.tasks, imported.data.examsAndTasks.tasks, 'task');
+  const events = mergeById(currentEvents, imported.data.calendarEvents, 'calendar event');
   const mergedPlanner = plannerSnapshotSchema.parse({ schemaVersion: 1, courses: courses.items, attempts: attempts.items });
   const mergedExamsAndTasks = examsTasksSnapshotSchema.parse({ schemaVersion: 1, exams: exams.items, tasks: tasks.items });
   const academicProfile: StoredAcademicProfile | null = currentAcademicProfile ?? imported.data.academicProfile;
@@ -125,6 +135,7 @@ export async function restoreLocalBackup(backup: LocalBackup): Promise<RestoreSu
         plannerAttemptsStoreName,
         personalExamsStoreName,
         studyTasksStoreName,
+        calendarEventsStoreName,
       ], 'readwrite');
       const profileStore = transaction.objectStore(academicProfileStoreName);
       profileStore.delete('current');
@@ -133,6 +144,7 @@ export async function restoreLocalBackup(backup: LocalBackup): Promise<RestoreSu
       replaceStore(transaction.objectStore(plannerAttemptsStoreName), mergedPlanner.attempts);
       replaceStore(transaction.objectStore(personalExamsStoreName), mergedExamsAndTasks.exams);
       replaceStore(transaction.objectStore(studyTasksStoreName), mergedExamsAndTasks.tasks);
+      replaceStore(transaction.objectStore(calendarEventsStoreName), events.items);
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error ?? new Error('Backup restore transaction failed.'));
       transaction.onabort = () => reject(transaction.error ?? new Error('Backup restore transaction was aborted.'));
@@ -146,6 +158,7 @@ export async function restoreLocalBackup(backup: LocalBackup): Promise<RestoreSu
     addedAttempts: attempts.added,
     addedExams: exams.added,
     addedTasks: tasks.added,
+    addedEvents: events.added,
     academicProfilePreserved: currentAcademicProfile !== null,
   };
 }

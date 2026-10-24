@@ -1,10 +1,11 @@
 export const localDatabaseName = 'fau-study-navigator';
-export const localDatabaseVersion = 3;
+export const localDatabaseVersion = 4;
 export const academicProfileStoreName = 'academic-profile';
 export const plannerCoursesStoreName = 'planner-courses';
 export const plannerAttemptsStoreName = 'planner-attempts';
 export const personalExamsStoreName = 'personal-exams';
 export const studyTasksStoreName = 'study-tasks';
+export const calendarEventsStoreName = 'calendar-events';
 
 export function openLocalDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -25,6 +26,11 @@ export function openLocalDatabase(): Promise<IDBDatabase> {
       }
       if (!database.objectStoreNames.contains(studyTasksStoreName)) {
         database.createObjectStore(studyTasksStoreName, { keyPath: 'id' });
+      }
+      // Added in database version 4. Existing stores are untouched, so a user
+      // upgrading from v3 keeps every course and exam.
+      if (!database.objectStoreNames.contains(calendarEventsStoreName)) {
+        database.createObjectStore(calendarEventsStoreName, { keyPath: 'id' });
       }
     };
     request.onsuccess = () => resolve(request.result);

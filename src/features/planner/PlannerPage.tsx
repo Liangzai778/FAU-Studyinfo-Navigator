@@ -21,6 +21,7 @@ import { buildTimetable } from '../../domain/planner';
 import type { TimetableDay } from '../../domain/planner';
 import { CourseForm } from './CourseForm';
 import { TimetableGrid } from './TimetableGrid';
+import { SemesterCalendar } from './SemesterCalendar';
 
 const riskKeys: Record<EctsRiskCode, `planner.risk.${EctsRiskCode}`> = {
   no_selected_po: 'planner.risk.no_selected_po',
@@ -46,6 +47,7 @@ export function PlannerPage() {
   const attempts = usePlannerStore((state) => state.attempts);
   const hydrated = usePlannerStore((state) => state.hydrated);
   const storageError = usePlannerStore((state) => state.storageError);
+  const lastSavedAt = usePlannerStore((state) => state.lastSavedAt);
   const hydrate = usePlannerStore((state) => state.hydrate);
   const addCourseWithAttempt = usePlannerStore((state) => state.addCourseWithAttempt);
   const updateCourse = usePlannerStore((state) => state.updateCourse);
@@ -230,6 +232,11 @@ export function PlannerPage() {
 
       <p aria-live="polite" className="mt-4 min-h-6 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
         {!hydrated ? t('planner.loading') : storageError ? t('planner.storageFailed') : liveMessage}
+        {lastSavedAt ? (
+          <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">
+            · {t('settings.lastSaved')} {new Date(lastSavedAt).toLocaleTimeString(language === 'zh-CN' ? 'zh-CN' : 'en-GB', { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        ) : null}
       </p>
 
       <section className="mt-8">
@@ -259,6 +266,14 @@ export function PlannerPage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-2xl font-bold text-slate-950 dark:text-white">{t('calendar.title')}</h2>
+        <p className="mt-2 text-slate-600 dark:text-slate-300">{t('calendar.body')}</p>
+        <div className="mt-5">
+          <SemesterCalendar tables={timetable} />
+        </div>
       </section>
 
       <section className="mt-6">
