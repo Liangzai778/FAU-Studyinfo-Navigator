@@ -54,3 +54,9 @@
 | [P6_ACCEPTANCE_REPORT.md](P6_ACCEPTANCE_REPORT.md) | P6 验收报告 |
 | [LOCAL_VERIFICATION.md](LOCAL_VERIFICATION.md) | 本地验证与发布记录 |
 | [DATA_POLICY.md](DATA_POLICY.md) | 数据政策 |
+
+## 维护者工具
+
+| 文件 | 内容 |
+|---|---|
+| [analytics/README.md](../analytics/README.md) | **访问统计（可选、默认关闭）**：Cloudflare Worker + KV + 看板；隐私设计、部署、接入步骤与法律措辞 |

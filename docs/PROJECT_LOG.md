@@ -1280,3 +1280,68 @@ README 顶部新增「使用指南」三步与链接；`docs/README.md` 索引�
 | 单元测试 | ✅ 169/169 |
 | E2E | ✅ 19 通过 / 2 跳过 |
 | 构建 | ✅ 成功 |
+
+---
+
+## 二十二、2026-10-24 · 可选的访问统计（默认关闭）
+
+### 22.1 为什么单独做
+
+主站的公开承诺是「无分析、无追踪、无后台请求」，`LEGAL.md` 和测试都按这条守着。直接在主站加统计会立刻让这句话变成假的。
+
+所以统计被做成一个**独立、可选**的服务：`analytics/`。主站默认不引用它、不构建它、不发任何请求。是否启用由维护者决定；启用前必须同步改 CSP、测试与法律声明，清单写在 `analytics/README.md`。
+
+### 22.2 组成
+
+| 部分 | 文件 | 作用 |
+|---|---|---|
+| Worker | `analytics/worker/src/index.ts` | `POST /collect` 计数；`GET /stats` 读取聚合数据；KV 存储 |
+| KV | `wrangler.toml` | 键 `p:<日期>:<路径>` / `e:<日期>:<事件>`，值整数 |
+| 看板 | `analytics/dashboard/` | 静态页面：填服务地址 + 令牌，显示总计、每日柱状、页面与功能排行；`?demo=1` 看演示数据 |
+| 客户端 | `analytics/client/usage.ts` | 给主站的可选接入代码，放在 `src/` 之外，默认不参与构建 |
+
+### 22.3 隐私与安全
+
+- 不存 IP、User-Agent、Cookie、访客 ID、来源页、任何用户输入；只存“某天某路径/事件 +1”。
+- 日期按 `Europe/Berlin`；KV 写入带 90 天 `expirationTtl`，自动过期。
+- CORS 白名单（`ALLOWED_ORIGINS`）；`/stats` 需要 Bearer 令牌；请求体上限 1 KB；路径与事件名做长度和字符校验。
+- 计数是近似值：KV 非原子递增，并发时可能少记；适合看趋势，不适合计费。
+
+### 22.4 本地验证
+
+- `POST /collect` 返回 204，`GET /stats` 无令牌返回 401，带令牌返回计数；
+- 看板连接本地 Worker 后读到 `pageViews: 1`、`events: 1`，页面 `/degree` 与 `course_added` 均显示；
+- `?demo=1` 渲染 30 天演示数据，60 根柱子，无控制台错误。
+
+### 22.5 部署
+
+```bash
+cd analytics/worker
+npm install
+npx wrangler login
+npx wrangler kv namespace create COUNTERS   # id 填入 wrangler.toml
+npx wrangler secret put STATS_TOKEN
+npx wrangler deploy
+
+npx wrangler pages deploy analytics/dashboard --project-name fau-study-stats
+```
+
+主站接入、CSP、测试与法律声明措辞见 `analytics/README.md`；不启用则完全不影响现有网站。
+
+### 22.6 边界
+
+- 没有独立访客（UV）统计，因为没有访客 ID。
+- 没有机器人过滤；异常流量会算进去。
+- 保留期固定 90 天，没有后台配置。
+- 看板令牌只存 `sessionStorage`，公共电脑上不要保存。
+
+### 22.7 验证
+
+| 检查 | 结果 |
+|---|---|
+| lint / typecheck | ✅ 0 错误 |
+| 静态测试 | ✅ 38/38 |
+| 单元测试 | ✅ 169/169 |
+| E2E | ✅ 19 通过 / 2 跳过 |
+| 构建 | ✅ 成功（主站未包含统计代码） |
+| 本地链路 | ✅ collect 204 / stats 200 / 未授权 401 / 看板读取成功 |

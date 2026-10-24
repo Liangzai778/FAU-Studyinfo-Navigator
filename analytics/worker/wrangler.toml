@@ -1,0 +1,15 @@
+name = "fau-study-stats"
+main = "src/index.ts"
+compatibility_date = "2026-10-24"
+
+# Set this to the origins that may send page views.
+[vars]
+ALLOWED_ORIGINS = "https://fau-studyinfo-navigator.pages.dev,http://127.0.0.1:5173,http://127.0.0.1:8099"
+
+# Run `npx wrangler kv namespace create COUNTERS` and paste the id here.
+[[kv_namespaces]]
+binding = "COUNTERS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# STATS_TOKEN is a secret:
+#   npx wrangler secret put STATS_TOKEN

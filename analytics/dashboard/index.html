@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https: http://127.0.0.1:*; base-uri 'none'; form-action 'self'"
+    />
+    <title>FAU Study Stats</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <p class="eyebrow">FAU Study Navigator</p>
+        <h1>访问统计</h1>
+        <p class="lede">聚合的页面访问与功能使用次数。没有 Cookie、没有访客 ID、不保存 IP。</p>
+      </div>
+      <a class="demo" href="?demo=1">查看演示数据</a>
+    </header>
+
+    <section class="panel" aria-label="连接设置">
+      <form id="config">
+        <label>
+          <span>统计服务地址</span>
+          <input id="endpoint" type="url" placeholder="https://fau-study-stats.example.workers.dev" required />
+        </label>
+        <label>
+          <span>统计令牌</span>
+          <input id="token" type="password" autocomplete="off" placeholder="STATS_TOKEN" />
+        </label>
+        <label>
+          <span>时间范围</span>
+          <select id="days">
+            <option value="7">最近 7 天</option>
+            <option value="30" selected>最近 30 天</option>
+            <option value="90">最近 90 天</option>
+          </select>
+        </label>
+        <button type="submit">读取</button>
+        <button type="button" id="forget" class="secondary">清除令牌</button>
+      </form>
+      <p id="status" class="status" role="status" aria-live="polite">令牌只保存在当前标签页的 sessionStorage。</p>
+    </section>
+
+    <main id="result" hidden>
+      <section class="cards" aria-label="总计">
+        <article><p>页面访问</p><strong id="total-views">0</strong></article>
+        <article><p>功能使用</p><strong id="total-events">0</strong></article>
+        <article><p>统计天数</p><strong id="total-days">0</strong></article>
+        <article><p>更新时间</p><strong id="generated-at" class="small">—</strong></article>
+      </section>
+
+      <section class="panel" aria-label="每日趋势">
+        <h2>每日趋势</h2>
+        <div id="chart" class="chart" role="img" aria-label="每日页面访问柱状图"></div>
+        <p class="legend"><span class="dot views"></span>页面访问 <span class="dot events"></span>功能使用</p>
+      </section>
+
+      <div class="grid">
+        <section class="panel" aria-label="页面排行">
+          <h2>页面排行</h2>
+          <table>
+            <thead><tr><th>路径</th><th class="num">次数</th></tr></thead>
+            <tbody id="pages"></tbody>
+          </table>
+        </section>
+        <section class="panel" aria-label="功能使用">
+          <h2>功能使用</h2>
+          <table>
+            <thead><tr><th>事件</th><th class="num">次数</th></tr></thead>
+            <tbody id="events"></tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>只保存“某天、某个路径 / 事件”的计数。统计是近似值（KV 写入不是原子操作），适合了解大致使用情况，不适合计费或审计。</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

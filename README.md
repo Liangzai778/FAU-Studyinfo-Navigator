@@ -294,4 +294,5 @@ GitHub Pages 没有服务端 SPA 回退，只能靠根目录的 `404.html`，因
 - [docs/SCALABILITY_AUDIT.md](docs/SCALABILITY_AUDIT.md) — 源码级审计
 - [docs/ACADEMIC_DATA_MODEL.md](docs/ACADEMIC_DATA_MODEL.md) — 数据模型
 - [docs/DATA_POLICY.md](docs/DATA_POLICY.md) — 数据政策（历史）
+- [analytics/README.md](analytics/README.md) — 可选的访问统计（默认关闭，需自行部署）
 - [upload/PRD(1).md](<upload/PRD(1).md>) — 最初的需求文档（保留原样）
