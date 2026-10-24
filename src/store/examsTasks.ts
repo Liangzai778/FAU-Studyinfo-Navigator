@@ -9,7 +9,15 @@ import {
   type StudyTaskInput,
 } from '../domain/exams';
 import { BERLIN_TIMEZONE } from '../domain/berlinDateTime';
-import { emptyExamsTasksSnapshot, readExamsTasksSnapshot, writeExamsTasksSnapshot } from '../storage/examsTasksStorage';
+import {
+  deleteExamRow,
+  deleteTaskRow,
+  emptyExamsTasksSnapshot,
+  putExam,
+  putTask,
+  readExamsTasksSnapshot,
+} from '../storage/examsTasksStorage';
+import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
 type ExamsTasksState = ExamsTasksSnapshot & {
   hydrated: boolean;
@@ -30,99 +38,139 @@ function createLocalId(prefix: string) {
   return `${prefix}-${suffix}`;
 }
 
-function snapshotFromState(state: ExamsTasksState, patch: Partial<ExamsTasksSnapshot>): ExamsTasksSnapshot {
-  return {
-    schemaVersion: 1,
-    exams: patch.exams ?? state.exams,
-    tasks: patch.tasks ?? state.tasks,
+export const useExamsTasksStore = create<ExamsTasksState>((set, get) => {
+  const ensureHydrated = async () => {
+    if (!get().hydrated) await get().hydrate();
   };
-}
+  const saved = () => {
+    set({ storageError: false });
+    broadcastSync('exams');
+  };
+  const failed = () => set({ storageError: true });
 
-async function persistPatch(
-  state: ExamsTasksState,
-  patch: Partial<ExamsTasksSnapshot>,
-  set: (patch: Partial<ExamsTasksState>) => void,
-) {
-  try {
-    await writeExamsTasksSnapshot(snapshotFromState(state, patch));
-    set({ ...patch, storageError: false });
-    return true;
-  } catch {
-    set({ storageError: true });
-    return false;
-  }
-}
+  return {
+    ...emptyExamsTasksSnapshot,
+    hydrated: false,
+    storageError: false,
+    hydrate: async (force = false) => {
+      if (get().hydrated && !force) return;
+      try {
+        const snapshot = await readExamsTasksSnapshot();
+        set({ ...snapshot, hydrated: true, storageError: false });
+      } catch {
+        set({ hydrated: true, storageError: true });
+      }
+    },
+    addExam: async (input) => {
+      await ensureHydrated();
+      const parsed = personalExamInputSchema.safeParse(input);
+      if (!parsed.success) return null;
+      const id = createLocalId('exam');
+      const now = new Date().toISOString();
+      const exam: PersonalExam = {
+        id,
+        ...parsed.data,
+        timezone: BERLIN_TIMEZONE,
+        origin: 'personal',
+        dateStatus: 'user_entered',
+        createdAt: now,
+        updatedAt: now,
+      };
+      try {
+        await putExam(exam);
+        set({ exams: [...get().exams, exam] });
+        saved();
+        return id;
+      } catch {
+        failed();
+        return null;
+      }
+    },
+    updateExam: async (id, input) => {
+      await ensureHydrated();
+      const parsed = personalExamInputSchema.safeParse(input);
+      if (!parsed.success) return false;
+      const current = get().exams.find((exam) => exam.id === id);
+      if (!current) return false;
+      const updated: PersonalExam = { ...current, ...parsed.data, updatedAt: new Date().toISOString() };
+      try {
+        await putExam(updated);
+        set({ exams: get().exams.map((exam) => (exam.id === id ? updated : exam)) });
+        saved();
+        return true;
+      } catch {
+        failed();
+        return false;
+      }
+    },
+    deleteExam: async (id) => {
+      await ensureHydrated();
+      try {
+        await deleteExamRow(id);
+        set({ exams: get().exams.filter((exam) => exam.id !== id) });
+        saved();
+        return true;
+      } catch {
+        failed();
+        return false;
+      }
+    },
+    addTask: async (input) => {
+      await ensureHydrated();
+      const parsed = studyTaskInputSchema.safeParse(input);
+      if (!parsed.success) return null;
+      const id = createLocalId('task');
+      const now = new Date().toISOString();
+      const task: StudyTask = {
+        id,
+        ...parsed.data,
+        timezone: BERLIN_TIMEZONE,
+        origin: 'personal',
+        createdAt: now,
+        updatedAt: now,
+      };
+      try {
+        await putTask(task);
+        set({ tasks: [...get().tasks, task] });
+        saved();
+        return id;
+      } catch {
+        failed();
+        return null;
+      }
+    },
+    updateTask: async (id, input) => {
+      await ensureHydrated();
+      const parsed = studyTaskInputSchema.safeParse(input);
+      if (!parsed.success) return false;
+      const current = get().tasks.find((task) => task.id === id);
+      if (!current) return false;
+      const updated: StudyTask = { ...current, ...parsed.data, updatedAt: new Date().toISOString() };
+      try {
+        await putTask(updated);
+        set({ tasks: get().tasks.map((task) => (task.id === id ? updated : task)) });
+        saved();
+        return true;
+      } catch {
+        failed();
+        return false;
+      }
+    },
+    deleteTask: async (id) => {
+      await ensureHydrated();
+      try {
+        await deleteTaskRow(id);
+        set({ tasks: get().tasks.filter((task) => task.id !== id) });
+        saved();
+        return true;
+      } catch {
+        failed();
+        return false;
+      }
+    },
+  };
+});
 
-export const useExamsTasksStore = create<ExamsTasksState>((set, get) => ({
-  ...emptyExamsTasksSnapshot,
-  hydrated: false,
-  storageError: false,
-  hydrate: async (force = false) => {
-    if (get().hydrated && !force) return;
-    try {
-      const snapshot = await readExamsTasksSnapshot();
-      set({ ...snapshot, hydrated: true, storageError: false });
-    } catch {
-      set({ hydrated: true, storageError: true });
-    }
-  },
-  addExam: async (input) => {
-    const parsed = personalExamInputSchema.safeParse(input);
-    if (!parsed.success) return null;
-    const id = createLocalId('exam');
-    const now = new Date().toISOString();
-    const exam: PersonalExam = {
-      id,
-      ...parsed.data,
-      timezone: BERLIN_TIMEZONE,
-      origin: 'personal',
-      dateStatus: 'user_entered',
-      createdAt: now,
-      updatedAt: now,
-    };
-    const state = get();
-    const saved = await persistPatch(state, { exams: [...state.exams, exam] }, set);
-    return saved ? id : null;
-  },
-  updateExam: async (id, input) => {
-    const parsed = personalExamInputSchema.safeParse(input);
-    if (!parsed.success) return false;
-    const state = get();
-    return persistPatch(state, {
-      exams: state.exams.map((exam) => exam.id === id ? { ...exam, ...parsed.data, updatedAt: new Date().toISOString() } : exam),
-    }, set);
-  },
-  deleteExam: async (id) => {
-    const state = get();
-    return persistPatch(state, { exams: state.exams.filter((exam) => exam.id !== id) }, set);
-  },
-  addTask: async (input) => {
-    const parsed = studyTaskInputSchema.safeParse(input);
-    if (!parsed.success) return null;
-    const id = createLocalId('task');
-    const now = new Date().toISOString();
-    const task: StudyTask = {
-      id,
-      ...parsed.data,
-      timezone: BERLIN_TIMEZONE,
-      origin: 'personal',
-      createdAt: now,
-      updatedAt: now,
-    };
-    const state = get();
-    const saved = await persistPatch(state, { tasks: [...state.tasks, task] }, set);
-    return saved ? id : null;
-  },
-  updateTask: async (id, input) => {
-    const parsed = studyTaskInputSchema.safeParse(input);
-    if (!parsed.success) return false;
-    const state = get();
-    return persistPatch(state, {
-      tasks: state.tasks.map((task) => task.id === id ? { ...task, ...parsed.data, updatedAt: new Date().toISOString() } : task),
-    }, set);
-  },
-  deleteTask: async (id) => {
-    const state = get();
-    return persistPatch(state, { tasks: state.tasks.filter((task) => task.id !== id) }, set);
-  },
-}));
+subscribeSync((area) => {
+  if (area === 'exams') void useExamsTasksStore.getState().hydrate(true);
+});

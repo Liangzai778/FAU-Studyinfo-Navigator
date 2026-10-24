@@ -38,3 +38,35 @@ export async function writeCalendarEvents(events: readonly CalendarEvent[]): Pro
     database.close();
   }
 }
+
+function transactionDone(transaction: IDBTransaction) {
+  return new Promise<void>((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error ?? new Error('Calendar save failed.'));
+    transaction.onabort = () => reject(transaction.error ?? new Error('Calendar save was aborted.'));
+  });
+}
+
+/** One row at a time, so a second tab cannot delete the first tab's plans. */
+export async function putCalendarEvent(event: CalendarEvent): Promise<void> {
+  const parsed = calendarEventSchema.parse(event);
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(calendarEventsStoreName, 'readwrite');
+    transaction.objectStore(calendarEventsStoreName).put(parsed);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function deleteCalendarEventRow(id: string): Promise<void> {
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(calendarEventsStoreName, 'readwrite');
+    transaction.objectStore(calendarEventsStoreName).delete(id);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}

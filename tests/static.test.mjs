@@ -83,15 +83,23 @@ test('wires the semester calendar, autosave and storage persistence', async () =
   assert.match(planner, /lastSavedAt/);
 
   const calendar = await readFile('src/features/planner/SemesterCalendar.tsx', 'utf8');
-  assert.match(calendar, /readSemesterStart/);
+  assert.match(calendar, /readSemesterRange/);
   assert.match(calendar, /eventsOnDate/);
   assert.match(calendar, /monthGrid/);
+  assert.match(calendar, /calendar\.viewWeek/);
 
   const settings = await readFile('src/features/settings/SettingsPage.tsx', 'utf8');
   assert.match(settings, /requestPersistentLocalStorage/);
 
   const backup = await readFile('src/storage/backup.ts', 'utf8');
   assert.match(backup, /calendarEvents/);
+
+  const crossTab = await readFile('src/storage/crossTab.ts', 'utf8');
+  assert.match(crossTab, /BroadcastChannel/);
+  const plannerStorage = await readFile('src/storage/plannerStorage.ts', 'utf8');
+  assert.match(plannerStorage, /putPlannerCourse/);
+  const calendarStorage = await readFile('src/storage/calendarStorage.ts', 'utf8');
+  assert.match(calendarStorage, /putCalendarEvent/);
 });
 
 test('publishes the project design, roadmap and README screenshots', async () => {

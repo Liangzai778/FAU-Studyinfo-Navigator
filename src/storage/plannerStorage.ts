@@ -1,4 +1,11 @@
-import { plannerSnapshotSchema, type PlannerSnapshot } from '../domain/planner';
+import {
+  courseAttemptSchema,
+  localCourseSchema,
+  plannerSnapshotSchema,
+  type CourseAttempt,
+  type LocalCourse,
+  type PlannerSnapshot,
+} from '../domain/planner';
 import { openLocalDatabase, plannerAttemptsStoreName, plannerCoursesStoreName } from './database';
 
 export const emptyPlannerSnapshot: PlannerSnapshot = {
@@ -97,6 +104,77 @@ export async function writePlannerSnapshot(snapshot: PlannerSnapshot): Promise<v
       transaction.onerror = () => reject(transaction.error ?? new Error('Unable to save planner data.'));
       transaction.onabort = () => reject(transaction.error ?? new Error('Planner save was aborted.'));
     });
+  } finally {
+    database.close();
+  }
+}
+
+function transactionDone(transaction: IDBTransaction) {
+  return new Promise<void>((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error ?? new Error('Planner save failed.'));
+    transaction.onabort = () => reject(transaction.error ?? new Error('Planner save was aborted.'));
+  });
+}
+
+/**
+ * Writes one course (optionally with its first attempt) instead of the whole
+ * snapshot. Two tabs adding different courses therefore both keep their row;
+ * before this, the second tab's full rewrite deleted the first tab's course.
+ */
+export async function putPlannerCourse(course: LocalCourse, attempt?: CourseAttempt): Promise<void> {
+  const parsedCourse = localCourseSchema.parse(course);
+  const parsedAttempt = attempt ? courseAttemptSchema.parse(attempt) : null;
+  const database = await openLocalDatabase();
+  try {
+    const stores = parsedAttempt
+      ? [plannerCoursesStoreName, plannerAttemptsStoreName]
+      : [plannerCoursesStoreName];
+    const transaction = database.transaction(stores, 'readwrite');
+    transaction.objectStore(plannerCoursesStoreName).put(parsedCourse);
+    if (parsedAttempt) transaction.objectStore(plannerAttemptsStoreName).put(parsedAttempt);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function deletePlannerCourse(courseId: string): Promise<void> {
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction([plannerCoursesStoreName, plannerAttemptsStoreName], 'readwrite');
+    transaction.objectStore(plannerCoursesStoreName).delete(courseId);
+    const attemptsStore = transaction.objectStore(plannerAttemptsStoreName);
+    const request = attemptsStore.getAll();
+    request.onsuccess = () => {
+      for (const attempt of request.result as CourseAttempt[]) {
+        if (attempt.courseId === courseId) attemptsStore.delete(attempt.id);
+      }
+    };
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function putPlannerAttempt(attempt: CourseAttempt): Promise<void> {
+  const parsed = courseAttemptSchema.parse(attempt);
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(plannerAttemptsStoreName, 'readwrite');
+    transaction.objectStore(plannerAttemptsStoreName).put(parsed);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function deletePlannerAttemptRow(attemptId: string): Promise<void> {
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(plannerAttemptsStoreName, 'readwrite');
+    transaction.objectStore(plannerAttemptsStoreName).delete(attemptId);
+    await transactionDone(transaction);
   } finally {
     database.close();
   }

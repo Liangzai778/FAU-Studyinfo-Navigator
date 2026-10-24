@@ -76,10 +76,30 @@ test('calendar moves by month and returns to today', async ({ page }) => {
   await expect(calendar).toBeVisible();
   const title = calendar.getByText(/\d{4}年\d{1,2}月|\w+ \d{4}/).first();
   const before = await title.innerText();
-  await page.getByRole('button', { name: '下个月' }).click();
+  await page.getByRole('button', { name: '往后翻' }).click();
   await expect(title).not.toHaveText(before);
-  await page.getByRole('button', { name: '上个月' }).click();
+  await page.getByRole('button', { name: '往前翻' }).click();
   await expect(title).toHaveText(before);
+});
+
+test('calendar switches between month, week and day views', async ({ page }) => {
+  await page.goto('/planner');
+  const calendar = page.locator('section', { has: page.getByRole('heading', { name: '学期日历' }) }).first();
+  await expect(calendar.getByRole('button', { name: '月', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await calendar.getByRole('button', { name: '周', exact: true }).click();
+  await expect(calendar.getByRole('button', { name: '周', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await calendar.getByRole('button', { name: '日', exact: true }).click();
+  await expect(calendar.getByRole('button', { name: '日', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('past plans remain visible outside the month grid', async ({ page }) => {
+  await page.goto('/planner');
+  const form = page.locator('#calendar-event-form');
+  await form.getByLabel('事由').fill('E2E past plan');
+  await form.getByLabel('日期').fill('2026-10-01');
+  await form.getByRole('button', { name: '保存日程' }).click();
+  await expect(page.getByRole('heading', { name: '已过去的日程' })).toBeVisible();
+  await expect(page.getByText('E2E past plan').first()).toBeVisible();
 });
 
 test('mobile navigation remains usable at the smallest supported width', async ({ page }, testInfo) => {

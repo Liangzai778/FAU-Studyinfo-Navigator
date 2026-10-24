@@ -2,7 +2,12 @@ import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { PlannerSnapshot } from '../domain/planner';
 import { localDatabaseName } from './database';
-import { readPlannerSnapshot, writePlannerSnapshot } from './plannerStorage';
+import {
+  deletePlannerCourse,
+  putPlannerCourse,
+  readPlannerSnapshot,
+  writePlannerSnapshot,
+} from './plannerStorage';
 
 const syntheticSnapshot: PlannerSnapshot = {
   schemaVersion: 1,
@@ -108,5 +113,47 @@ describe('planner IndexedDB storage', () => {
     const invalid = { ...syntheticSnapshot, attempts: [{ ...syntheticSnapshot.attempts[0]!, courseId: 'missing-course' }] };
     await expect(writePlannerSnapshot(invalid)).rejects.toThrow();
     await expect(readPlannerSnapshot()).resolves.toEqual(syntheticSnapshot);
+  });
+
+  it('keeps a course written by another tab instead of replacing the whole plan', async () => {
+    await writePlannerSnapshot(syntheticSnapshot);
+    const secondCourse = {
+      ...syntheticSnapshot.courses[0]!,
+      id: 'synthetic-test-only-course-2',
+      title: 'Second tab course',
+    };
+    const secondAttempt = {
+      ...syntheticSnapshot.attempts[0]!,
+      id: 'synthetic-test-only-attempt-2',
+      courseId: secondCourse.id,
+    };
+
+    await putPlannerCourse(secondCourse, secondAttempt);
+    const snapshot = await readPlannerSnapshot();
+    expect(snapshot.courses.map((course) => course.id).sort()).toEqual([
+      'synthetic-test-only-course',
+      'synthetic-test-only-course-2',
+    ]);
+    expect(snapshot.attempts).toHaveLength(2);
+  });
+
+  it('deletes one course and only that course attempts', async () => {
+    await writePlannerSnapshot(syntheticSnapshot);
+    const secondCourse = {
+      ...syntheticSnapshot.courses[0]!,
+      id: 'synthetic-test-only-course-2',
+      title: 'Second tab course',
+    };
+    const secondAttempt = {
+      ...syntheticSnapshot.attempts[0]!,
+      id: 'synthetic-test-only-attempt-2',
+      courseId: secondCourse.id,
+    };
+    await putPlannerCourse(secondCourse, secondAttempt);
+
+    await deletePlannerCourse('synthetic-test-only-course');
+    const snapshot = await readPlannerSnapshot();
+    expect(snapshot.courses.map((course) => course.id)).toEqual(['synthetic-test-only-course-2']);
+    expect(snapshot.attempts.map((attempt) => attempt.courseId)).toEqual(['synthetic-test-only-course-2']);
   });
 });

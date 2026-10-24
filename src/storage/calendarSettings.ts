@@ -1,48 +1,71 @@
-import { defaultSemesterStart, formatIsoDate, parseIsoDate } from '../domain/calendar';
+import {
+  defaultSemesterEnd,
+  defaultSemesterStart,
+  formatIsoDate,
+  parseIsoDate,
+} from '../domain/calendar';
 
 const STORAGE_KEY = 'fau-study-navigator.calendar.v1';
 
 type CalendarSettings = {
   semesterStarts: Record<string, string>;
+  semesterEnds: Record<string, string>;
+};
+
+export type SemesterRange = {
+  start: string;
+  end: string;
 };
 
 function readRaw(): CalendarSettings {
-  if (typeof localStorage === 'undefined') return { semesterStarts: {} };
+  if (typeof localStorage === 'undefined') return { semesterStarts: {}, semesterEnds: {} };
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') as Partial<CalendarSettings>;
     const starts = parsed.semesterStarts;
-    if (!starts || typeof starts !== 'object') return { semesterStarts: {} };
-    return {
-      semesterStarts: Object.fromEntries(
-        Object.entries(starts).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
-      ),
-    };
+    const ends = parsed.semesterEnds;
+    const pickDates = (value: unknown) =>
+      value && typeof value === 'object'
+        ? Object.fromEntries(
+            Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
+          )
+        : {};
+    return { semesterStarts: pickDates(starts), semesterEnds: pickDates(ends) };
   } catch {
-    return { semesterStarts: {} };
+    return { semesterStarts: {}, semesterEnds: {} };
   }
 }
 
 /**
- * The start date a student chose for a semester, falling back to the 1st of
- * October (winter) or April (summer). Stored in localStorage because it is a
- * low-sensitivity display preference, like language and theme.
+ * Start and end a student chose for a semester.
+ *
+ * Defaults: 1 October – 31 March for winter, 1 April – 30 September for summer.
+ * Only the display is affected; no academic rule depends on these dates.
  */
-export function readSemesterStart(semesterId: string): string {
-  const stored = readRaw().semesterStarts[semesterId];
-  if (stored && parseIsoDate(stored)) return stored;
-  return defaultSemesterStart(semesterId);
+export function readSemesterRange(semesterId: string): SemesterRange {
+  const settings = readRaw();
+  const storedStart = settings.semesterStarts[semesterId];
+  const storedEnd = settings.semesterEnds[semesterId];
+  const start = storedStart && parseIsoDate(storedStart) ? storedStart : defaultSemesterStart(semesterId);
+  let end = storedEnd && parseIsoDate(storedEnd) ? storedEnd : defaultSemesterEnd(semesterId);
+  if (end < start) end = start;
+  return { start, end };
 }
 
-export function writeSemesterStart(semesterId: string, dateIso: string): string {
-  const parsed = parseIsoDate(dateIso);
-  const value = parsed ? formatIsoDate(parsed) : defaultSemesterStart(semesterId);
+export function writeSemesterRange(semesterId: string, range: SemesterRange): SemesterRange {
+  const parsedStart = parseIsoDate(range.start);
+  const parsedEnd = parseIsoDate(range.end);
+  const start = parsedStart ? formatIsoDate(parsedStart) : defaultSemesterStart(semesterId);
+  let end = parsedEnd ? formatIsoDate(parsedEnd) : defaultSemesterEnd(semesterId);
+  if (end < start) end = start;
+
   const settings = readRaw();
-  settings.semesterStarts[semesterId] = value;
+  settings.semesterStarts[semesterId] = start;
+  settings.semesterEnds[semesterId] = end;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   } catch {
-    // A full or blocked localStorage must not break the calendar; the default
-    // start is still returned and the user sees the date they typed this visit.
+    // A blocked localStorage must not break the calendar; this visit still
+    // shows what the student typed.
   }
-  return value;
+  return { start, end };
 }

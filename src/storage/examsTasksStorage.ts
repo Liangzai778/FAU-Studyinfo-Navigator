@@ -1,4 +1,11 @@
-import { examsTasksSnapshotSchema, type ExamsTasksSnapshot } from '../domain/exams';
+import {
+  examsTasksSnapshotSchema,
+  personalExamSchema,
+  studyTaskSchema,
+  type ExamsTasksSnapshot,
+  type PersonalExam,
+  type StudyTask,
+} from '../domain/exams';
 import { openLocalDatabase, personalExamsStoreName, studyTasksStoreName } from './database';
 
 export const emptyExamsTasksSnapshot: ExamsTasksSnapshot = {
@@ -48,6 +55,61 @@ export async function writeExamsTasksSnapshot(snapshot: ExamsTasksSnapshot): Pro
       transaction.onerror = () => reject(transaction.error ?? new Error('Unable to save exam/task data.'));
       transaction.onabort = () => reject(transaction.error ?? new Error('Exam/task save was aborted.'));
     });
+  } finally {
+    database.close();
+  }
+}
+
+function transactionDone(transaction: IDBTransaction) {
+  return new Promise<void>((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error ?? new Error('Exam/task save failed.'));
+    transaction.onabort = () => reject(transaction.error ?? new Error('Exam/task save was aborted.'));
+  });
+}
+
+/** Row-level writes, so two tabs do not erase each other's entries. */
+export async function putExam(exam: PersonalExam): Promise<void> {
+  const parsed = personalExamSchema.parse(exam);
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(personalExamsStoreName, 'readwrite');
+    transaction.objectStore(personalExamsStoreName).put(parsed);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function deleteExamRow(id: string): Promise<void> {
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(personalExamsStoreName, 'readwrite');
+    transaction.objectStore(personalExamsStoreName).delete(id);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function putTask(task: StudyTask): Promise<void> {
+  const parsed = studyTaskSchema.parse(task);
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(studyTasksStoreName, 'readwrite');
+    transaction.objectStore(studyTasksStoreName).put(parsed);
+    await transactionDone(transaction);
+  } finally {
+    database.close();
+  }
+}
+
+export async function deleteTaskRow(id: string): Promise<void> {
+  const database = await openLocalDatabase();
+  try {
+    const transaction = database.transaction(studyTasksStoreName, 'readwrite');
+    transaction.objectStore(studyTasksStoreName).delete(id);
+    await transactionDone(transaction);
   } finally {
     database.close();
   }

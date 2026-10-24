@@ -12,6 +12,7 @@ import {
   writeAcademicProfile,
   type StoredAcademicProfile,
 } from '../storage/academicProfileStorage';
+import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
 type GeneralProfileInput = {
   degreeType: DegreeType;
@@ -51,6 +52,7 @@ export const useAcademicProfileStore = create<AcademicProfileState>((set, get) =
     try {
       await writeAcademicProfile(profile);
       set({ profile, storageError: false });
+      broadcastSync('profile');
       return true;
     } catch {
       set({ storageError: true });
@@ -67,6 +69,7 @@ export const useAcademicProfileStore = create<AcademicProfileState>((set, get) =
     try {
       await writeAcademicProfile(profile);
       set({ profile, storageError: false });
+      broadcastSync('profile');
       return true;
     } catch {
       set({ storageError: true });
@@ -77,6 +80,7 @@ export const useAcademicProfileStore = create<AcademicProfileState>((set, get) =
     try {
       await deleteAcademicProfile();
       set({ profile: null, storageError: false });
+      broadcastSync('profile');
       return true;
     } catch {
       set({ storageError: true });
@@ -84,3 +88,8 @@ export const useAcademicProfileStore = create<AcademicProfileState>((set, get) =
     }
   },
 }));
+
+// The degree selection changed in another tab.
+subscribeSync((area) => {
+  if (area === 'profile') void useAcademicProfileStore.getState().hydrate(true);
+});

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { SemesterTimetable } from '../../domain/planner';
 import {
+  addDays,
   addMonths,
-  defaultSemesterEnd,
   eventsOnDate,
   formatIsoDate,
   formatMinutes,
   isWithinSemester,
+  mondayOfWeek,
   monthGrid,
   parseIsoDate,
   teachingWeekNumber,
@@ -15,12 +16,14 @@ import {
 import { minutesToLabel, parseTimeOfDay } from '../../domain/timetableGrid';
 import { TIMETABLE_DAYS } from '../../domain/timetableLabels';
 import { useTranslation } from '../../i18n/useTranslation';
-import { readSemesterStart, writeSemesterStart } from '../../storage/calendarSettings';
+import { readSemesterRange, writeSemesterRange, type SemesterRange } from '../../storage/calendarSettings';
 import { useCalendarEventsStore } from '../../store/calendarEvents';
 
 type SemesterCalendarProps = {
   tables: SemesterTimetable[];
 };
+
+type CalendarView = 'month' | 'week' | 'day';
 
 type EventDraft = {
   title: string;
@@ -36,19 +39,17 @@ function currentSemesterId() {
   return `${now.getFullYear()}-${term}`;
 }
 
-/** Turns "09:15" into minutes, or null for an empty field. */
 function draftTime(value: string): number | null {
   if (!value) return null;
   return parseTimeOfDay(value);
 }
 
 /**
- * Month calendar from the semester start.
+ * Month, week and day views from the semester range.
  *
- * The weekly grid above shows the structure of a teaching week; this view puts
- * actual dates on it, so a student can see "week 3, Monday 19 October" and put
- * personal plans on a specific day. Courses repeat by weekday because that is
- * how the regulation describes them; they are not copied into 15 database rows.
+ * Courses repeat by weekday because that is how the regulation describes them;
+ * they are only drawn inside the semester range, and the range itself is
+ * editable because faculties do not all start on the same day.
  */
 export function SemesterCalendar({ tables }: SemesterCalendarProps) {
   const { language, t } = useTranslation();
@@ -56,8 +57,9 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
   const fallbackSemester = currentSemesterId();
 
   const [semesterId, setSemesterId] = useState(() => tables.at(-1)?.semesterId ?? fallbackSemester);
-  const [startIso, setStartIso] = useState(() => readSemesterStart(semesterId));
-  const [viewDate, setViewDate] = useState(() => parseIsoDate(startIso) ?? new Date());
+  const [range, setRange] = useState<SemesterRange>(() => readSemesterRange(semesterId));
+  const [viewDate, setViewDate] = useState(() => parseIsoDate(range.start) ?? new Date());
+  const [view, setView] = useState<CalendarView>('month');
   const [draft, setDraft] = useState<EventDraft>({
     title: '',
     date: todayIso,
@@ -79,7 +81,6 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
 
   const table = tables.find((item) => item.semesterId === semesterId);
   const entries = table?.entries ?? [];
-  const semesterEnd = defaultSemesterEnd(semesterId);
   const cells = useMemo(() => monthGrid(viewDate.getFullYear(), viewDate.getMonth()), [viewDate]);
 
   const weekdayNames = useMemo(
@@ -92,10 +93,26 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
     [language],
   );
 
+  const dayLabel = (date: Date) =>
+    new Intl.DateTimeFormat(language === 'zh-CN' ? 'zh-CN' : 'en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+
   const monthTitle = new Intl.DateTimeFormat(language === 'zh-CN' ? 'zh-CN' : 'en-GB', {
     year: 'numeric',
     month: 'long',
   }).format(viewDate);
+
+  const weekStart = mondayOfWeek(viewDate);
+  const weekDates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+  const title =
+    view === 'month'
+      ? monthTitle
+      : view === 'week'
+        ? `${dayLabel(weekStart)} – ${dayLabel(addDays(weekStart, 6))}`
+        : dayLabel(viewDate);
 
   const coursesForDate = (date: Date) => {
     const day = TIMETABLE_DAYS[weekdayIndex(date)];
@@ -111,15 +128,37 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
 
   const changeSemester = (nextId: string) => {
     setSemesterId(nextId);
-    const nextStart = readSemesterStart(nextId);
-    setStartIso(nextStart);
-    setViewDate(parseIsoDate(nextStart) ?? new Date());
+    const nextRange = readSemesterRange(nextId);
+    setRange(nextRange);
+    setViewDate(parseIsoDate(nextRange.start) ?? new Date());
   };
 
-  const changeStart = (value: string) => {
-    const saved = writeSemesterStart(semesterId, value);
-    setStartIso(saved);
-    setViewDate(parseIsoDate(saved) ?? new Date());
+  const changeRange = (field: 'start' | 'end', value: string) => {
+    const saved = writeSemesterRange(semesterId, { ...range, [field]: value });
+    setRange(saved);
+    setViewDate(parseIsoDate(saved.start) ?? new Date());
+  };
+
+  const shift = (direction: number) => {
+    const next =
+      view === 'month'
+        ? addMonths(viewDate, direction)
+        : view === 'week'
+          ? addDays(viewDate, direction * 7)
+          : addDays(viewDate, direction);
+    setViewDate(next);
+    if (view === 'day') setDraft((current) => ({ ...current, date: formatIsoDate(next) }));
+  };
+
+  const goToday = () => {
+    const now = new Date();
+    setViewDate(now);
+    if (view === 'day') setDraft((current) => ({ ...current, date: formatIsoDate(now) }));
+  };
+
+  const changeView = (next: CalendarView) => {
+    setView(next);
+    if (next === 'day') setDraft((current) => ({ ...current, date: formatIsoDate(viewDate) }));
   };
 
   const submitEvent = async () => {
@@ -146,14 +185,43 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
     .sort((left, right) => left.date.localeCompare(right.date) || (left.startMinutes ?? -1) - (right.startMinutes ?? -1))
     .slice(0, 8);
 
-  const isoDateLabel = (iso: string) => {
-    const date = parseIsoDate(iso);
-    if (!date) return iso;
-    return new Intl.DateTimeFormat(language === 'zh-CN' ? 'zh-CN' : 'en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date);
+  const past = events
+    .filter((event) => event.date < todayIso)
+    .slice()
+    .sort((left, right) => right.date.localeCompare(left.date) || (right.startMinutes ?? -1) - (left.startMinutes ?? -1))
+    .slice(0, 5);
+
+  const eventTime = (event: (typeof events)[number]) =>
+    event.startMinutes === null
+      ? t('calendar.allDay')
+      : `${formatMinutes(event.startMinutes)}${event.endMinutes === null ? '' : `–${formatMinutes(event.endMinutes)}`}`;
+
+  const renderChips = (date: Date, limit?: number) => {
+    const inSemester = isWithinSemester(formatIsoDate(date), range.start, range.end);
+    const courses = inSemester ? coursesForDate(date) : [];
+    const dayEvents = eventsOnDate(events, formatIsoDate(date));
+    const shownCourses = limit ? courses.slice(0, limit) : courses;
+    const shownEvents = limit ? dayEvents.slice(0, limit) : dayEvents;
+    return (
+      <div className="mt-1 space-y-1">
+        {shownCourses.map(({ entry, meeting }) => (
+          <span key={`${entry.attemptId}-${meeting.day}`} className="block truncate rounded bg-sky-100 px-1.5 py-0.5 text-[11px] font-medium text-sky-950 dark:bg-sky-950 dark:text-sky-100">
+            {minutesToLabel(meeting.startMinutes)} {entry.title}
+          </span>
+        ))}
+        {limit && courses.length > shownCourses.length ? (
+          <span className="block text-[10px] font-semibold text-slate-500">+{courses.length - shownCourses.length} {t('calendar.more')}</span>
+        ) : null}
+        {shownEvents.map((event) => (
+          <span key={event.id} className="block truncate rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-950 dark:bg-amber-950 dark:text-amber-100">
+            {event.startMinutes === null ? t('calendar.allDay') : formatMinutes(event.startMinutes)} {event.title}
+          </span>
+        ))}
+        {limit && dayEvents.length > shownEvents.length ? (
+          <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-300">+{dayEvents.length - shownEvents.length} {t('calendar.more')}</span>
+        ) : null}
+      </div>
+    );
   };
 
   return (
@@ -178,22 +246,47 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
             <span className="mb-1 block font-semibold text-slate-700 dark:text-slate-200">{t('calendar.startDate')}</span>
             <input
               type="date"
-              value={startIso}
-              onChange={(event) => changeStart(event.target.value)}
+              value={range.start}
+              onChange={(event) => changeRange('start', event.target.value)}
               aria-label={t('calendar.startDate')}
+              className="h-10 rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block font-semibold text-slate-700 dark:text-slate-200">{t('calendar.endDate')}</span>
+            <input
+              type="date"
+              value={range.end}
+              onChange={(event) => changeRange('end', event.target.value)}
+              aria-label={t('calendar.endDate')}
               className="h-10 rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-700 dark:bg-slate-950"
             />
           </label>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" aria-label={t('calendar.prevMonth')} onClick={() => setViewDate(addMonths(viewDate, -1))} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
+          <div className="flex overflow-hidden rounded-xl border border-slate-300 dark:border-slate-700">
+            {(['month', 'week', 'day'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={view === option}
+                onClick={() => changeView(option)}
+                className={`px-3 py-2 text-sm font-semibold ${
+                  view === option ? 'bg-sky-700 text-white' : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+              >
+                {option === 'month' ? t('calendar.viewMonth') : option === 'week' ? t('calendar.viewWeek') : t('calendar.viewDay')}
+              </button>
+            ))}
+          </div>
+          <button type="button" aria-label={t('calendar.prev')} onClick={() => shift(-1)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
             ←
           </button>
-          <span className="min-w-36 text-center text-base font-bold text-slate-950 dark:text-white">{monthTitle}</span>
-          <button type="button" aria-label={t('calendar.nextMonth')} onClick={() => setViewDate(addMonths(viewDate, 1))} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
+          <span className="min-w-44 text-center text-base font-bold text-slate-950 dark:text-white">{title}</span>
+          <button type="button" aria-label={t('calendar.next')} onClick={() => shift(1)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
             →
           </button>
-          <button type="button" onClick={() => setViewDate(new Date())} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
+          <button type="button" onClick={goToday} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
             {t('calendar.today')}
           </button>
           <input
@@ -209,65 +302,108 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
         </div>
       </div>
       <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-        {t('calendar.startHint')} · {startIso} – {semesterEnd}
+        {t('calendar.startHint')} · {range.start} – {range.end}
       </p>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-        <div className="grid grid-cols-7 bg-slate-100 text-center text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          {weekdayNames.map((name) => (
-            <div key={name} className="py-2">{name}</div>
-          ))}
+      {view === 'month' ? (
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          <div className="grid grid-cols-7 bg-slate-100 text-center text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            {weekdayNames.map((name) => (
+              <div key={name} className="py-2">{name}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7">
+            {cells.map((cell) => {
+              const week = cell.date.getDay() === 1 ? teachingWeekNumber(cell.iso, range.start) : null;
+              const isToday = cell.iso === todayIso;
+              return (
+                <button
+                  key={cell.iso}
+                  type="button"
+                  onClick={() => setDraft((current) => ({ ...current, date: cell.iso }))}
+                  aria-label={cell.iso}
+                  className={[
+                    'min-h-28 border-b border-r border-slate-200 p-2 text-left align-top dark:border-slate-700',
+                    cell.inMonth ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 text-slate-400 dark:bg-slate-950/60',
+                    isToday ? 'ring-2 ring-inset ring-sky-500' : '',
+                  ].join(' ')}
+                >
+                  <div className="flex items-baseline justify-between gap-1">
+                    <span className={`text-sm font-bold ${isToday ? 'text-sky-700 dark:text-sky-300' : ''}`}>{cell.date.getDate()}</span>
+                    {week && week > 0 ? (
+                      <span className="text-[10px] font-semibold text-slate-400">
+                        {language === 'zh-CN' ? `第 ${week} 周` : `Week ${week}`}
+                      </span>
+                    ) : null}
+                  </div>
+                  {renderChips(cell.date, 3)}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="grid grid-cols-7">
-          {cells.map((cell) => {
-            const inSemester = isWithinSemester(cell.iso, startIso, semesterEnd);
-            const courses = inSemester ? coursesForDate(cell.date) : [];
-            const dayEvents = eventsOnDate(events, cell.iso);
-            const week = cell.date.getDay() === 1 ? teachingWeekNumber(cell.iso, startIso) : null;
-            const isToday = cell.iso === todayIso;
+      ) : null}
+
+      {view === 'week' ? (
+        <div className="mt-4 grid grid-cols-7 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          {weekDates.map((date) => {
+            const iso = formatIsoDate(date);
+            const isToday = iso === todayIso;
             return (
-              <button
-                key={cell.iso}
-                type="button"
-                onClick={() => setDraft((current) => ({ ...current, date: cell.iso }))}
-                aria-label={cell.iso}
-                className={[
-                  'min-h-28 border-b border-r border-slate-200 p-2 text-left align-top last:border-r-0 dark:border-slate-700',
-                  cell.inMonth ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 text-slate-400 dark:bg-slate-950/60',
-                  isToday ? 'ring-2 ring-inset ring-sky-500' : '',
-                ].join(' ')}
-              >
-                <div className="flex items-baseline justify-between gap-1">
-                  <span className={`text-sm font-bold ${isToday ? 'text-sky-700 dark:text-sky-300' : ''}`}>{cell.date.getDate()}</span>
-                  {week && week > 0 ? (
-                    <span className="text-[10px] font-semibold text-slate-400">
-                      {language === 'zh-CN' ? `第 ${week} 周` : `Week ${week}`}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-1 space-y-1">
-                  {courses.slice(0, 3).map(({ entry, meeting }) => (
-                    <span key={`${entry.attemptId}-${meeting.day}`} className="block truncate rounded bg-sky-100 px-1.5 py-0.5 text-[11px] font-medium text-sky-950 dark:bg-sky-950 dark:text-sky-100">
-                      {minutesToLabel(meeting.startMinutes)} {entry.title}
-                    </span>
-                  ))}
-                  {courses.length > 3 ? (
-                    <span className="block text-[10px] font-semibold text-slate-500">+{courses.length - 3} {t('calendar.more')}</span>
-                  ) : null}
-                  {dayEvents.slice(0, 3).map((event) => (
-                    <span key={event.id} className="block truncate rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-950 dark:bg-amber-950 dark:text-amber-100">
-                      {event.startMinutes === null ? t('calendar.allDay') : formatMinutes(event.startMinutes)} {event.title}
-                    </span>
-                  ))}
-                  {dayEvents.length > 3 ? (
-                    <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-300">+{dayEvents.length - 3} {t('calendar.more')}</span>
-                  ) : null}
-                </div>
-              </button>
+              <div key={iso} className={`min-h-40 border-r border-slate-200 p-2 last:border-r-0 dark:border-slate-700 ${isToday ? 'bg-sky-50/60 dark:bg-sky-950/30' : ''}`}>
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  {new Intl.DateTimeFormat(language === 'zh-CN' ? 'zh-CN' : 'en-GB', { weekday: 'short' }).format(date)}
+                </p>
+                <p className={`text-sm font-bold ${isToday ? 'text-sky-700 dark:text-sky-300' : 'text-slate-900 dark:text-white'}`}>
+                  <button type="button" aria-label={iso} onClick={() => setDraft((current) => ({ ...current, date: iso }))}>
+                    {date.getDate()}
+                  </button>
+                </p>
+                {renderChips(date)}
+              </div>
             );
           })}
         </div>
-      </div>
+      ) : null}
+
+      {view === 'day' ? (
+        <div className="mt-4 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{dayLabel(viewDate)}</p>
+          {(() => {
+            const iso = formatIsoDate(viewDate);
+            const week = teachingWeekNumber(iso, range.start);
+            const inSemester = isWithinSemester(iso, range.start, range.end);
+            const courses = inSemester ? coursesForDate(viewDate) : [];
+            const dayEvents = eventsOnDate(events, iso);
+            return (
+              <>
+                {week && week > 0 ? (
+                  <p className="mt-1 text-xs font-semibold text-slate-400">
+                    {language === 'zh-CN' ? `第 ${week} 周` : `Week ${week}`}
+                  </p>
+                ) : null}
+                {courses.length === 0 && dayEvents.length === 0 ? (
+                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{t('calendar.dayEmpty')}</p>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {courses.map(({ entry, meeting }) => (
+                      <li key={`${entry.attemptId}-${meeting.day}`} className="rounded-lg bg-sky-100 px-3 py-2 text-sm font-medium text-sky-950 dark:bg-sky-950 dark:text-sky-100">
+                        {minutesToLabel(meeting.startMinutes)}
+                        {meeting.durationMinutes ? `–${minutesToLabel(meeting.startMinutes + meeting.durationMinutes)}` : ''} {entry.title}
+                      </li>
+                    ))}
+                    {dayEvents.map((event) => (
+                      <li key={event.id} className="rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-950 dark:bg-amber-950 dark:text-amber-100">
+                        {eventTime(event)} {event.title}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      ) : null}
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section aria-label={t('calendar.addEvent')} id="calendar-event-form">
@@ -331,32 +467,56 @@ export function SemesterCalendar({ tables }: SemesterCalendarProps) {
           </div>
         </section>
 
-        <section aria-label={t('calendar.upcoming')}>
-          <h3 className="font-bold text-slate-950 dark:text-white">{t('calendar.upcoming')}</h3>
-          {upcoming.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t('calendar.noEvents')}</p>
-          ) : (
-            <ul className="mt-3 space-y-2">
-              {upcoming.map((event) => (
-                <li key={event.id} className="flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-amber-950 dark:text-amber-100">{event.title}</p>
-                    <p className="text-xs text-amber-900/80 dark:text-amber-200/80">
-                      {isoDateLabel(event.date)}
-                      {' · '}
-                      {event.startMinutes === null ? t('calendar.allDay') : `${formatMinutes(event.startMinutes)}–${formatMinutes(event.endMinutes)}`}
-                    </p>
-                    {event.notes ? <p className="mt-1 text-xs text-amber-900/70 dark:text-amber-200/70">{event.notes}</p> : null}
-                  </div>
-                  <button type="button" onClick={() => void deleteEvent(event.id)} aria-label={`${t('calendar.deleteEvent')} ${event.title}`} className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-amber-900 underline dark:text-amber-200">
-                    {t('calendar.deleteEvent')}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div>
+          <section aria-label={t('calendar.upcoming')}>
+            <h3 className="font-bold text-slate-950 dark:text-white">{t('calendar.upcoming')}</h3>
+            {upcoming.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t('calendar.noEvents')}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {upcoming.map((event) => (
+                  <li key={event.id} className="flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-amber-950 dark:text-amber-100">{event.title}</p>
+                      <p className="text-xs text-amber-900/80 dark:text-amber-200/80">
+                        {dayLabel(parseIsoDate(event.date) ?? new Date())} · {eventTime(event)}
+                      </p>
+                      {event.notes ? <p className="mt-1 text-xs text-amber-900/70 dark:text-amber-200/70">{event.notes}</p> : null}
+                    </div>
+                    <button type="button" onClick={() => void deleteEvent(event.id)} aria-label={`${t('calendar.deleteEvent')} ${event.title}`} className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-amber-900 underline dark:text-amber-200">
+                      {t('calendar.deleteEvent')}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section aria-label={t('calendar.past')} className="mt-5">
+            <h3 className="font-bold text-slate-950 dark:text-white">{t('calendar.past')}</h3>
+            {past.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t('calendar.noEvents')}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {past.map((event) => (
+                  <li key={event.id} className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/60">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">{event.title}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {dayLabel(parseIsoDate(event.date) ?? new Date())} · {eventTime(event)}
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => void deleteEvent(event.id)} aria-label={`${t('calendar.deleteEvent')} ${event.title}`} className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-slate-600 underline dark:text-slate-300">
+                      {t('calendar.deleteEvent')}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
           {!table ? <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">{t('calendar.emptySemester')}</p> : null}
-        </section>
+        </div>
       </div>
     </div>
   );

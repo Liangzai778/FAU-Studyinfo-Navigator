@@ -227,8 +227,8 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 | 类型检查 | `npm run typecheck` | ✅ 0 错误 |
 | 代码规范 | `npm run lint` | ✅ 0 错误 |
 | 静态测试 | `npm run test:static` | ✅ 36/36 |
-| 单元测试 | `npm test` | ✅ 156/156（含日历、存储与生物专业回归测试） |
-| E2E | `npm run test:e2e` | ✅ 13 通过 / 2 跳过 |
+| 单元测试 | `npm test` | ✅ 162/162（含跨标签页存储与日历设置测试） |
+| E2E | `npm run test:e2e` | ✅ 19 通过 / 2 跳过 |
 | 数据校验 | `npm run test:data` | ✅ ALL CHECKS PASSED |
 | 构建 | `npm run build` | ✅ 成功（已拆分 vendor chunk，无体积告警） |
 
@@ -1129,3 +1129,64 @@ errors: none
 ---
 
 *本文档由项目维护者与 AI 助手共同整理，2026-10-24*
+
+---
+
+## 十九、2026-10-24 · 四项遗留问题收尾
+
+### 19.1 跨标签页覆盖
+
+**根因不是 BroadcastChannel 缺失，而是整包重写**：`writePlannerSnapshot` 每次都 clear 两个 store 再写内存里的全部记录。标签页 A 加了一门课，标签页 B 手里的旧快照一写，A 的课就没了。只加广播只会让 B 更早地覆盖 A。
+
+改法分两层：
+
+1. **逐条写入**：新增 `putPlannerCourse` / `deletePlannerCourse` / `putPlannerAttempt` / `deletePlannerAttemptRow`，`putCalendarEvent` / `deleteCalendarEventRow`，`putExam` / `deleteExamRow` / `putTask` / `deleteTaskRow`。新增只写自己那条，删除只删自己的 ID。
+2. **`BroadcastChannel` 通知**：`src/storage/crossTab.ts` 在写入成功后广播 `planner | calendar | profile | exams`，其他标签页收到后 `hydrate(true)` 重新读盘，界面自动出现新数据。
+3. **写入前先载入**：所有 store 的变更都等待 `hydrate` 完成，避免空状态覆盖磁盘。
+4. **可选清理**：`crossTab` 在 `window` 或 `BroadcastChannel` 不存在时退化为空实现，不影响保存。
+
+仍然保留的语义：两个标签页同时修改**同一条记录**时是后写覆盖，这是正常冲突，不做自动合并。
+
+### 19.2 月 / 周 / 日视图
+
+- 视图切换按钮（月、周、日），`aria-pressed` 可读。
+- 翻页步长随视图变化：月 ±1 月、周 ±7 天、日 ±1 天；「今天」与日期跳转都保留。
+- 周视图：周一到周日七列，带日期，点击日期数字会把「添加日程」的日期设为那天。
+- 日视图：单日列表，课程与日程按时间排列；切换或翻到某天时，表单日期同步到那天。
+- 月视图仍限制每格最多 3 条课程 + 3 条日程，超出显示 `+N`，避免一个月被十门课撑开。
+
+### 19.3 学期起止日可编辑
+
+- `calendarSettings` 从「只存起始日」升级为 `{ start, end }`；旧数据只有 `semesterStarts` 时仍能读。
+- 默认值：冬季 10-01 至次年 03-31，夏季 04-01 至 09-30。
+- 两个日期都可改；结束日早于开始日时自动夹到开始日。
+- 课程只在 `[start, end]` 内绘制；周次按包含开始日的自然周计算。
+
+### 19.4 过去的日程
+
+「接下来的日程」只列今天及以后；新增「已过去的日程」区块，按日期倒序显示最近 5 条，可删除。过去不再只在月视图里能找到。
+
+### 19.5 新增测试
+
+| 文件 | 覆盖 |
+|---|---|
+| `src/storage/calendarSettings.test.ts` | 4 条：默认区间、自定义区间、结束日夹紧、非法值回退 |
+| `src/storage/plannerStorage.test.ts` | 2 条新：另一标签页写入的课程不被覆盖、删除只影响目标课程及其记录 |
+| `tests/e2e/smoke.spec.ts` | 3 条新：月/周/日切换、过去日程可见、翻页按钮（改为通用「往前/往后」） |
+
+### 19.6 验证
+
+| 检查 | 结果 |
+|---|---|
+| typecheck / lint | ✅ 0 错误 |
+| 静态测试 | ✅ 37/37 |
+| 单元测试 | ✅ 162/162 |
+| E2E | ✅ 19 通过 / 2 跳过 |
+| 构建 | ✅ 成功 |
+| 浏览器实测 | ✅ 三种视图渲染、过去/未来日程分区、无控制台错误 |
+
+### 19.7 剩余边界
+
+- 同一记录被两个标签页同时编辑时仍是后写覆盖（不做字段级合并）。
+- 周/日视图不做拖动改期；改时间仍在课程表单里。
+- 学期区间只影响日历显示，不写入学术规则，也不改变 ECTS。

@@ -4,7 +4,12 @@ import {
   type CalendarEvent,
   type CalendarEventInput,
 } from '../domain/calendar';
-import { readCalendarEvents, writeCalendarEvents } from '../storage/calendarStorage';
+import {
+  deleteCalendarEventRow,
+  putCalendarEvent,
+  readCalendarEvents,
+} from '../storage/calendarStorage';
+import { broadcastSync, subscribeSync } from '../storage/crossTab';
 
 type CalendarEventsState = {
   events: CalendarEvent[];
@@ -25,26 +30,13 @@ function createLocalId() {
 }
 
 export const useCalendarEventsStore = create<CalendarEventsState>((set, get) => {
-  /**
-   * Waits for the stored list before mutating.
-   *
-   * Writing the in-memory list before hydration finishes would overwrite what
-   * was on disk with an empty array — the exact "my plan disappeared" failure.
-   * `hydrate` itself is idempotent, so calling it here is safe.
-   */
   const ensureHydrated = async () => {
     if (!get().hydrated) await get().hydrate();
   };
 
-  const persist = async (next: CalendarEvent[]) => {
-    try {
-      await writeCalendarEvents(next);
-      set({ events: next, storageError: false, lastSavedAt: new Date().toISOString() });
-      return true;
-    } catch {
-      set({ storageError: true });
-      return false;
-    }
+  const saved = () => {
+    set({ storageError: false, lastSavedAt: new Date().toISOString() });
+    broadcastSync('calendar');
   };
 
   return {
@@ -67,23 +59,49 @@ export const useCalendarEventsStore = create<CalendarEventsState>((set, get) => 
       await ensureHydrated();
       const now = new Date().toISOString();
       const event: CalendarEvent = { id: createLocalId(), ...parsed.data, createdAt: now, updatedAt: now };
-      const saved = await persist([...get().events, event]);
-      return saved ? event.id : null;
+      try {
+        await putCalendarEvent(event);
+        set({ events: [...get().events, event] });
+        saved();
+        return event.id;
+      } catch {
+        set({ storageError: true });
+        return null;
+      }
     },
     updateEvent: async (id, input) => {
       const parsed = calendarEventInputSchema.safeParse(input);
       if (!parsed.success) return false;
       await ensureHydrated();
-      const now = new Date().toISOString();
-      const next = get().events.map((event) =>
-        event.id === id ? { ...event, ...parsed.data, updatedAt: now } : event,
-      );
-      if (!next.some((event) => event.id === id)) return false;
-      return persist(next);
+      const current = get().events.find((event) => event.id === id);
+      if (!current) return false;
+      const updated: CalendarEvent = { ...current, ...parsed.data, updatedAt: new Date().toISOString() };
+      try {
+        await putCalendarEvent(updated);
+        set({ events: get().events.map((event) => (event.id === id ? updated : event)) });
+        saved();
+        return true;
+      } catch {
+        set({ storageError: true });
+        return false;
+      }
     },
     deleteEvent: async (id) => {
       await ensureHydrated();
-      return persist(get().events.filter((event) => event.id !== id));
+      try {
+        await deleteCalendarEventRow(id);
+        set({ events: get().events.filter((event) => event.id !== id) });
+        saved();
+        return true;
+      } catch {
+        set({ storageError: true });
+        return false;
+      }
     },
   };
+});
+
+// A second tab added or removed a plan: re-read it.
+subscribeSync((area) => {
+  if (area === 'calendar') void useCalendarEventsStore.getState().hydrate(true);
 });
