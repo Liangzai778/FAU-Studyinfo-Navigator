@@ -3,6 +3,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
 import { DegreePage } from '../features/degree/DegreePage';
 import { ExamsPage } from '../features/exams/ExamsPage';
+import { LegalPage } from '../features/legal/LegalPage';
 import { NotFoundPage } from '../features/not-found/NotFoundPage';
 import { PlannerPage } from '../features/planner/PlannerPage';
 import { ResourcesPage } from '../features/resources/ResourcesPage';
@@ -18,6 +19,7 @@ export function AppRouter() {
         <Route path="exams" element={<ExamsPage />} />
         <Route path="resources" element={<ResourcesPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="legal" element={<LegalPage />} />
         <Route path="home" element={<Navigate to="/" replace />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

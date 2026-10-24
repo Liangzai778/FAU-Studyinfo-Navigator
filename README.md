@@ -56,7 +56,7 @@ The extension point is the data file, not the UI: see
 
 ## 功能
 
-- 六个页面：概览、专业要求、学期规划、考试与期限、校园导航、设置，外加 404。
+- 六个主页面：概览、专业要求、学期规划、考试与期限、校园导航、设置；另有 404 与法律声明页。
 - 专业要求按 `学位类型 + 学院 + 专业 + 入学学期 + PO 版本` 解析；系统不会替你选中「最新 PO」。
 - 规则按树形渲染：父组显示 ECTS 与子组，子组列出模块、ECTS 与开课学期；每张卡片附官方来源。
 - 验证状态可见：已核实 / 暂定 / 待复核 / 未核实 / 来源冲突。
@@ -91,7 +91,7 @@ npm run dev      # http://127.0.0.1:5173
 ```bash
 npm run lint
 npm run typecheck
-npm run test        # 静态检查 32 项 + 单元测试
+npm run test        # 静态检查 34 项 + 单元测试
 npm run test:data   # 学术数据引用完整性、PO 范围、ECTS 算术
 npm run test:e2e    # 需要先执行 npx playwright install chromium
 npm run build
@@ -149,6 +149,20 @@ GitHub Pages 没有服务端 SPA 回退，只能靠根目录的 `404.html`，因
 3. **改代码 / 翻译 / 文档**：[CONTRIBUTING.md](CONTRIBUTING.md)
 
 唯一不能破的规则：**不猜测学术数据**。看起来合理的 ECTS 比一个明显的空白更危险。
+
+## 法律声明与数据保护（Datenschutz）
+
+本项目按德国法背景设计，完整声明见 [LEGAL.md](LEGAL.md)，站内地址 `/legal`（页脚与设置页都有入口）。
+
+- **非商业**：无广告、无联盟链接、无付费功能、不募捐、不买卖数据；维护成本由维护者承担。
+- **数据最小化**：课程、成绩、考试、任务与专业选择只写入本机 `localStorage` / `IndexedDB`，不上传、无账号。
+- **无追踪**：没有分析工具、像素、指纹识别、第三方字体/CDN，也没有后台网络请求，因此不需要 Cookie 同意弹窗。本地存储属于实现功能所必需（TDDDG § 25 Abs. 2 Nr. 2）。
+- **托管日志**：Cloudflare Pages / GitHub Pages 为分发与防滥用处理技术上必要的访问数据（IP、User-Agent），依据 DSGVO 第 6 条第 1 款 f 项，这部分不受本项目控制。
+- **不抓取**：不访问、不爬取、不模拟登录 Campo、StudOn、FAUmail 等 FAU 系统，不索取 FAU 账号、密码、SSO 凭据或 Cookie。
+- **版权与数据权益**：考试条例等官方文件通常属于 § 5 UrhG 的官方作品；模块手册版权归 FAU，仅作核对用途并在被要求时移除；不对受保护数据库作实质性提取（§§ 87a ff. UrhG）。
+- **独立性**：与 FAU 无隶属或认可关系，内容不构成法律或学业建议，以官方文件和 Campo 为准。
+
+这些不是口号：无网络请求由静态测试与 E2E 守护，法律声明与仓库文本由测试检查（`tests/static.test.mjs`）。
 
 ## 许可证
 

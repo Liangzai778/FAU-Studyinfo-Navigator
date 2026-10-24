@@ -226,7 +226,7 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 |---|---|---|
 | 类型检查 | `npm run typecheck` | ✅ 0 错误 |
 | 代码规范 | `npm run lint` | ✅ 0 错误 |
-| 静态测试 | `npm run test:static` | ✅ 32/32 |
+| 静态测试 | `npm run test:static` | ✅ 34/34 |
 | 单元测试 | `npm test` | ✅ 136/136（21 个测试文件，含 ECTS 引擎行为测试） |
 | E2E | `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
 | 数据校验 | `npm run test:data` | ✅ ALL CHECKS PASSED |
@@ -798,7 +798,7 @@ errors: none
 |---|---|
 | `npm run typecheck` | ✅ 0 错误 |
 | `npm run lint` | ✅ 0 错误 |
-| `npm run test:static` | ✅ 32/32 |
+| `npm run test:static` | ✅ 34/34（含隐私/法律声明检查） |
 | `npm test`（含单元） | ✅ 136/136，21 个文件 |
 | `npm run test:data` | ✅ ALL CHECKS PASSED |
 | `npm run build` | ✅ 成功，无体积告警 |
@@ -806,3 +806,57 @@ errors: none
 | 线上子路径 | ✅ 全部 200 |
 
 **未做**：没有伪造任何学术数据；`iimmun-m8-v1` 的 ECTS 仍然保持 `null`，原因与补救方式写在 11 节待办。
+
+---
+
+## 十三、2026-10-24 · 法律声明（Datenschutz / Urheberrecht）
+
+项目面向德国高校，需要一个公开、可核对的非商业与数据保护声明：既在网站里直接可见，也在仓库里可追溯。这次把它当成功能来做，而不是贴一段免责声明。
+
+### 13.1 网站
+
+| 位置 | 内容 |
+|---|---|
+| `/legal` 路由 | 完整的法律声明页；不放进左侧主菜单（主菜单是站内功能，法律页属于常驻信息），从页脚、设置页和首页进入 |
+| 页脚（每页常驻） | 「非商业学生工具 · 无追踪 · 数据只存本机」+ 法律声明链接 |
+| 首页「本地优先」卡片 | 增加法律声明链接 |
+| 设置页 | 新增「法律与数据保护」卡片，一段摘要 + 链接 |
+
+页面结构：一句话概括 → 非商业 → 不抓取/不登录 → 数据保护（4 条要点）→ 版权与数据权益 → 独立性与责任限制 → 适用法律 → **Deutsche Zusammenfassung（7 段静态德语）** → 完整文件链接 → 联系方式。
+
+德语摘要刻意不跟随界面语言切换：德语使用者和监管机构应当无需切换界面就能读到核心表述。
+
+### 13.2 仓库文件
+
+| 文件 | 内容 |
+|---|---|
+| `LEGAL.md` | 德语主文本 + 英文摘要 + 中文摘要。覆盖 § 5 DDG（私人非商业站点通常无需 Impressum）、DSGVO/BDSG（Art. 4, 6, 15–21, 25）、§ 25 TDDDG、§ 5 UrhG、§§ 87a ff. UrhG、责任限制、适用法律 |
+| `NOTICE.md` | 增加指向 `LEGAL.md` 的说明 |
+| `README.md` | 新增「法律声明与数据保护」章节，列出 6 条可核对的事实与对应保障 |
+| `CONTRIBUTING.md` | 新增非商业与隐私底线：拒绝广告/联盟链接/募捐、拒绝 Cookie 与分析工具、不得转载整本受保护手册 |
+| `AGENTS.md` | 新增第 9 节：改变存储、托管商、第三方请求或商业模式时，必须同步更新 `LEGAL.md`、`/legal` 文案与测试 |
+
+### 13.3 自动化护栏
+
+- `tests/static.test.mjs` 新增 2 项：
+  1. 源码不得出现 `document.cookie`、`navigator.sendBeacon`、`gtag`/`dataLayer`/`plausible`/`matomo`/`google-analytics`；
+  2. `LEGAL.md` 必须包含 DSGVO、BDSG、TDDDG、UrhG、nicht-kommerziell、Kein Scraping，且 `/legal` 路由与页脚链接存在。
+- E2E 路由列表加入 `/legal`，确认中文与英文都能渲染且无远程请求。
+
+### 13.4 声明里的诚实边界
+
+- 明确写了「不是法律意见」，没有声称「完全合规」。
+- 没有说「零数据处理」：托管商的访问日志（IP、User-Agent）如实写出，并给出 Art. 6(1)(f) 依据。
+- 对 Impressum 只写「纯私人非商业站点通常不需要」，没有替用户做法律结论。
+- 学院数据仍是手工转录，`sources/` 下官方文件的版权归属单列，权利人要求时移除。
+
+### 13.5 验证结果
+
+| 检查 | 结果 |
+|---|---|
+| typecheck / lint | ✅ 0 错误 |
+| 静态测试 | ✅ 34/34（新增 2 项合规检查） |
+| 单元测试 | ✅ 136/136 |
+| E2E | ✅ 7 通过 / 2 跳过（含 `/legal`） |
+| 构建 | ✅ 成功 |
+| 浏览器实测 | ✅ `/legal` 9 个区块、7 段德语、3 个文件链接；页脚与设置入口存在；中英切换正常；无控制台错误 |

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon';
 import { PageHeader } from '../../components/common/PageHeader';
 import { BackupPanel } from '../exams/BackupPanel';
@@ -114,6 +115,19 @@ export function SettingsPage() {
           <div>
             <h2 className="font-semibold text-emerald-950 dark:text-emerald-100">{t('settings.storageTitle')}</h2>
             <p className="mt-1 text-sm leading-6 text-emerald-900/80 dark:text-emerald-200/80">{t('settings.storageBody')}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-start gap-3">
+          <Icon name="globe" className="mt-0.5 h-6 w-6 text-sky-700 dark:text-sky-300" />
+          <div>
+            <h2 className="font-semibold text-slate-950 dark:text-white">{t('settings.legalTitle')}</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{t('settings.legalBody')}</p>
+            <Link to="/legal" className="mt-2 inline-block text-sm font-semibold text-sky-700 underline underline-offset-2 dark:text-sky-300">
+              {t('settings.legalLink')}
+            </Link>
           </div>
         </div>
       </section>

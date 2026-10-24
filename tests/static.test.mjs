@@ -66,6 +66,31 @@ test('contains no background networking implementation', async () => {
   assert.doesNotMatch(source, /\baxios\b/);
 });
 
+test('uses no cookies, beacons or tracking scripts', async () => {
+  const files = await collectSourceFiles('src');
+  const source = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n');
+  assert.doesNotMatch(source, /document\.cookie/);
+  assert.doesNotMatch(source, /navigator\.sendBeacon/);
+  assert.doesNotMatch(source, /\bgtag\b|\bdataLayer\b|\bplausible\b|\bmatomo\b|google-analytics/i);
+});
+
+test('declares the non-commercial legal notice in both the repo and the app', async () => {
+  const legal = await readFile('LEGAL.md', 'utf8');
+  for (const term of ['DSGVO', 'BDSG', 'TDDDG', 'UrhG', 'nicht-kommerziell', 'Kein Scraping']) {
+    assert.ok(legal.includes(term), `LEGAL.md must mention ${term}`);
+  }
+
+  const router = await readFile('src/app/router.tsx', 'utf8');
+  assert.match(router, /path="legal"/);
+
+  const shell = await readFile('src/components/layout/AppShell.tsx', 'utf8');
+  assert.match(shell, /to="\/legal"/);
+
+  const messages = await readFile('src/i18n/messages.ts', 'utf8');
+  assert.match(messages, /'legal\.privacyTitle'/);
+  assert.match(messages, /'legal\.nonCommercialTitle'/);
+});
+
 async function collectSourceFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const nested = await Promise.all(entries.map(async (entry) => {

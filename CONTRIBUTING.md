@@ -133,6 +133,18 @@ Tests: 120 unit, data checks pass.
 - No scraping at runtime: the app ships a versioned data package.
 - No Campo/StudOn automation, no exam registration on the student's behalf.
 - No demo data that looks real. Empty means empty.
+- **No commercial use.** No advertising, affiliate links, sponsorships, paid
+  features or donation drives. The project stays non-commercial; see
+  [LEGAL.md](LEGAL.md).
+- **No tracking.** No cookies, analytics, pixels or fingerprinting, and no
+  third-party fonts or CDNs. Local storage only where the feature truly needs
+  it (currently: preferences and the user's own study data).
+- **No copying of protected material.** Official regulations may be quoted;
+  module handbooks and other copyrighted documents stay with their rights
+  holder. Do not paste a full handbook into the repository.
+
+Any pull request that weakens these rules will be rejected, even if the feature
+itself is useful.
 
 ## Licence
 
@@ -158,6 +170,13 @@ FAU's property and are not covered by that licence; see [NOTICE.md](NOTICE.md).
 - 无法从官方文件确认的数值保持 `null`，或把规则标为 `needs_review`。
 - 每条规则必须绑定来源。
 - schema 校验通过不等于内容真实；只有人工对照 PDF 才能标 `verified`。
+
+## 非商业与隐私底线（德国法背景）
+
+- 不加入广告、联盟链接、赞助、付费功能或募捐；项目保持非商业，详见 [LEGAL.md](LEGAL.md)。
+- 不加入 Cookie、分析工具、像素、指纹识别或第三方字体/CDN；不得引入后台网络请求。
+- 不提交受版权保护的整本手册或大段原文；官方条例可引用，模块手册仅作核对。
+- 不在公开 issue 或测试 fixture 中放入任何个人成绩、邮箱或 FAU 凭据。
 
 ## 本地开发与门禁
 

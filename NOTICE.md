@@ -3,6 +3,10 @@
 This project is released under the MIT License (see `LICENSE`). That licence
 covers the source code of FAU Study Navigator.
 
+Data protection, the non-commercial character of the project and the
+no-scraping policy are described in [`LEGAL.md`](LEGAL.md) and on the site at
+`/legal`.
+
 ## Official FAU material
 
 Examination regulations, module handbooks and other official documents quoted

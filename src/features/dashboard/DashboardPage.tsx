@@ -230,6 +230,9 @@ export function DashboardPage() {
         <div>
           <h2 className="font-semibold text-emerald-950 dark:text-emerald-100">{t('dashboard.privacyTitle')}</h2>
           <p className="mt-1 text-sm leading-6 text-emerald-900/80 dark:text-emerald-200/80">{t('dashboard.privacyBody')}</p>
+          <Link to="/legal" className="mt-2 inline-block text-sm font-semibold text-emerald-800 underline underline-offset-2 dark:text-emerald-200">
+            {t('app.legalLink')}
+          </Link>
         </div>
       </section>
     </div>

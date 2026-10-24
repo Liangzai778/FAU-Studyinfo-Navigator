@@ -16,7 +16,7 @@ async function rejectRemoteRequests(page: Page) {
 
 test('all application routes render without remote requests', async ({ page }) => {
   const unexpected = await rejectRemoteRequests(page);
-  for (const path of ['/', '/degree', '/planner', '/exams', '/resources', '/settings', '/missing']) {
+  for (const path of ['/', '/degree', '/planner', '/exams', '/resources', '/settings', '/legal', '/missing']) {
     await page.goto(path);
     await expect(page.locator('main h1')).toBeVisible();
   }

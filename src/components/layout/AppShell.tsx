@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
 import { MobileNav } from './MobileNav';
@@ -29,7 +29,14 @@ export function AppShell() {
             <Outlet />
           </main>
           <footer className="border-t border-slate-200 bg-white px-6 pb-24 pt-6 text-center text-xs leading-5 text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 lg:ml-0 lg:py-6">
-            {t('app.unofficial')}
+            <p>{t('app.unofficial')}</p>
+            <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+              <span>{t('app.legalLine')}</span>
+              <span aria-hidden="true">·</span>
+              <Link to="/legal" className="font-semibold text-sky-700 underline underline-offset-2 dark:text-sky-300">
+                {t('app.legalLink')}
+              </Link>
+            </p>
           </footer>
         </div>
       </div>
