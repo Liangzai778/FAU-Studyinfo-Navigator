@@ -116,6 +116,17 @@ test('wires the semester calendar, autosave and storage persistence', async () =
   assert.match(academicCalendar, /ul-decision/);
 });
 
+test('keeps a user guide with the live and repository addresses', async () => {
+  const guide = await readFile('docs/USER_GUIDE.md', 'utf8');
+  assert.match(guide, /fau-studyinfo-navigator\.pages\.dev/);
+  assert.match(guide, /github\.com\/tommy2345-art\/FAU-Studyinfo-Navigator/);
+  assert.match(guide, /授课周/);
+  assert.match(guide, /备份/);
+
+  const readme = await readFile('README.md', 'utf8');
+  assert.match(readme, /docs\/USER_GUIDE\.md/);
+});
+
 test('publishes the project design, roadmap and README screenshots', async () => {
   const design = await readFile('docs/DESIGN.md', 'utf8');
   assert.match(design, /## 2\. 总体架构/);

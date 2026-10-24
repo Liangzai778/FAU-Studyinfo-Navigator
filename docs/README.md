@@ -6,6 +6,7 @@
 
 | 文件 | 内容 |
 |---|---|
+| [USER_GUIDE.md](USER_GUIDE.md) | **使用指南**：第一次使用的五步、状态说明、备份与常见问题 |
 | [README](../README.md) | 在线地址、覆盖范围、本地开发、数据保存位置 |
 | [LEGAL.md](../LEGAL.md) | 非商业声明、数据保护（DSGVO/BDSG）、版权与不抓取承诺 |
 
