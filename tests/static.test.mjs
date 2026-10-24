@@ -74,6 +74,24 @@ test('uses no cookies, beacons or tracking scripts', async () => {
   assert.doesNotMatch(source, /\bgtag\b|\bdataLayer\b|\bplausible\b|\bmatomo\b|google-analytics/i);
 });
 
+test('keeps the contributor guides discoverable from each other', async () => {
+  const english = await readFile('docs/ADDING_A_FACULTY.md', 'utf8');
+  const chinese = await readFile('docs/ADDING_A_FACULTY.zh-CN.md', 'utf8');
+  const index = await readFile('docs/README.md', 'utf8');
+  const readme = await readFile('README.md', 'utf8');
+  const contributing = await readFile('CONTRIBUTING.md', 'utf8');
+
+  assert.ok(english.includes('ADDING_A_FACULTY.zh-CN.md'), 'the English guide must link the Chinese one');
+  assert.ok(chinese.includes('ADDING_A_FACULTY.md'), 'the Chinese guide must link the English one');
+  assert.ok(index.includes('ADDING_A_FACULTY.zh-CN.md'), 'the docs index must list the Chinese guide');
+  assert.ok(readme.includes('ADDING_A_FACULTY.zh-CN.md'), 'the README must point at the Chinese guide');
+  assert.ok(contributing.includes('ADDING_A_FACULTY.zh-CN.md'), 'CONTRIBUTING must point at the Chinese guide');
+
+  for (const section of ['30 秒看懂', '报错对照表', '字段速查', '常见问题']) {
+    assert.ok(chinese.includes(section), `the Chinese guide must keep the "${section}" section`);
+  }
+});
+
 test('declares the non-commercial legal notice in both the repo and the app', async () => {
   const legal = await readFile('LEGAL.md', 'utf8');
   for (const term of ['DSGVO', 'BDSG', 'TDDDG', 'UrhG', 'nicht-kommerziell', 'Kein Scraping']) {

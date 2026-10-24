@@ -1,5 +1,9 @@
 # Contributing to FAU Study Navigator
 
+> 中文贡献教程（推荐中文读者从这里开始）：[docs/ADDING_A_FACULTY.zh-CN.md](docs/ADDING_A_FACULTY.zh-CN.md)
+> English data guide: [docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md)
+> 文档总览： [docs/README.md](docs/README.md)
+
 Thanks for taking a look. This project exists because official FAU study
 information is spread across Campo, StudOn, faculty pages and PDF regulations,
 and nobody has time to cross-check all of it before every semester.

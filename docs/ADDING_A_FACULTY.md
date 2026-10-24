@@ -1,5 +1,8 @@
 # Adding your faculty's programmes
 
+> 中文版（推荐中文读者从这里开始）：[ADDING_A_FACULTY.zh-CN.md](ADDING_A_FACULTY.zh-CN.md)
+> Overview for all contributions: [CONTRIBUTING.md](../CONTRIBUTING.md)
+
 This guide is for the main contribution this project needs: transcribing the
 study requirements of a faculty that is not covered yet.
 
@@ -13,6 +16,18 @@ hard-coded to biology:
 
 You do not need to touch React components. You do need to read official
 documents carefully.
+
+```mermaid
+flowchart TD
+    A["1. Official PO + module handbook"] --> B["2. academicSources"]
+    B --> C["3. programmes"]
+    C --> D["4. examinationRegulationVersions"]
+    D --> E["5. modules + moduleVersions"]
+    E --> F["6. requirementGroups"]
+    F --> G["7. dataReleaseId"]
+    G --> H["8. npm run test:data / test / build"]
+    H --> I["9. pull request"]
+```
 
 ---
 

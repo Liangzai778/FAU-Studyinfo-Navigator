@@ -140,15 +140,37 @@ GitHub Pages 没有服务端 SPA 回退，只能靠根目录的 `404.html`，因
 
 所有个人数据都在当前浏览器。换设备看不到，清站点数据会丢；迁移用设置页的 JSON 备份。
 
-## 贡献
+## 参与贡献
 
-欢迎三类贡献：
+**不需要会 React。** 补一个学院的数据，只需要编辑一个 JSON 文件；界面会自动更新。
 
-1. **补你所在学院的数据**（最有价值）：[docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md)
-2. **纠错**：用「Wrong academic data」模板，给出官方链接和页码
-3. **改代码 / 翻译 / 文档**：[CONTRIBUTING.md](CONTRIBUTING.md)
+### 三步开始
+
+1. 读 **[中文贡献教程](docs/ADDING_A_FACULTY.zh-CN.md)**（十步流程、培养计划怎么变成规则组、报错对照表）或者 [English guide](docs/ADDING_A_FACULTY.md)。
+2. 编辑 [`src/data/academic/academic-data.json`](src/data/academic/academic-data.json)。
+3. 跑 `npm run test:data && npm run test && npm run build`，然后按 PR 模板提交。
+
+### 现在缺什么
+
+| 学院 | 状态 | 可以帮什么 |
+|---|---|---|
+| 自然科学学院（生物系） | ✅ 3 个硕士专业 | 纠错；补 iImmune「项目工作研讨课」的 ECTS；补 ZMB 2019 版模块表 |
+| 人文、社会科学与神学学院 | ⬜ 未录入 | 按教程加数据，或先开「我的学院缺失」issue |
+| 经济、管理与法律学院 | ⬜ 未录入 | 同上 |
+| 医学院 | ⬜ 未录入 | 同上（条例可能不公开，可先提资料） |
+| 工程学院 | ⬜ 未录入 | 同上 |
+
+### 三种贡献方式
+
+| 方式 | 怎么做 | 适合 |
+|---|---|---|
+| 补数据 | [中文教程](docs/ADDING_A_FACULTY.zh-CN.md) | 有心读官方条例的同学（最有价值） |
+| 纠错 | [数据纠错 issue](https://github.com/tommy2345-art/FAU-Studyinfo-Navigator/issues/new?template=data_correction.yml)，附官方链接 + 页码 | 发现数字不对，但不想改代码 |
+| 改代码 / 翻译 / 文档 | [CONTRIBUTING.md](CONTRIBUTING.md) | 前端、测试、文档维护 |
 
 唯一不能破的规则：**不猜测学术数据**。看起来合理的 ECTS 比一个明显的空白更危险。
+
+文档导航见 [docs/README.md](docs/README.md)。
 
 ## 法律声明与数据保护（Datenschutz）
 
@@ -178,10 +200,14 @@ GitHub Pages 没有服务端 SPA 回退，只能靠根目录的 `404.html`，因
 - 弹窗具备语义与键盘操作，但未完成独立屏幕阅读器与 400% 缩放的人工认证。
 - 学术数据的「每字段证据」（RuleEvidence）尚未实现，PDF 改版后无法逐字段 diff。
 
-## 历史文档
+## 文档
 
-- [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md) — 项目日志与决策记录
+完整导航见 **[docs/README.md](docs/README.md)**（按「我想用 / 我想贡献 / 我想改代码 / 我想知道状态」分类）。
+
+- [docs/ADDING_A_FACULTY.zh-CN.md](docs/ADDING_A_FACULTY.zh-CN.md) — 中文贡献教程（从这里开始）
+- [docs/ADDING_A_FACULTY.md](docs/ADDING_A_FACULTY.md) — English guide
+- [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md) — 项目日志、决策与现状（以此为准）
 - [docs/SCALABILITY_AUDIT.md](docs/SCALABILITY_AUDIT.md) — 源码级审计
 - [docs/ACADEMIC_DATA_MODEL.md](docs/ACADEMIC_DATA_MODEL.md) — 数据模型
-- [docs/DATA_POLICY.md](docs/DATA_POLICY.md) — 数据政策
+- [docs/DATA_POLICY.md](docs/DATA_POLICY.md) — 数据政策（历史）
 - [upload/PRD(1).md](<upload/PRD(1).md>) — 最初的需求文档（保留原样）
