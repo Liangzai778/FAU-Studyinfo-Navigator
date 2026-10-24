@@ -145,7 +145,7 @@ npx wrangler pages deploy dist --project-name fau-studyinfo-navigator
 
 ## 许可证
 
-代码以 [MIT License](LICENSE) 发布。FAU 官方文件与手册版权归 FAU。
+代码以 [MIT License](LICENSE) 发布。FAU 官方文件与手册版权归 FAU，不在此许可范围内，详见 [NOTICE.md](NOTICE.md)。
 
 ## 已知限制
 

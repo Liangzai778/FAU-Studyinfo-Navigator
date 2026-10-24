@@ -138,7 +138,7 @@ Tests: 120 unit, data checks pass.
 
 By contributing you agree that your code is licensed under the [MIT
 License](LICENSE). Official FAU documents quoted or stored in `sources/` remain
-FAU's property and are not covered by that licence.
+FAU's property and are not covered by that licence; see [NOTICE.md](NOTICE.md).
 
 ---
 

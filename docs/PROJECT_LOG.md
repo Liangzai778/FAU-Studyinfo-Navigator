@@ -778,7 +778,8 @@ errors: none
 
 | 文件 | 作用 |
 |---|---|
-| `LICENSE` | MIT；附注说明 `sources/` 下 FAU 官方文件版权归 FAU，不在 MIT 范围 |
+| `LICENSE` | 标准 MIT 全文（保持纯净，GitHub 才能识别为 MIT） |
+| `NOTICE.md` | FAU 官方文件版权、与 FAU 无隶属关系、无个人数据三项声明；MIT 不覆盖官方文件 |
 | `CONTRIBUTING.md` | 中英双语：开发、门禁、数据红线、提交信息风格、PR 检查表 |
 | `docs/ADDING_A_FACULTY.md` | 给其他学院贡献者的完整手册：找条例、登记来源、加专业/PO/模块/要求组、跑校验、常见坑 |
 | `CODE_OF_CONDUCT.md` | 行为准则（含「不猜测数据」与「不要上传 FAU 凭据」） |
