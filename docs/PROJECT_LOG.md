@@ -226,7 +226,7 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 |---|---|---|
 | 类型检查 | `npm run typecheck` | ✅ 0 错误 |
 | 代码规范 | `npm run lint` | ✅ 0 错误 |
-| 静态测试 | `npm run test:static` | ✅ 35/35 |
+| 静态测试 | `npm run test:static` | ✅ 36/36 |
 | 单元测试 | `npm test` | ✅ 142/142（含新增的 6 条生物专业回归测试） |
 | E2E | `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
 | 数据校验 | `npm run test:data` | ✅ ALL CHECKS PASSED |
@@ -1007,3 +1007,65 @@ errors: none
 - **考试形式**：PO 里的 Klausur/mündliche Prüfung 等未入库。
 - **ZMB 2019 模块手册的专题内容**：95 页手册里各 Orientierungsmodul 的具体主题未逐条转录，数据沿用 PO 的四个模块行。
 - **iImmune 2022 模块表**：只有壳，没有要求组。
+
+---
+
+## 十七、2026-10-24 · GitHub 展示与设计文档
+
+### 17.1 问题
+
+仓库能跑，但首页只有文字：没有界面预览，也没有一处说清「这项目是怎么设计的」。对开源项目来说，这会让第一次访问的人在 10 秒内离开，也让想接着做的人不知道从哪里下手。
+
+### 17.2 README 重构
+
+新增四个区块，放在最前面：
+
+| 区块 | 内容 |
+|---|---|
+| 这是什么 | 给谁用、解决什么、不做什么、数据从哪来，四条 |
+| 界面一览 | 四张 1440×950 真实截图，2×2 表格：首页、覆盖范围、规则树、国际学生资源 |
+| 功能总览 | 七行表格：专业要求、学期规划、课程表、考试与任务、校园导航、数据治理、隐私与安全 |
+| 项目怎么设计 | Mermaid 流程图（官方 PDF → JSON → Zod → 领域层 → 页面；用户数据 → IndexedDB）+ 链接到 `docs/DESIGN.md` |
+| 路线图 | 三条当前最缺的事 + 链接到 `ROADMAP.md` |
+
+截图全部来自真实构建，选择的是 ILS 2026 + MG1/MG2 方向，**不含任何个人数据**。
+
+### 17.3 新增文档
+
+| 文件 | 内容 |
+|---|---|
+| `docs/DESIGN.md` | 目标/非目标、总体架构图、数据模型 ER 图、9 条关键设计决策（决策/理由/代价）、数据流、安全设计、扩展方式、目录结构、已知取舍 |
+| `ROADMAP.md` | 按 P0–P3 分级的公开路线图：缺哪个学院、每个方向从哪开始、难度标记、明确不做的事、如何认领 |
+| `docs/README.md` | 索引加入 DESIGN、ROADMAP，按“用 / 贡献 / 改代码 / 看设计 / 看状态”分类 |
+
+### 17.4 顺带修掉的细节
+
+| 位置 | 问题 | 修复 |
+|---|---|---|
+| `resources.official` 文案 | 显示「PRD 已核对」/「Checked in PRD」，是早期需求文档阶段的遗留 | 改为「官方来源已核对」/「Official source checked」 |
+| `src/data/resources.ts` | 资源来源标题写成「FAU 官方入口；项目 PRD §3.2：…」，把内部术语暴露给学生 | 改名 `officialSource`，标题改为「FAU 官方页面：…」 |
+
+### 17.5 截图过程中的坑
+
+第一次拍出来的“覆盖范围”截图和首页一模一样：全局 CSS 有 `scroll-behavior: smooth`，`scrollIntoView` 之后立刻截图，页面还在滚动动画中间。改成 `window.scrollTo({ behavior: 'instant' })` 后正常。
+
+第二次拍“规则树”只显示了收尾组 3 个模块：探测脚本没有勾选 ILS 的方向（track），而方向组会被 `getRequirementGroupsForSelection` 过滤掉。补上 MG1/MG2 后正确显示 21 个模块。两条都记在这里，避免下次重拍再踩。
+
+### 17.6 自动化护栏
+
+`tests/static.test.mjs` 新增第 36 项：
+
+- `docs/DESIGN.md` 必须存在且包含「总体架构」与 mermaid；
+- `ROADMAP.md` 必须存在且包含 P0 与「不打算做」；
+- README 必须引用四张截图，且文件真实存在。
+
+### 17.7 验证
+
+| 检查 | 结果 |
+|---|---|
+| typecheck / lint | ✅ 0 错误 |
+| 静态测试 | ✅ 36/36 |
+| 单元测试 | ✅ 142/142 |
+| E2E | ✅ 7 通过 / 2 跳过 |
+| 构建 | ✅ 成功 |
+| 截图 | ✅ 4 张，均为真实构建、无个人数据 |

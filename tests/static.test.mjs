@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { access, readFile, readdir, stat } from 'node:fs/promises';
 import test from 'node:test';
-
 const requiredFiles = [
   'AGENTS.md',
   'upload/PRD(1).md',
@@ -72,6 +71,28 @@ test('uses no cookies, beacons or tracking scripts', async () => {
   assert.doesNotMatch(source, /document\.cookie/);
   assert.doesNotMatch(source, /navigator\.sendBeacon/);
   assert.doesNotMatch(source, /\bgtag\b|\bdataLayer\b|\bplausible\b|\bmatomo\b|google-analytics/i);
+});
+
+test('publishes the project design, roadmap and README screenshots', async () => {
+  const design = await readFile('docs/DESIGN.md', 'utf8');
+  assert.match(design, /## 2\. 总体架构/);
+  assert.match(design, /mermaid/);
+
+  const roadmap = await readFile('ROADMAP.md', 'utf8');
+  assert.match(roadmap, /## P0/);
+  assert.match(roadmap, /## 不打算做/);
+
+  const readme = await readFile('README.md', 'utf8');
+  const screenshots = [
+    'dashboard.png',
+    'coverage.png',
+    'degree-rules.png',
+    'resources-international.png',
+  ];
+  for (const file of screenshots) {
+    assert.ok(readme.includes(`docs/screenshots/${file}`), `README must embed ${file}`);
+    await access(`docs/screenshots/${file}`);
+  }
 });
 
 test('keeps the contributor guides discoverable from each other', async () => {

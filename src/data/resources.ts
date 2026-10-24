@@ -50,10 +50,10 @@ const internationalScope: Pick<
   lastCheckedAt: '2026-10-24',
 };
 
-const prdSource = (title: string, url: string) => ({
+const officialSource = (title: string, url: string) => ({
   title: {
-    'zh-CN': `FAU 官方入口；项目 PRD §3.2：${title}`,
-    en: `Official FAU destination; project PRD §3.2: ${title}`,
+    'zh-CN': `FAU 官方页面：${title}`,
+    en: `Official FAU page: ${title}`,
   },
   url,
 });
@@ -77,7 +77,7 @@ const resourceSeeds: Resource[] = [
       'zh-CN': ['学籍', '课程目录', '成绩', '考试报名', '模块'],
       en: ['student records', 'course catalogue', 'grades', 'exam registration', 'modules'],
     },
-    source: prdSource('Campo', 'https://campo.fau.de'),
+    source: officialSource('Campo', 'https://campo.fau.de'),
     priority: 10,
   },
   {
@@ -92,7 +92,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'study',
     url: 'https://www.studon.fau.de',
     keywords: { 'zh-CN': ['课程资料', '学习平台', '选课'], en: ['course materials', 'learning platform', 'courses'] },
-    source: prdSource('StudOn', 'https://www.studon.fau.de'),
+    source: officialSource('StudOn', 'https://www.studon.fau.de'),
     priority: 20,
   },
   {
@@ -107,7 +107,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'exams',
     url: 'https://www.studon-exam.fau.de',
     keywords: { 'zh-CN': ['数字考试', '线上考试'], en: ['digital exams', 'online exams'] },
-    source: prdSource('StudOn-Exam', 'https://www.studon-exam.fau.de'),
+    source: officialSource('StudOn-Exam', 'https://www.studon-exam.fau.de'),
     priority: 30,
   },
   {
@@ -122,7 +122,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'services',
     url: 'https://www.idm.fau.de',
     keywords: { 'zh-CN': ['账号', '密码', '身份管理'], en: ['account', 'password', 'identity'] },
-    source: prdSource('IdM', 'https://www.idm.fau.de'),
+    source: officialSource('IdM', 'https://www.idm.fau.de'),
     priority: 40,
   },
   {
@@ -144,7 +144,7 @@ const resourceSeeds: Resource[] = [
       'zh-CN': ['邮箱', '邮件', 'FAUmail', 'webmail', '学校通知', '收件箱'],
       en: ['mail', 'email', 'FAUmail', 'webmail', 'university notices', 'inbox'],
     },
-    source: prdSource('FAUmail', 'https://www.fau.de/glossary/webmail/'),
+    source: officialSource('FAUmail', 'https://www.fau.de/glossary/webmail/'),
     priority: 45,
   },
   {
@@ -159,7 +159,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'services',
     url: 'https://www.ub.fau.de',
     keywords: { 'zh-CN': ['图书馆', '文献', '开放时间', '学习空间'], en: ['library', 'literature', 'opening hours', 'study spaces'] },
-    source: prdSource('University Library', 'https://www.ub.fau.de'),
+    source: officialSource('University Library', 'https://www.ub.fau.de'),
     priority: 50,
   },
   {
@@ -174,7 +174,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'exams',
     url: 'https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/',
     keywords: { 'zh-CN': ['考试条例', 'PO', '毕业要求'], en: ['examination regulations', 'PO', 'graduation requirements'] },
-    source: prdSource('Prüfungsordnungen', 'https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/'),
+    source: officialSource('Prüfungsordnungen', 'https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/'),
     priority: 60,
   },
   {
@@ -189,7 +189,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'study',
     url: 'https://www.fau.de/studium/bewerbung-und-zulassung/alle-fristen-und-termine/',
     keywords: { 'zh-CN': ['校历', '学期日期', '截止日期'], en: ['academic calendar', 'semester dates', 'deadlines'] },
-    source: prdSource('Academic dates', 'https://www.fau.de/studium/bewerbung-und-zulassung/alle-fristen-und-termine/'),
+    source: officialSource('Academic dates', 'https://www.fau.de/studium/bewerbung-und-zulassung/alle-fristen-und-termine/'),
     priority: 70,
   },
   {
@@ -204,7 +204,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'exams',
     url: 'https://www.fau.de/glossary/anmeldezeitraeume-fuer-pruefungen/',
     keywords: { 'zh-CN': ['考试报名', '报名窗口', 'Anmeldezeitraum'], en: ['exam registration', 'registration period', 'Anmeldezeitraum'] },
-    source: prdSource('Exam registration windows', 'https://www.fau.de/glossary/anmeldezeitraeume-fuer-pruefungen/'),
+    source: officialSource('Exam registration windows', 'https://www.fau.de/glossary/anmeldezeitraeume-fuer-pruefungen/'),
     priority: 80,
   },
   {
@@ -219,7 +219,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'study',
     url: 'https://www.fau.de/studium/studienorganisation/studienstart/stundenplan-und-vorlesungsverzeichnis/modulbeschreibungen-in-campo-suchen-und-anzeigen/',
     keywords: { 'zh-CN': ['模块手册', '模块描述', 'Campo'], en: ['module handbook', 'module description', 'Campo'] },
-    source: prdSource('Campo module descriptions', 'https://www.fau.de/studium/studienorganisation/studienstart/stundenplan-und-vorlesungsverzeichnis/modulbeschreibungen-in-campo-suchen-und-anzeigen/'),
+    source: officialSource('Campo module descriptions', 'https://www.fau.de/studium/studienorganisation/studienstart/stundenplan-und-vorlesungsverzeichnis/modulbeschreibungen-in-campo-suchen-und-anzeigen/'),
     priority: 90,
   },
   {
@@ -234,7 +234,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'exams',
     url: 'https://www.fau.de/studium/studienorganisation/pruefungen/pruefungen-und-wahlfaecher-im-studienplaner-mit-modulplan-in-campo-verwalten/',
     keywords: { 'zh-CN': ['Studienplaner', '考试', '选修课'], en: ['Studienplaner', 'exams', 'electives'] },
-    source: prdSource('Campo study planner', 'https://www.fau.de/studium/studienorganisation/pruefungen/pruefungen-und-wahlfaecher-im-studienplaner-mit-modulplan-in-campo-verwalten/'),
+    source: officialSource('Campo study planner', 'https://www.fau.de/studium/studienorganisation/pruefungen/pruefungen-und-wahlfaecher-im-studienplaner-mit-modulplan-in-campo-verwalten/'),
     priority: 100,
   },
   {
@@ -249,7 +249,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'services',
     url: 'https://www.fau.de/studium/studienorganisation/studienstart/faqs-zum-studienstart-und-zum-ersten-studienjahr/faqs-semesterbeginn/',
     keywords: { 'zh-CN': ['新生', '开学', '第一学年', 'FAQ'], en: ['first year', 'semester start', 'new students', 'FAQ'] },
-    source: prdSource('First-year FAQ', 'https://www.fau.de/studium/studienorganisation/studienstart/faqs-zum-studienstart-und-zum-ersten-studienjahr/faqs-semesterbeginn/'),
+    source: officialSource('First-year FAQ', 'https://www.fau.de/studium/studienorganisation/studienstart/faqs-zum-studienstart-und-zum-ersten-studienjahr/faqs-semesterbeginn/'),
     priority: 110,
   },
   {
@@ -264,7 +264,7 @@ const resourceSeeds: Resource[] = [
     categoryId: 'faculty',
     url: 'https://www.fau.eu/university/university-organization/faculties/',
     keywords: { 'zh-CN': ['学院', '组织', '五大学院'], en: ['faculties', 'organisation', 'five faculties'] },
-    source: prdSource('Faculties', 'https://www.fau.eu/university/university-organization/faculties/'),
+    source: officialSource('Faculties', 'https://www.fau.eu/university/university-organization/faculties/'),
     priority: 120,
   },
 

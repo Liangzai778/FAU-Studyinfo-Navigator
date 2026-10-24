@@ -16,6 +16,15 @@
 | [ADDING_A_FACULTY.zh-CN.md](ADDING_A_FACULTY.zh-CN.md) | 中文 | **从这里开始。** 十步流程、培养计划到规则组的映射、报错对照表、常见问题 |
 | [ADDING_A_FACULTY.md](ADDING_A_FACULTY.md) | English | 同一份指南的英文版 |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | 中英 | 开发环境、质量门禁、数据红线、PR 流程 |
+| [ROADMAP.md](../ROADMAP.md) | 中英 | 哪些事最缺人、从哪开始、哪些不做 |
+
+## 我想了解项目怎么设计
+
+| 文件 | 内容 |
+|---|---|
+| [DESIGN.md](DESIGN.md) | 总体架构、数据模型（ER 图）、关键取舍、安全与扩展方式 |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 更细的分层、路由与状态边界 |
+| [ACADEMIC_DATA_MODEL.md](ACADEMIC_DATA_MODEL.md) | 数据字段与 PO 模型 |
 
 ## 我想改代码
 
