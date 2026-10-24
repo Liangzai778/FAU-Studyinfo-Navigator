@@ -274,7 +274,7 @@ npm run test:data  # 随时可以跑，检查数据是否自相矛盾
 文件顶部：
 
 ```text
-"dataReleaseId": "2026-10-24.1"   →   "2026-10-25.1"
+"dataReleaseId": "2026-10-24.2"   →   "2026-11-01.1"
 ```
 
 `createdAt` 不要改。

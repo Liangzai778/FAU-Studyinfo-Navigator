@@ -312,7 +312,7 @@ Two things the table does not tell you:
 
 ## 7. Fill in the release metadata
 
-- Bump `dataReleaseId` (for example `2026-10-24.1` → `2026-11-01.1`).
+- Bump `dataReleaseId` (for example `2026-10-24.2` → `2026-11-01.1`).
 - You do **not** need to touch `src/data/coverage.test.ts`. It pins the three
   biology programmes and structural invariants, and is written so that adding
   another faculty is a data change only. If it fails, the failure names the

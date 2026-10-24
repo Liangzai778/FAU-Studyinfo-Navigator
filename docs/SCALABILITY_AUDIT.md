@@ -244,7 +244,7 @@ data look broader while being less trustworthy.
 | # | Item | Status | Where |
 | --- | --- | --- | --- |
 | 1 | ILS: 9 curriculum modules unreachable from any requirement group | **Fixed.** The 9 duplicate catalogue entries were removed (module count 65 → 56) and all 32 ILS modules are now reachable from a group. | `4f3acb1`, `coverage.test.ts` |
-| 2 | `iimmun-m8-v1` has `ects: null` | **Open, but narrower than stated.** Deliberately not guessed. The Degree page now shows an "ECTS unconfirmed" badge. Correction: it does **not** permanently block a satisfied status — the other three modules in `rg-iimmun-projekt` add up to exactly 35 ECTS, so the group minimum is reachable without it. | `DegreePage.tsx`, i18n |
+| 2 | `iimmun-m8-v1` has `ects: null` | **Fixed 2026-10-24.** Appendix 2 of the 2026 FPO splits the third semester into Practical Project Work (15) and Theoretical Project Work (10). The data now records 15 + 10 instead of 25 + null. | `4f3acb1` follow-up |
 | 3 | `rg-ils-abschluss` points at the wrong module versions | **Fixed.** It now references the real statistics / advanced module / thesis versions (5 + 20 + 30 = 55 ECTS against `minEcts` 60 with an elective remainder). | `4f3acb1` |
 | 4 | No per-field evidence (`RuleEvidence`) | **Open.** Unchanged. | — |
 | 5 | Covered-module catalogue not split per programme/PO | **Partly addressed.** `src/data/coverage.ts` derives per-programme and per-faculty coverage, which is what the UI needed. Per-PO evidence is still missing. | `coverage.ts` |
@@ -256,9 +256,9 @@ Correction to §1: after the dedupe the package has 56 modules, not 65. The
 "41 ILS modules, 32 electable" split described there no longer exists; ILS now
 carries exactly the 32 modules that its requirement groups reference.
 
-Correction to the release id: the data changed twice after `2026-10-22.2`
-(ILS fixes, then the coverage release), so the current release is
-`2026-10-24.1`.
+Correction to the release id: the data changed after `2026-10-22.2` (ILS fixes,
+coverage release, then the biology PDF re-check), so the current release is
+`2026-10-24.2`.
 
 ### 10.1 Two defects this audit did not catch
 
@@ -288,3 +288,22 @@ complete ILS plan from the real data and asserts a satisfied result.
 This corrects §4's conclusion in one respect: allocation is still user-driven
 and the engine still does not guess, but the result it reports is now the whole
 tree, not just the leaves.
+
+### 10.2 Follow-up from the official PDFs, 2026-10-24
+
+Two more findings came out of reading the documents rather than the code:
+
+- **The iImmun project work was mis-split.** The 2026 FPO (Appendix 2, pp. 26–27)
+  has Practical Project Work at 15 ECTS and Theoretical Project Work at 10.
+  The package had 25 ECTS on the practical part and a `null` seminar, which is
+  where the long-standing "unknown ECTS" came from. Both documents (the 2026 PO
+  and the 2022 handbook the package was built from) actually agree on 15 + 10.
+- **ZMB 2019 was not missing, only untranscribed.** Its Anlage 2 (p. 11) is
+  line-for-line identical to the 2026 one: the same 13 modules, the same 120
+  ECTS, the same groups. It is now transcribed as its own 13 module versions and
+  5 groups, so students who enrolled before winter 2026/27 get a real table
+  instead of an empty shell.
+
+The per-group reachability check in `npm run test:data` still guards every
+group minimum; `src/data/biologyProgrammes.test.ts` pins the specific values
+above.

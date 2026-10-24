@@ -105,7 +105,7 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 - 入学学期只筛选**候选** PO，系统**不会**自动选最新版，必须用户确认
 - 每条正式规则必须可追溯到至少一个 `AcademicSource`
 - 验证状态分 `verified` / `tentative` / `needs_review`，界面可见
-- 数据版本通过 `dataReleaseId` 管理（当前 `2026-10-24.1`）
+- 数据版本通过 `dataReleaseId` 管理（当前 `2026-10-24.2`）
 
 **当前数据规模**（2026-10-24 实测，脚本核对）：
 
@@ -227,7 +227,7 @@ Faculty → DegreeType → Programme → ProgrammeTrack
 | 类型检查 | `npm run typecheck` | ✅ 0 错误 |
 | 代码规范 | `npm run lint` | ✅ 0 错误 |
 | 静态测试 | `npm run test:static` | ✅ 35/35 |
-| 单元测试 | `npm test` | ✅ 136/136（21 个测试文件，含 ECTS 引擎行为测试） |
+| 单元测试 | `npm test` | ✅ 142/142（含新增的 6 条生物专业回归测试） |
 | E2E | `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
 | 数据校验 | `npm run test:data` | ✅ ALL CHECKS PASSED |
 | 构建 | `npm run build` | ✅ 成功（已拆分 vendor chunk，无体积告警） |
@@ -339,21 +339,14 @@ npm run preview      # 本地预览生产构建
 
 ### 5.1.1 已录入但不完整的 PO 版本
 
-`FPO BAMA Bio 2019`（细胞与分子生物学旧版条例）在数据包里**存在**，但**没有任何要求组**：
+**2026-10-24 更新：ZMB 2019 已补齐。** 官方 2019-10-28 版 Anlage 2 与 2026 版逐行一致（13 个模块、120 ECTS、同一分组），已按第 11 页转录 13 个模块版本与 5 个要求组，`po-zmb-2019` 现在可以被 2026 夏季及之前入学的学生正常使用。
 
-| 字段 | 值 |
-|---|---|
-| `id` | `po-zmb-2019` |
-| `entrySemesterFrom` | `null` |
-| `entrySemesterUntil` | `2026-summer` |
-| `verificationStatus` | `needs_review` |
-| `applicabilityNotes` | 明确写「本工具未逐条录入该版模块表」 |
+仍不完整的版本：
 
-含义：**2026 夏季及之前入学的老生会正常匹配到这个 PO**，选中后看到的是「此 PO 版本尚未逐条录入」的提示，而不是模块清单。
-
-这是已知且有意保留的缺口，不是 bug。要补齐需回溯 2019 版考试条例 PDF 并重新走一遍深度录入工序。
-
-注意：`po-zmb-2019` 与 `po-zmb-2026` 同时挂在同一个专业下，入学期决定匹配哪个 —— 2026 冬季及之后 → 2026 版；之前 → 2019 版。两条路径均已实测正确。
+| PO | 状态 | 说明 |
+|---|---|---|
+| `po-iimmune-2022` | `needs_review`，无要求组 | 2026 夏季及之前入学的 iImmune 学生适用。只登记版本，未取得并转录其条例原文；选中后显示「此版本尚未逐条录入」。 |
+| `po-zmb-2019` | `verified` | 已补齐（见上）。 |
 
 ### 5.2 HTTP 状态码问题（2026-10-23 已修复）
 
@@ -694,8 +687,8 @@ errors: none
 
 | 优先级 | 事项 | 状态 | 说明 |
 |---|---|---|---|
-| 高 | 补 `iimmun-m8-v1`（项目工作研讨课）的 ECTS | 未完成 | 该模块 `ects: null`，会显示「ECTS 待确认」且不计入任何学分。同组其余三个模块（5+25+5）刚好凑满 35，所以它不会单独让毕业判断停在 `unknown`；但若学生必须依赖它，就会显示缺口。需要 iImmune 模块手册 |
-| 中 | 补 2019 版 ZMB 条例的模块表 | 未完成 | 已有来源记录，缺逐条转录；老生目前只能看到「此版本未转录」 |
+| ~~高~~ | ~~补 `iimmun-m8-v1` 的 ECTS~~ | ✅ 已完成（2026-10-24） | 2026 版 PO Appendix 2 把第三学期拆为 Practical 15 + Theoretical 10；已改为 15/10，并更名模块 |
+| ~~中~~ | ~~补 2019 版 ZMB 条例的模块表~~ | ✅ 已完成（2026-10-24） | 2019 版 Anlage 2 与 2026 版逐行一致，已转录 13 个模块与 5 个要求组 |
 | 中 | 补自然科学学院其他专业骨架 | 未开始 | 现在有贡献指南和覆盖率 UI，可由外部贡献者接手 |
 | 中 | 为每条规则建立逐字段证据（RuleEvidence） | 未开始 | PDF 改版后目前无法 diff 出哪个数值变了 |
 | 低 | 扩四个学院 | 未开始 | 按学院分批，接口已留好 |
@@ -805,7 +798,7 @@ errors: none
 | `npm run test:e2e` | ✅ 7 通过 / 2 跳过 |
 | 线上子路径 | ✅ 全部 200 |
 
-**未做**：没有伪造任何学术数据；`iimmun-m8-v1` 的 ECTS 仍然保持 `null`，原因与补救方式写在 11 节待办。
+**未做**：没有伪造任何学术数据；当轮未补齐的 `iimmun-m8-v1` 与 ZMB 2019 已在第十六节按官方 PDF 补齐。
 
 ---
 
@@ -951,3 +944,66 @@ errors: none
 | 单元测试 | ✅ 136/136 |
 | 构建 | ✅ 成功 |
 | 链接检查 | ✅ 中英指南、README、CONTRIBUTING、docs 索引互相可达 |
+
+---
+
+## 十六、2026-10-24 · 按官方 PDF 复核三个生物硕士专业
+
+### 16.1 输入
+
+五份官方文件（用户提供，均来自 FAU 官方渠道）：
+
+| 文件 | 页数 | 用途 |
+|---|---|---|
+| `FPO_BAMA_Bio_20260331.pdf` | 15 | ZMB 2026 版 PO，Anlage 2 第 13–14 页 |
+| `Zell-und-Molekularbiologie-SoSe-26.pdf` | 95 | ZMB 模块手册（PO 2019 体系） |
+| `FPO_BSc-MSc_ILS_FPO_BAMA_ILS_20230822_idF_20260331_en.pdf` | 19 | ILS 英文合并版 PO，Anlage 2a/2b |
+| `FPOiImmune_20260213_en.pdf` | 27 | iImmune 2026 版 PO，Appendix 2 第 26–27 页 |
+| `MHB_..._PO-Version-20222.pdf` | 21 | iImmune 模块手册（PO 2022 体系） |
+
+另外从项目已登记的官方 URL 下载了 `FPO_BAMA_Bio_20191028.pdf`（13 页），用于补齐 2019 版。
+
+### 16.2 核对结论与动作
+
+| 专业 | 文件与数据的差异 | 动作 |
+|---|---|---|
+| ZMB 2026 | Anlage 2 的 13 个模块、ECTS 与分组与现有数据完全一致（6×7.5 + 20 + 15 + 5 + 5 + 30 = 120） | 无需改数据 |
+| ZMB 2019 | **Anlage 2 与 2026 版逐行一致**；此前该 PO 是没有任何要求组的空壳 | 按 2019 版第 11 页新增 13 个模块版本（`-v2019`）+ 5 个要求组；`po-zmb-2019` 改为 `verified` |
+| ILS 2026 | §51 Abs. 2 为 5 + 30 + 35 + 20 + 30 = 120，与现有 65 + 55 分组一致；§54 修订自 2026-04-01 生效，原则上适用于 2026/27 冬季起入学，§52 修订也适用于 2023 版学生 | 更新 `applicabilityNotes`，保留 `entrySemesterFrom: 2023-winter` |
+| iImmune 2026 | **Appendix 2 把第三学期拆为 Practical 15 + Theoretical 10**，而数据是 Practical 25 + 一个 `ects: null` 的 Seminar；PO 的 `entrySemesterFrom` 还是 `null` | M7 改为 15，M8 改为 10 并更名为 Theoretical Project Work；PO 起始学期改为 `2026-winter`；补 `applicabilityNotes`（§32） |
+| iImmune 2022 | 2026 夏季及之前入学的学生适用，但未取得该版条例原文 | 新增 `po-iimmune-2022` 壳（`needs_review`、无要求组、至 2026-summer），避免老生被错误套用 2026 规则 |
+
+### 16.3 数据规模变化
+
+| 项目 | 之前 | 现在 |
+|---|---|---|
+| 模块版本 | 56 | 69（+13 个 ZMB 2019 版本） |
+| 要求组 | 15 | 20（+5 个 ZMB 2019 组） |
+| PO 版本 | 4 | 5（+iImmune 2022 壳） |
+| 数据版本 | `2026-10-24.1` | `2026-10-24.2` |
+
+### 16.4 新增回归测试
+
+`src/data/biologyProgrammes.test.ts`（6 条）：
+
+- ZMB 2019 有 5 个组、13 个模块版本、根组 120；
+- ZMB 2026 结构保持不变；
+- iImmune M7=15、M8=10，Projekt 组合计 35；
+- iImmune 2022 壳存在且不含模块；
+- iImmune 2026 从 `2026-winter` 开始；
+- 每个有规则的专业根组都是 120。
+
+### 16.5 浏览器实测
+
+| 场景 | 结果 |
+|---|---|
+| ZMB，2024 冬季入学 | 匹配 `po-zmb-2019`，显示 13 个模块，不再出现「尚未逐条录入」 |
+| iImmune，2026 冬季入学 | 显示 11 个模块，含「项目工作理论模块」，无「ECTS 待确认」 |
+| 控制台 | 无错误 |
+
+### 16.6 仍未建模的部分
+
+- **培养计划的学期分布**：Anlage 的 1–4 学期列尚未作为字段存储，界面按要求组与 ECTS 呈现。要逐模块显示学期，需要给 `moduleVersion` 增加 `recommendedSemester`（ILS 的 2a/2b 两种入学季还会让同一模块落在不同学期）。
+- **考试形式**：PO 里的 Klausur/mündliche Prüfung 等未入库。
+- **ZMB 2019 模块手册的专题内容**：95 页手册里各 Orientierungsmodul 的具体主题未逐条转录，数据沿用 PO 的四个模块行。
+- **iImmune 2022 模块表**：只有壳，没有要求组。

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataReleaseId": "2026-10-24.1",
+  "dataReleaseId": "2026-10-24.2",
   "createdAt": "2026-10-22",
   "faculties": [
     {
@@ -105,7 +105,8 @@
       },
       "programmeTrackIds": [],
       "examinationRegulationVersionIds": [
-        "po-iimmune-2026"
+        "po-iimmune-2026",
+        "po-iimmune-2022"
       ],
       "dataStatus": "verified",
       "websiteSourceIds": [
@@ -189,13 +190,13 @@
       "entrySemesterFrom": null,
       "entrySemesterUntil": "2026-summer",
       "applicabilityNotes": {
-        "zh-CN": "适用于 2026/27 冬季学期之前入学的学生，2029 年 9 月 30 日失效。本工具未逐条录入该版模块表。",
-        "en": "Applies to students who enrolled before winter semester 2026/27; expires 30 September 2029. Its module table is not transcribed here."
+        "zh-CN": "适用于 2026/27 冬季学期之前入学的学生，2029 年 9 月 30 日失效。本工具已按该版 Anlage 2（第 11 页）逐行转录模块表，结构与 2026 版一致。",
+        "en": "Applies to students who enrolled before winter semester 2026/27; expires 30 September 2029. The module table is transcribed from Anlage 2 (p. 11) and matches the structure of the 2026 version."
       },
       "sourceIds": [
         "fau-fpo-bama-bio-2019"
       ],
-      "verificationStatus": "needs_review"
+      "verificationStatus": "verified"
     },
     {
       "id": "po-ils-2026",
@@ -208,8 +209,8 @@
       "entrySemesterFrom": "2023-winter",
       "entrySemesterUntil": null,
       "applicabilityNotes": {
-        "zh-CN": "§ 54：本条例自公布次日起生效，首次适用于 2023/24 冬季学期起入学的学生。冬季和夏季都可入学，两种学期的学习计划分别见附录 2a 与 2b。2023 冬季之前入学的学生适用更早的版本，本工具尚未录入。",
-        "en": "§ 54: in force from the day after publication, first applied to students enrolled from winter semester 2023/24. Entry is possible in winter and summer semester; the study plans are in Annexes 2a and 2b. Students who enrolled before winter 2023 fall under an earlier version that this tool does not transcribe yet."
+        "zh-CN": "§ 54：本条例自公布次日起生效，首次适用于 2023/24 冬季学期起入学的学生。2026 年 3 月 31 日的修订自 2026 年 4 月 1 日生效，原则上适用于 2026/27 冬季学期起入学的学生；其中 § 52 的修订同样适用于仍按 2023 版条例就读的学生。冬季和夏季都可入学，学习计划分别见附录 2a 与 2b。2023 冬季之前入学的学生适用更早版本，本工具尚未录入。",
+        "en": "§ 54: in force from the day after publication, first applied to students enrolled from winter semester 2023/24. The amendment of 31 March 2026 took effect on 1 April 2026 and applies in principle to students starting from winter semester 2026/27; the amendments to Section 52 also apply to students still studying under the 2023 regulations. Entry is possible in winter and summer semester; the study plans are in Annexes 2a and 2b. Students who enrolled before winter 2023 fall under an earlier version that this tool does not transcribe yet."
       },
       "sourceIds": [
         "fau-fpo-ils-2026"
@@ -224,17 +225,36 @@
         "zh-CN": "整合免疫学精英硕士考试条例（2026-02-13 版）",
         "en": "M.Sc. Integrated Immunology Examination Regulations (13 February 2026)"
       },
-      "entrySemesterFrom": null,
+      "entrySemesterFrom": "2026-winter",
       "entrySemesterUntil": null,
       "applicabilityNotes": {
-        "zh-CN": "当前适用版本，另有官方英文版。该项目属巴伐利亚精英网络（Elitenetzwerk Bayern）。",
-        "en": "Currently applicable; an official English version also exists. The programme belongs to the Elite Network of Bavaria."
+        "zh-CN": "§ 32：本条例自 2026 年 4 月 1 日生效，适用于 2026/27 冬季学期及以后入学的学生；自 2026/27 冬季学期起举行的考试也适用本条例，包括仍按 2022 版条例就读的学生。此前入学的学生适用 2022 版，本工具仅登记该版本、尚未转录。另有官方英文版。该项目属巴伐利亚精英网络（Elitenetzwerk Bayern）。",
+        "en": "Section 32: in force from 1 April 2026 and applies to students starting from winter semester 2026/27. Examinations held from winter semester 2026/27 onwards also follow these regulations, including for students still studying under the 2022 regulations. Students who enrolled earlier fall under the 2022 version, which this tool registers but has not transcribed. An official English version also exists. The programme belongs to the Elite Network of Bavaria."
       },
       "sourceIds": [
         "fau-fpo-iimmune-2026",
         "fau-fpo-iimmune-2026-en"
       ],
       "verificationStatus": "verified"
+    },
+    {
+      "id": "po-iimmune-2022",
+      "programmeId": "nat-biologie-integrated-immunology-msc",
+      "code": "FPO iImmune 2022",
+      "title": {
+        "zh-CN": "整合免疫学硕士考试条例（2022 版，未转录）",
+        "en": "M.Sc. Integrated Immunology Examination Regulations (2022, not transcribed)"
+      },
+      "entrySemesterFrom": null,
+      "entrySemesterUntil": "2026-summer",
+      "applicabilityNotes": {
+        "zh-CN": "适用于 2026 夏季学期及之前入学的学生。本工具只登记了该版本，未取得并转录其模块表，因此选中后不会显示模块清单；这不代表你的选择无效。官方模块手册标注 “Version of examination regulation 2022”，可对照参考。",
+        "en": "Applies to students enrolled up to summer semester 2026. The version is registered only; its module table has not been obtained or transcribed, so no module list is shown. This does not mean your selection is invalid. The official module handbook states 'Version of examination regulation 2022'."
+      },
+      "sourceIds": [
+        "fau-iimmune-programme-site"
+      ],
+      "verificationStatus": "needs_review"
     }
   ],
   "modules": [
@@ -534,8 +554,8 @@
         "nat-biologie-integrated-immunology-msc"
       ],
       "name": {
-        "zh-CN": "项目工作研讨课",
-        "en": "Seminar to Project Work"
+        "zh-CN": "项目工作理论模块",
+        "en": "Theoretical Project Work"
       }
     },
     {
@@ -1009,6 +1029,214 @@
       "verificationStatus": "verified"
     },
     {
+      "id": "zmb-grundlagen-1-v2019",
+      "moduleId": "zmb-grundlagen-1",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-grundlagen-2-v2019",
+      "moduleId": "zmb-grundlagen-2",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-orientierung-1-v2019",
+      "moduleId": "zmb-orientierung-1",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-orientierung-2-v2019",
+      "moduleId": "zmb-orientierung-2",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-orientierung-3-v2019",
+      "moduleId": "zmb-orientierung-3",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-orientierung-4-v2019",
+      "moduleId": "zmb-orientierung-4",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 7.5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-forschungsmodul-v2019",
+      "moduleId": "zmb-forschungsmodul",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 20,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-wahl-extern-v2019",
+      "moduleId": "zmb-wahl-extern",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 15,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-wahl-intern-v2019",
+      "moduleId": "zmb-wahl-intern",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 15,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-wahl-unicert-v2019",
+      "moduleId": "zmb-wahl-unicert",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 15,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-schluesselqualifikation-v2019",
+      "moduleId": "zmb-schluesselqualifikation",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-scientific-presentations-v2019",
+      "moduleId": "zmb-scientific-presentations",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 5,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "zmb-masterarbeit-v2019",
+      "moduleId": "zmb-masterarbeit",
+      "versionLabel": "FPO BAMA Bio 2019, Anlage 2, S. 11",
+      "validFromSemester": null,
+      "validUntilSemester": null,
+      "applicablePoVersionIds": [
+        "po-zmb-2019"
+      ],
+      "ects": 30,
+      "offeringTerms": null,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
       "id": "ils-m1-statistics-v1",
       "moduleId": "ils-m1-statistics",
       "versionLabel": "Modulhandbuch SoSe 2026, S. 3",
@@ -1271,13 +1499,13 @@
     {
       "id": "iimmun-m7-v1",
       "moduleId": "iimmun-m7",
-      "versionLabel": "po-iimmune-2026",
+      "versionLabel": "FPO iImmune 2026, Appendix 2, p. 26",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-iimmune-2026"
       ],
-      "ects": 25,
+      "ects": 15,
       "offeringTerms": null,
       "sourceIds": [
         "fau-fpo-iimmune-2026"
@@ -1287,13 +1515,13 @@
     {
       "id": "iimmun-m8-v1",
       "moduleId": "iimmun-m8",
-      "versionLabel": "po-iimmune-2026",
+      "versionLabel": "FPO iImmune 2026, Appendix 2, p. 27",
       "validFromSemester": null,
       "validUntilSemester": null,
       "applicablePoVersionIds": [
         "po-iimmune-2026"
       ],
-      "ects": null,
+      "ects": 10,
       "offeringTerms": null,
       "sourceIds": [
         "fau-fpo-iimmune-2026"
@@ -1892,6 +2120,138 @@
       "exclusiveCounting": false,
       "sourceIds": [
         "fau-fpo-bama-bio-2026"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-zmb-2019-gesamt",
+      "examinationRegulationVersionId": "po-zmb-2019",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": null,
+      "name": {
+        "zh-CN": "硕士总学分",
+        "en": "Total master credits"
+      },
+      "kind": "mandatory",
+      "ruleText": {
+        "zh-CN": "硕士共需 120 ECTS，四个学期，每学期 30 ECTS。硕士论文占 30 ECTS（书面论文 27 + 答辩 3）。",
+        "en": "The master requires 120 ECTS across four semesters, 30 per semester. The master thesis accounts for 30 ECTS (27 written + 3 defence)."
+      },
+      "minEcts": 120,
+      "maxEcts": 120,
+      "eligibleModuleVersionIds": [],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-zmb-2019-pflicht",
+      "examinationRegulationVersionId": "po-zmb-2019",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-zmb-2019-gesamt",
+      "name": {
+        "zh-CN": "必修：基础课与定位模块",
+        "en": "Mandatory: foundation lectures and orientation modules"
+      },
+      "kind": "mandatory",
+      "ruleText": {
+        "zh-CN": "两门基础课各 7.5 ECTS（90 分钟笔试），四个定位模块各 7.5 ECTS，合计 45 ECTS。",
+        "en": "Two foundation lectures at 7.5 ECTS each (90-minute written exam) and four orientation modules at 7.5 ECTS each, 45 ECTS in total."
+      },
+      "minEcts": 45,
+      "maxEcts": 45,
+      "eligibleModuleVersionIds": [
+        "zmb-grundlagen-1-v2019",
+        "zmb-grundlagen-2-v2019",
+        "zmb-orientierung-1-v2019",
+        "zmb-orientierung-2-v2019",
+        "zmb-orientierung-3-v2019",
+        "zmb-orientierung-4-v2019"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-zmb-2019-forschung",
+      "examinationRegulationVersionId": "po-zmb-2019",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-zmb-2019-gesamt",
+      "name": {
+        "zh-CN": "研究模块",
+        "en": "Research module"
+      },
+      "kind": "mandatory",
+      "ruleText": {
+        "zh-CN": "研究模块 20 ECTS，考核形式为 45 分钟口试。",
+        "en": "Research module worth 20 ECTS, assessed by a 45-minute oral examination."
+      },
+      "minEcts": 20,
+      "maxEcts": 20,
+      "eligibleModuleVersionIds": [
+        "zmb-forschungsmodul-v2019"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-zmb-2019-wahl",
+      "examinationRegulationVersionId": "po-zmb-2019",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-zmb-2019-gesamt",
+      "name": {
+        "zh-CN": "选修：三选一实习或语言模块",
+        "en": "Elective: one of three internship or language modules"
+      },
+      "kind": "restricted_elective",
+      "ruleText": {
+        "zh-CN": "校外实习、校内实习、UNIcert III 英语三者中必选其一，15 ECTS。校外实习须在开始前经生物系教授批准，实习结束后由同一位教授评定成绩。",
+        "en": "Exactly one of external internship, internal internship, or UNIcert III English must be taken, 15 ECTS. An external internship needs approval from a Biology Department professor beforehand, and the same professor assesses it afterwards."
+      },
+      "minEcts": 15,
+      "maxEcts": 15,
+      "eligibleModuleVersionIds": [
+        "zmb-wahl-extern-v2019",
+        "zmb-wahl-intern-v2019",
+        "zmb-wahl-unicert-v2019"
+      ],
+      "exclusiveCounting": true,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
+      ],
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "rg-zmb-2019-abschluss",
+      "examinationRegulationVersionId": "po-zmb-2019",
+      "programmeTrackIds": [],
+      "parentRequirementGroupId": "rg-zmb-2019-gesamt",
+      "name": {
+        "zh-CN": "关键能力、学术演讲与硕士论文",
+        "en": "Key qualifications, scientific presentations and master thesis"
+      },
+      "kind": "mandatory",
+      "ruleText": {
+        "zh-CN": "关键能力 5 ECTS，学术演讲 5 ECTS，硕士论文 30 ECTS，合计 40 ECTS。关键能力可从 FAU 全部关键能力模块中选。",
+        "en": "Key qualifications 5 ECTS, scientific presentations 5 ECTS, master thesis 30 ECTS, 40 ECTS in total. Key qualifications may be chosen from the full FAU catalogue."
+      },
+      "minEcts": 40,
+      "maxEcts": 40,
+      "eligibleModuleVersionIds": [
+        "zmb-schluesselqualifikation-v2019",
+        "zmb-scientific-presentations-v2019",
+        "zmb-masterarbeit-v2019"
+      ],
+      "exclusiveCounting": false,
+      "sourceIds": [
+        "fau-fpo-bama-bio-2019"
       ],
       "verificationStatus": "verified"
     },
