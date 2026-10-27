@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataReleaseId": "2026-10-24.2",
+  "dataReleaseId": "2026-10-27.1",
   "createdAt": "2026-10-22",
   "faculties": [
     {
@@ -118,6 +118,23 @@
         "fau-fpo-iimmune-2026",
         "fau-fpo-iimmune-2026-en",
         "fau-abmpo-natfak"
+      ]
+    },
+    {
+      "id": "wiso-fact-msc",
+      "facultyId": "wiso",
+      "degreeType": "master",
+      "name": {
+        "zh-CN": "Finance, Auditing, Controlling, Taxation（FACT，金融、审计、管理控制与税务硕士）",
+        "en": "Finance, Auditing, Controlling, Taxation (FACT, M.Sc.)"
+      },
+      "programmeTrackIds": [],
+      "examinationRegulationVersionIds": [
+        "po-fact-2023-idf-2024"
+      ],
+      "dataStatus": "partial",
+      "websiteSourceIds": [
+        "fau-fact-programme-page"
       ]
     }
   ],
@@ -253,6 +270,25 @@
       },
       "sourceIds": [
         "fau-iimmune-programme-site"
+      ],
+      "verificationStatus": "needs_review"
+    },
+    {
+      "id": "po-fact-2023-idf-2024",
+      "programmeId": "wiso-fact-msc",
+      "code": "FPOFACT 2023, idF 2024-02-29",
+      "title": {
+        "zh-CN": "FACT 硕士考试条例（2023-06-15，2024-02-29 修订）",
+        "en": "FACT M.Sc. examination regulations (15 June 2023, amended 29 February 2024)"
+      },
+      "entrySemesterFrom": "2023-winter",
+      "entrySemesterUntil": null,
+      "applicabilityNotes": {
+        "zh-CN": "依 § 7(1)，2023 年条例自 2023-10-01 生效，首次适用于 2023/24 冬季学期起入学者。依 § 7(3)，2024 年修订自 2024-04-01 生效；其中 §§ 3、4 的修改适用于 2024/25 冬季学期起入学者，其余修改也适用于当时已按 2023 年条例就读者。旧版学生转入现行条例的情形见 § 7(2)，须人工确认。本次仅登记专业与 PO，尚未逐条录入模块和毕业要求。",
+        "en": "Under § 7(1), the 2023 regulation took effect on 1 October 2023 and first applies to entrants from winter 2023/24. Under § 7(3), the amendment took effect on 1 April 2024: changes to §§ 3 and 4 apply to entrants from winter 2024/25; other changes also apply to students already studying under the 2023 regulation. Transfers from the older regulation under § 7(2) require manual confirmation. Programme/PO skeleton only; modules and degree requirements are not transcribed."
+      },
+      "sourceIds": [
+        "fau-fpo-fact-2023-idf-2024"
       ],
       "verificationStatus": "needs_review"
     }
@@ -3110,6 +3146,70 @@
       "notes": {
         "zh-CN": "ILS 硕士模块手册（SoSe 2026，2026-03-02 更新）。已逐模块核对 33 个模块的编号、名称、ECTS、开课学期与考试形式。SHA-256: 4a04ccdfc47cee2b4b3be1ffe7714b2c19422918e49212616712c542d24ac4a7",
         "en": "ILS M.Sc. module handbook (SoSe 2026, updated 2 March 2026). All 33 modules checked one by one for code, title, ECTS, offered terms and examination method. SHA-256: 4a04ccdfc47cee2b4b3be1ffe7714b2c19422918e49212616712c542d24ac4a7"
+      }
+    },
+    {
+      "id": "fau-fact-programme-page",
+      "title": {
+        "zh-CN": "FAU FACT 硕士官方专业页",
+        "en": "Official FAU FACT master programme page"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg, FACT-Institut",
+      "url": "https://www.fact.rw.fau.de/master-fact/",
+      "documentType": "official_index",
+      "scope": {
+        "level": "programme",
+        "facultyIds": [
+          "wiso"
+        ],
+        "programmeIds": [
+          "wiso-fact-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [],
+        "moduleVersionIds": []
+      },
+      "documentVersion": null,
+      "sectionOrPage": "Master FACT; Bewerbungs- und Zulassungsprozess",
+      "lastCheckedAt": "2026-10-27",
+      "lastVerifiedAt": null,
+      "verificationStatus": "needs_review",
+      "notes": {
+        "zh-CN": "用于核对专业名称、M.Sc. 学位与官方条例入口；尚待维护者复核。",
+        "en": "Programme identity, M.Sc. degree and official regulation navigation; awaiting maintainer review."
+      }
+    },
+    {
+      "id": "fau-fpo-fact-2023-idf-2024",
+      "title": {
+        "zh-CN": "FACT 硕士专业考试条例（2023-06-15，2024-02-29 修订）",
+        "en": "FACT M.Sc. subject examination regulations (15 June 2023, amended 29 February 2024)"
+      },
+      "publisher": "Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "url": "https://www.fau.de/wp-json/rrze-faubox/v1/download?file=%2Fwebdav%2FL1%2FPO%2FRW%2FWiWi%2FMaster%2FFinance%2C_Auditing%2C_Controlling%2C_Taxation%2Fkonsolidierte_Fassungen%2FMSc_Finance_Auditing_Controlling_Taxation_FPOFACT_20230615_idF_20240229.pdf&sig=f269ffeca53e3fb803f87bc010cce7d90a8983f5aa03ff59b2e427e24527370d",
+      "documentType": "examination_regulation",
+      "scope": {
+        "level": "po",
+        "facultyIds": [
+          "wiso"
+        ],
+        "programmeIds": [
+          "wiso-fact-msc"
+        ],
+        "programmeTrackIds": [],
+        "examinationRegulationVersionIds": [
+          "po-fact-2023-idf-2024"
+        ],
+        "moduleVersionIds": []
+      },
+      "documentVersion": "2023-06-15, idF 2024-02-29",
+      "sectionOrPage": "p. 1, title and § 1; pp. 5–6, § 7(1)–(3)",
+      "lastCheckedAt": "2026-10-27",
+      "lastVerifiedAt": null,
+      "verificationStatus": "needs_review",
+      "notes": {
+        "zh-CN": "专业与适用范围待复核；未录入模块、要求组或旧版 PO。官方目录：https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/rw/wiso/masterstudiengaenge/；本地核对文件 SHA-256：66e26077a4531bdf51faf8faa253a0d3861169b4f90b6ff512de27ae27b2902e",
+        "en": "Identity and applicability await review; no modules, requirement groups or older PO transcribed. Official index: https://www.fau.de/universitaet/universitaetsorganisation/rechtliche-grundlagen/pruefungsordnungen/rw/wiso/masterstudiengaenge/; checked local file SHA-256: 66e26077a4531bdf51faf8faa253a0d3861169b4f90b6ff512de27ae27b2902e"
       }
     }
   ]
